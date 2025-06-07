@@ -55,5 +55,5 @@ jobs:
           GRADLE_OPTS: -Dorg.gradle.daemon=false
 
       - name: Run code quality checks
-        run: ./gradlew detekt ktlintCheck --no-daemon --parallel
+        run: ./gradlew detekt ktlintCheck --build-cache --parallel
         continue-on-error: true
