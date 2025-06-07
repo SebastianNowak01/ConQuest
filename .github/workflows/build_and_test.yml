@@ -1,11 +1,11 @@
 name: Build and Test
 
 on:
-push:
-  branches: [ "**" ]  # Runs on push to any branch
-pull_request:
-  branches: [ "main" ]  # Runs on PRs to main
-merge_group:  # Runs on merge queue (if using merge queues)
+  push:
+    branches: [ "**" ]  # Runs on push to any branch
+  pull_request:
+    branches: [ "main" ]  # Runs on PRs to main
+  merge_group:  # Runs on merge queue (if using merge queues)
 
 jobs:
 test:
