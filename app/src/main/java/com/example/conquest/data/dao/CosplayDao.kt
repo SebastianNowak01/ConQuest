@@ -1,0 +1,19 @@
+package com.example.conquest.data.dao
+
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import com.example.conquest.data.entity.Cosplay
+
+@Dao
+interface CosplayDao {
+    @Insert
+    fun insertCosplay(cosplay: Cosplay): Long
+
+    @Delete
+    fun delete(cosplay: Cosplay)
+
+    @Query("SELECT * FROM cosplays")
+    fun getAllCosplays(): List<Cosplay>
+}
