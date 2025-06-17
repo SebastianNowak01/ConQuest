@@ -23,11 +23,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Using lifecycleScope instead of Thread
         lifecycleScope.launch {
-            // Switch to IO dispatcher for database operations
             withContext(Dispatchers.IO) {
-                val db = ViewModel(application).database
+                val db = CosplayViewModel(application).database
                 val allCosplays = db.cosplayDao().getAllCosplays()
                 Log.d("DATABASE", "Contents: $allCosplays")
             }
