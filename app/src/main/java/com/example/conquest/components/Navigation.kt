@@ -32,7 +32,9 @@ import com.example.conquest.ui.theme.ConQuestTheme
 fun Navigation() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = Paths.MainView.route) {
-        composable(route = Paths.MainView.route) {
+        composable(
+            route = Paths.MainView.route
+        ) {
             MainScreen(navController = navController)
         }
     }
