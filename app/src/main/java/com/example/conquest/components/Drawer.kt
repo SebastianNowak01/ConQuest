@@ -1,5 +1,6 @@
 package com.example.conquest.components
 
+import MainNavigation
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -37,13 +38,12 @@ import kotlinx.coroutines.launch
  * routes is a list of all the routes in the navigation drawer.
  */
 val routes = listOf(
-    Paths.MainView.route,
-    Paths.CosplayView.route,
+    MainScreen,
+    DetailScreen(name = null, age = 0)
 )
 
 /**
  * NavigationDrawerMobile composable is used to display the navigation drawer on a mobile device.
- * Uses MainNavigationMobile composable to display the main navigation.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -61,7 +61,6 @@ fun Drawer() {
                 ModalDrawerSheet(
                     drawerContainerColor = MaterialTheme.colorScheme.background,
                 ) {
-
                     Spacer(modifier = Modifier.height(16.dp))
                     navigationItems.forEachIndexed { index, item ->
                         NavigationDrawerItem(
@@ -119,7 +118,7 @@ fun Drawer() {
                 }
             )
             {
-                Navigation()
+                MainNavigation(navController)
             }
         }
     }

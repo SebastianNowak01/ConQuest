@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     id("com.google.devtools.ksp")
 }
 
@@ -53,6 +54,8 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
     ksp(libs.androidx.room.compiler.v250)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

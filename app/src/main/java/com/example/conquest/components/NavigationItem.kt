@@ -14,23 +14,13 @@ data class NavigationItem(
 
 val navigationItems = listOf(
     NavigationItem(
-        title = "Trasy",
+        title = "MainScreen",
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home,
     ),
     NavigationItem(
-        title = "Czasomierz",
+        title = "DetailScreen",
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home,
     ),
-    NavigationItem(
-        title = "Ulubione",
-        selectedIcon = Icons.Filled.Home,
-        unselectedIcon = Icons.Outlined.Home,
-    ),
-    NavigationItem(
-        title = "Kamera",
-        selectedIcon = Icons.Filled.Home,
-        unselectedIcon = Icons.Outlined.Home,
-    )
 )
