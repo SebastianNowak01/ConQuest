@@ -14,12 +14,12 @@ data class NavigationItem(
 
 val navigationItems = listOf(
     NavigationItem(
-        title = "MainScreen",
+        title = "Main Screen",
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home,
     ),
     NavigationItem(
-        title = "DetailScreen",
+        title = "Detail Screen",
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home,
     ),

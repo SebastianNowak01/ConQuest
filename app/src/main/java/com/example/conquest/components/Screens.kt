@@ -10,3 +10,6 @@ data class DetailScreen(
     val name: String?,
     val age: Int
 )
+
+@Serializable
+object NewCosplayScreen

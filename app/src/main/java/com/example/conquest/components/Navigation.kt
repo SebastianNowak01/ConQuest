@@ -21,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.example.conquest.components.DetailScreen
 import com.example.conquest.components.MainScreen
+import com.example.conquest.components.NewCosplayScreen
 
 @Composable
 fun MainNavigation(navController: NavHostController) {
@@ -65,6 +66,16 @@ fun MainNavigation(navController: NavHostController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             )  {
                 Text(text = "${args.name}, ${args.age}")
+            }
+        }
+
+        composable<NewCosplayScreen> {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            )  {
+                Text(text = "Lorem Ipsum!")
             }
         }
     }

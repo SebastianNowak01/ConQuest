@@ -1,12 +1,17 @@
 package com.example.conquest.components
 
 import MainNavigation
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Settings
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
@@ -20,6 +25,8 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
@@ -29,7 +36,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
@@ -103,7 +112,38 @@ fun Drawer() {
                             navigationIconContentColor = MaterialTheme.colorScheme.primary
                         ),
                         title = {
-                            Text("Trackz")
+                            // Place the action button in the title area, which positions it right after the navigation icon
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically                            ) {
+                                IconButton(onClick = {
+                                    navController.navigate(NewCosplayScreen)
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Menu, // Change icon as needed
+                                        contentDescription = "Action Button"
+                                    )
+                                }
+                                TextField(
+                                    value = "",
+                                    onValueChange = { /* Handle search input */ },
+                                    placeholder = { Text("Search") },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(start = 16.dp, top = 4.dp, bottom = 4.dp, end = 16.dp),
+                                    shape = RoundedCornerShape(24.dp), // Add rounded corners
+                                    singleLine = true,
+                                    colors = TextFieldDefaults.colors(
+                                        focusedContainerColor = MaterialTheme.colorScheme.tertiary,
+                                        unfocusedContainerColor = MaterialTheme.colorScheme.tertiary,
+                                        disabledContainerColor = MaterialTheme.colorScheme.tertiary,
+                                        focusedIndicatorColor = Color.Transparent,
+                                        unfocusedIndicatorColor = Color.Transparent,
+                                        disabledIndicatorColor = Color.Transparent,
+                                        errorIndicatorColor = Color.Transparent
+                                    )
+                                )
+                            }
                         },
                         navigationIcon = {
                             IconButton(onClick = {
@@ -114,6 +154,27 @@ fun Drawer() {
                                 Icon(imageVector = Icons.Default.Menu, contentDescription = "Menu")
                             }
                         },
+                        actions = {
+                            // Three action buttons
+                            IconButton(onClick = { /* First button action */ }) {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = "Search"
+                                )
+                            }
+                            IconButton(onClick = { /* Second button action */ }) {
+                                Icon(
+                                    imageVector = Icons.Default.Favorite,
+                                    contentDescription = "Favorite"
+                                )
+                            }
+                            IconButton(onClick = { /* Third button action */ }) {
+                                Icon(
+                                    imageVector = Icons.Default.Settings,
+                                    contentDescription = "Settings"
+                                )
+                            }
+                        }
                     )
                 }
             )
