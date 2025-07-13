@@ -7,8 +7,8 @@ import com.example.conquest.data.dao.CosplayDao
 import com.example.conquest.data.entity.Cosplay
 import com.example.conquest.data.entity.DateConverter
 
-@Database(entities = [Cosplay::class], version = 1)
+@Database(entities = [Cosplay::class], version = 3)
 @TypeConverters(DateConverter::class)
-abstract class CosplayDatabase: RoomDatabase() {
+abstract class CosplayDatabase : RoomDatabase() {
     abstract fun cosplayDao(): CosplayDao
 }
