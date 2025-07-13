@@ -35,8 +35,8 @@ fun NewCosplayScreen(
 ) {
     var characterName by remember { mutableStateOf("") }
     var series by remember { mutableStateOf("") }
-    var initialDate by remember { mutableStateOf(getCurrentDate()) }
-    var dueDate by remember { mutableStateOf("") }
+    var initialDate by remember { mutableStateOf<Date?>(getCurrentDate()) }
+    var dueDate by remember { mutableStateOf<Date?>(getCurrentDate()) }
     var budget by remember { mutableStateOf("") }
     var isInProgress by remember { mutableStateOf(true) }
 
@@ -81,9 +81,17 @@ fun NewCosplayScreen(
             singleLine = true
         )
 
-        DatePickerFieldToModal("Initial date*")
+        DatePickerFieldToModal(
+            label = "Initial date*",
+            selectedDate = initialDate,
+            onDateSelected = { initialDate = it }
+        )
 
-        DatePickerFieldToModal("Due date")
+        DatePickerFieldToModal(
+            label = "Due date",
+            selectedDate = dueDate,
+            onDateSelected = { dueDate = it }
+        )
 
         OutlinedTextField(
             value = budget,
@@ -110,12 +118,12 @@ fun NewCosplayScreen(
 
             Button(
                 onClick = {
-                    if (characterName.isNotBlank() && series.isNotBlank() && initialDate.isNotBlank()) {
+                    if (characterName.isNotBlank() && series.isNotBlank() && initialDate != null) {
                         val cosplayProject = CosplayProject(
                             characterName = characterName,
                             series = series,
-                            initialDate = initialDate,
-                            dueDate = dueDate.takeIf { it.isNotBlank() },
+                            initialDate = initialDate!!,
+                            dueDate = dueDate,
                             budget = budget.takeIf { it.isNotBlank() }?.toDoubleOrNull(),
                             isInProgress = isInProgress
                         )
@@ -123,7 +131,7 @@ fun NewCosplayScreen(
                     }
                 },
                 modifier = Modifier.weight(1f),
-                enabled = characterName.isNotBlank() && series.isNotBlank() && initialDate.isNotBlank()
+                enabled = characterName.isNotBlank() && series.isNotBlank() && initialDate != null
             ) {
                 Text("Save")
             }
@@ -134,21 +142,20 @@ fun NewCosplayScreen(
 data class CosplayProject(
     val characterName: String,
     val series: String,
-    val initialDate: String,
-    val dueDate: String? = null,
+    val initialDate: Date,
+    val dueDate: Date? = null,
     val budget: Double? = null,
     val isInProgress: Boolean = true
 )
 
-private fun getCurrentDate(): String {
-    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-    return dateFormat.format(Date())
+private fun getCurrentDate(): Date {
+    return Calendar.getInstance().time
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerModal(
-    onDateSelected: (String?) -> Unit,
+    onDateSelected: (Date?) -> Unit,
     onDismiss: () -> Unit
 ) {
     val datePickerState = rememberDatePickerState()
@@ -157,7 +164,8 @@ fun DatePickerModal(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = {
-                onDateSelected(convertMillisToDate(datePickerState.selectedDateMillis))
+                val selectedMillis = datePickerState.selectedDateMillis
+                onDateSelected(selectedMillis?.let { Date(it) })
                 onDismiss()
             }) {
                 Text("OK")
@@ -174,12 +182,15 @@ fun DatePickerModal(
 }
 
 @Composable
-fun DatePickerFieldToModal(label: String) {
-    var selectedDate by remember { mutableStateOf<String?>(getCurrentDate()) }
+fun DatePickerFieldToModal(
+    label: String,
+    selectedDate: Date?,
+    onDateSelected: (Date?) -> Unit
+) {
     var showModal by remember { mutableStateOf(false) }
 
     OutlinedTextField(
-        value = selectedDate ?: "",
+        value = selectedDate?.let { convertDateToString(it) } ?: "",
         onValueChange = { },
         label = { Text(label) },
         placeholder = { Text("DD/MM/YYYY") },
@@ -188,7 +199,7 @@ fun DatePickerFieldToModal(label: String) {
         },
         modifier = Modifier
             .fillMaxWidth()
-            .pointerInput(selectedDate) {
+            .pointerInput(Unit) {
                 awaitEachGesture {
                     awaitFirstDown(pass = PointerEventPass.Initial)
                     val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
@@ -201,13 +212,16 @@ fun DatePickerFieldToModal(label: String) {
 
     if (showModal) {
         DatePickerModal(
-            onDateSelected = { selectedDate = it.toString() },
+            onDateSelected = {
+                onDateSelected(it)
+                showModal = false
+            },
             onDismiss = { showModal = false }
         )
     }
 }
 
-fun convertMillisToDate(millis: Long?): String {
+fun convertDateToString(date: Date): String {
     val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-    return formatter.format(Date(millis?.toLong() ?: 0))
+    return formatter.format(date)
 }

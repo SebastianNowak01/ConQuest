@@ -2,10 +2,10 @@ package com.example.conquest.components
 
 import MainNavigation
 import androidx.compose.material.icons.filled.Search
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -55,7 +55,6 @@ val routes = listOf(
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun Drawer() {
     Column(
@@ -128,8 +127,14 @@ fun Drawer() {
                     Spacer(modifier = Modifier.fillMaxWidth().height(1.dp))
                 }
             )
-            {
-                MainNavigation(navController)
+            { padding ->
+                Column (
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding) // Apply padding from the drawer
+                ) {
+                    MainNavigation(navController)
+                }
             }
         }
     }
