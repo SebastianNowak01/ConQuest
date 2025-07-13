@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import kotlinx.serialization.Serializable
 import androidx.compose.foundation.layout.*
@@ -17,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import java.text.SimpleDateFormat
@@ -25,7 +25,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.PointerEventPass
 
 @Serializable
-object NewCosplayScreen
+object NewCosplayScreen {
+    const val route = "com.example.conquest.screens.NewCosplayScreen"
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,73 +42,80 @@ fun NewCosplayScreen(
     var budget by remember { mutableStateOf("") }
     var isInProgress by remember { mutableStateOf(true) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+    Box(
+        modifier = Modifier.fillMaxSize(),
     ) {
-        Text(
-            text = "New Cosplay Project",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .fillMaxWidth(0.9f)
+                .padding(top = 70.dp, start = 16.dp, end = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = if (isInProgress) "In Progress" else "Planned",
-                modifier = Modifier.weight(1f)
+                text = "New Cosplay Project",
+                style = MaterialTheme.typography.headlineMedium
             )
-            Switch(
-                checked = isInProgress,
-                onCheckedChange = { isInProgress = it }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (isInProgress) "In Progress" else "Planned",
+                    modifier = Modifier.weight(1f)
+                )
+                Switch(
+                    checked = isInProgress,
+                    onCheckedChange = { isInProgress = it }
+                )
+            }
+
+            OutlinedTextField(
+                value = characterName,
+                onValueChange = { characterName = it },
+                label = { Text("Character Name*") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
+
+            OutlinedTextField(
+                value = series,
+                onValueChange = { series = it },
+                label = { Text("Series*") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+
+            DatePickerFieldToModal(
+                label = "Initial date*",
+                selectedDate = initialDate,
+                onDateSelected = { initialDate = it }
+            )
+
+            DatePickerFieldToModal(
+                label = "Due date",
+                selectedDate = dueDate,
+                onDateSelected = { dueDate = it }
+            )
+
+            OutlinedTextField(
+                value = budget,
+                onValueChange = { budget = it.filter { it.isDigit() || it == '.' } },
+                label = { Text("Budget (Optional)") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                leadingIcon = { Text("$") }
+            )
+
         }
-
-        OutlinedTextField(
-            value = characterName,
-            onValueChange = { characterName = it },
-            label = { Text("Character Name*") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-
-        OutlinedTextField(
-            value = series,
-            onValueChange = { series = it },
-            label = { Text("Series*") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-
-        DatePickerFieldToModal(
-            label = "Initial date*",
-            selectedDate = initialDate,
-            onDateSelected = { initialDate = it }
-        )
-
-        DatePickerFieldToModal(
-            label = "Due date",
-            selectedDate = dueDate,
-            onDateSelected = { dueDate = it }
-        )
-
-        OutlinedTextField(
-            value = budget,
-            onValueChange = { budget = it.filter { it.isDigit() || it == '.' } },
-            label = { Text("Budget (Optional)") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            leadingIcon = { Text("$") }
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 70.dp, start = 16.dp, end = 16.dp)
+                .fillMaxWidth(0.9f),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             OutlinedButton(

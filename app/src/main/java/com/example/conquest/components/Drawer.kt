@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -42,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.conquest.screens.MainScreen
 import com.example.conquest.screens.NewCosplayScreen
@@ -54,6 +56,8 @@ val routes = listOf(
     SettingsScreenParams(name = null, age = 0)
 )
 
+val noScaffoldRoutes = listOf(NewCosplayScreen.route)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Drawer() {
@@ -64,6 +68,9 @@ fun Drawer() {
         val drawerState = rememberDrawerState(DrawerValue.Closed)
         val scope = rememberCoroutineScope()
         var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route
+
         ModalNavigationDrawer(
             drawerContent = {
                 ModalDrawerSheet(
@@ -95,51 +102,62 @@ fun Drawer() {
             },
             drawerState = drawerState
         ) {
-            Scaffold(
-                containerColor = MaterialTheme.colorScheme.background,
-                contentColor = MaterialTheme.colorScheme.primary,
-                topBar = {
-                    TopAppBar(
-                        colors = topAppBarColorsObject(),
-                        title = {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically) {
-                                MyIcon({navController.navigate(NewCosplayScreen) }, Icons.Default.Add, "Add new cosplay")
-                                SearchBar()
-                            }
-                        },
-                        navigationIcon = {
-                            IconButton(onClick = {
-                                scope.launch {
-                                    drawerState.open()
+            if (currentRoute !in noScaffoldRoutes) {
+                Scaffold(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    topBar = {
+                        TopAppBar(
+                            colors = topAppBarColorsObject(),
+                            title = {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    MyIcon(
+                                        { navController.navigate(NewCosplayScreen) },
+                                        Icons.Default.Add,
+                                        "Add new cosplay"
+                                    )
+                                    SearchBar()
                                 }
-                            }) {
-                                Icon(imageVector = Icons.Default.Menu, contentDescription = "Menu")
+                            },
+                            navigationIcon = {
+                                IconButton(onClick = {
+                                    scope.launch {
+                                        drawerState.open()
+                                    }
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Menu,
+                                        contentDescription = "Menu"
+                                    )
+                                }
+                            },
+                            actions = {
+                                MyIcon({}, Icons.Default.Search, "Filter")
+                                MyIcon({}, Icons.Default.AccountCircle, "Sort by")
+                                MyIcon({}, Icons.Default.KeyboardArrowDown, "Order by")
                             }
-                        },
-                        actions = {
-                            MyIcon({}, Icons.Default.Search, "Filter")
-                            MyIcon({}, Icons.Default.AccountCircle, "Sort by")
-                            MyIcon({}, Icons.Default.KeyboardArrowDown, "Order by")
-                        }
-                    )
-                    Spacer(modifier = Modifier.fillMaxWidth().height(1.dp))
+                        )
+                    }
+                )
+                { padding ->
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(padding) // Apply padding from the drawer
+                    ) {
+                        HorizontalDivider(thickness = 1.dp)
+                        MainNavigation(navController)
+                    }
                 }
-            )
-            { padding ->
-                Column (
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding) // Apply padding from the drawer
-                ) {
-                    MainNavigation(navController)
-                }
+            } else {
+                MainNavigation(navController)
             }
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
