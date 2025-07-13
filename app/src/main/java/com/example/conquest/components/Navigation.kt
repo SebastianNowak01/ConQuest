@@ -11,8 +11,7 @@ import com.example.conquest.screens.SettingsScreenParams
 fun MainNavigation(navController: NavHostController) {
     val navController = navController
     NavHost(
-        navController = navController,
-        startDestination = MainScreen
+        navController = navController, startDestination = MainScreen
     ) {
         composable<MainScreen> {
             MainScreen(navController)

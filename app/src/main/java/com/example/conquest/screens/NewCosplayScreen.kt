@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import kotlinx.serialization.Serializable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,6 +22,9 @@ import java.util.*
 import com.example.conquest.components.DatePickerFieldToModal
 import com.example.conquest.components.getCurrentDate
 import com.example.conquest.data.entity.Cosplay
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import kotlinx.coroutines.launch
 
 @Serializable
 object NewCosplayScreen
@@ -31,6 +35,8 @@ fun NewCosplayScreen(
     navController: NavController,
 ) {
     val cosplayViewModel: CosplayViewModel = viewModel()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
     var characterName by remember { mutableStateOf("") }
     var series by remember { mutableStateOf("") }
     var initialDate by remember { mutableStateOf<Date?>(getCurrentDate()) }
@@ -50,13 +56,11 @@ fun NewCosplayScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "New Cosplay Project",
-                style = MaterialTheme.typography.headlineMedium
+                text = "New Cosplay Project", style = MaterialTheme.typography.headlineMedium
             )
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = if (inProgress) "In Progress" else "Planned",
@@ -64,7 +68,13 @@ fun NewCosplayScreen(
                 )
                 Switch(
                     checked = inProgress,
-                    onCheckedChange = { inProgress = it }
+                    onCheckedChange = { inProgress = it },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.primary,
+                        checkedTrackColor = MaterialTheme.colorScheme.secondary,
+                        uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        uncheckedTrackColor = MaterialTheme.colorScheme.secondary
+                    )
                 )
             }
 
@@ -73,7 +83,8 @@ fun NewCosplayScreen(
                 onValueChange = { characterName = it },
                 label = { Text("Character Name*") },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                shape = RoundedCornerShape(32.dp)
             )
 
             OutlinedTextField(
@@ -81,20 +92,18 @@ fun NewCosplayScreen(
                 onValueChange = { series = it },
                 label = { Text("Series*") },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                shape = RoundedCornerShape(32.dp)
+
             )
 
             DatePickerFieldToModal(
                 label = "Initial date*",
                 selectedDate = initialDate,
-                onDateSelected = { initialDate = it }
-            )
+                onDateSelected = { initialDate = it })
 
             DatePickerFieldToModal(
-                label = "Due date",
-                selectedDate = dueDate,
-                onDateSelected = { dueDate = it }
-            )
+                label = "Due date", selectedDate = dueDate, onDateSelected = { dueDate = it })
 
             OutlinedTextField(
                 value = budget,
@@ -103,7 +112,8 @@ fun NewCosplayScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                leadingIcon = { Text("$") }
+                leadingIcon = { Text("$") },
+                shape = RoundedCornerShape(32.dp)
             )
 
         }
@@ -115,8 +125,7 @@ fun NewCosplayScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             OutlinedButton(
-                onClick = {navController.popBackStack()},
-                modifier = Modifier.weight(1f)
+                onClick = { navController.popBackStack() }, modifier = Modifier.weight(1f)
             ) {
                 Text("Cancel")
             }
@@ -132,16 +141,37 @@ fun NewCosplayScreen(
                             budget = budget.takeIf { it.isNotBlank() }?.toDoubleOrNull(),
                             inProgress = inProgress,
                             uid = 0,
+                            finished = false
                         )
                         cosplayViewModel.insertCosplay(newCosplay)
                         navController.popBackStack()
+                    } else {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = "Please fill all required fields!"
+                            )
+                        }
                     }
-                },
-                modifier = Modifier.weight(1f),
-                enabled = characterName.isNotBlank() && series.isNotBlank() && initialDate != null
+                }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.primary
+                )
             ) {
                 Text("Save")
             }
         }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(horizontal = 16.dp, vertical = 140.dp),
+            snackbar = { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    shape = RoundedCornerShape(32.dp),
+                )
+            })
     }
 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.DatePicker
@@ -22,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.dp
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -34,37 +36,30 @@ internal fun getCurrentDate(): Date {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerModal(
-    onDateSelected: (Date?) -> Unit,
-    onDismiss: () -> Unit
+    onDateSelected: (Date?) -> Unit, onDismiss: () -> Unit
 ) {
     val datePickerState = rememberDatePickerState()
 
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = {
-                val selectedMillis = datePickerState.selectedDateMillis
-                onDateSelected(selectedMillis?.let { Date(it) })
-                onDismiss()
-            }) {
-                Text("OK")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
-            }
+    DatePickerDialog(onDismissRequest = onDismiss, confirmButton = {
+        TextButton(onClick = {
+            val selectedMillis = datePickerState.selectedDateMillis
+            onDateSelected(selectedMillis?.let { Date(it) })
+            onDismiss()
+        }) {
+            Text("OK")
         }
-    ) {
+    }, dismissButton = {
+        TextButton(onClick = onDismiss) {
+            Text("Cancel")
+        }
+    }) {
         DatePicker(state = datePickerState)
     }
 }
 
 @Composable
 fun DatePickerFieldToModal(
-    label: String,
-    selectedDate: Date?,
-    onDateSelected: (Date?) -> Unit
+    label: String, selectedDate: Date?, onDateSelected: (Date?) -> Unit
 ) {
     var showModal by remember { mutableStateOf(false) }
 
@@ -76,6 +71,7 @@ fun DatePickerFieldToModal(
         trailingIcon = {
             Icon(Icons.Default.DateRange, contentDescription = "Select date")
         },
+        shape = RoundedCornerShape(32.dp),
         modifier = Modifier
             .fillMaxWidth()
             .pointerInput(Unit) {
@@ -86,17 +82,13 @@ fun DatePickerFieldToModal(
                         showModal = true
                     }
                 }
-            }
-    )
+            })
 
     if (showModal) {
-        DatePickerModal(
-            onDateSelected = {
-                onDateSelected(it)
-                showModal = false
-            },
-            onDismiss = { showModal = false }
-        )
+        DatePickerModal(onDateSelected = {
+            onDateSelected(it)
+            showModal = false
+        }, onDismiss = { showModal = false })
     }
 }
 

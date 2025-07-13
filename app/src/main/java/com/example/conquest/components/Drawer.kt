@@ -52,11 +52,10 @@ import kotlinx.coroutines.launch
 
 
 val routes = listOf(
-    MainScreen,
-    SettingsScreenParams(name = null, age = 0)
+    MainScreen, SettingsScreenParams(name = null, age = 0)
 )
 
-val noScaffoldRoutes = listOf(
+val noDrawerRoutes = listOf(
     "com.example.conquest.screens.NewCosplayScreen"
 )
 
@@ -74,78 +73,70 @@ fun Drawer(
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
 
-        ModalNavigationDrawer(
-            drawerContent = {
-                ModalDrawerSheet(
-                    drawerContainerColor = MaterialTheme.colorScheme.background,
-                ) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    navigationItems.forEachIndexed { index, item ->
-                        NavigationDrawerItem(
-                            label = { Text(text = item.title) },
-                            selected = index == selectedItemIndex,
-                            onClick = {
-                                navController.navigate(routes[index])
-                                selectedItemIndex = index
-                                scope.launch {
-                                    drawerState.close()
-                                }
-                            },
-                            icon = {
-                                Icon(
-                                    imageVector = if (index == selectedItemIndex) item.selectedIcon else item.unselectedIcon,
-                                    contentDescription = item.title
-                                )
-                            },
-                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-                            colors = navigationDrawerItemColorsObject()
-                        )
+        if (currentRoute !in noDrawerRoutes) {
+            ModalNavigationDrawer(
+                drawerContent = {
+                    ModalDrawerSheet(
+                        drawerContainerColor = MaterialTheme.colorScheme.background,
+                    ) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        navigationItems.forEachIndexed { index, item ->
+                            NavigationDrawerItem(
+                                label = { Text(text = item.title) },
+                                selected = index == selectedItemIndex,
+                                onClick = {
+                                    navController.navigate(routes[index])
+                                    selectedItemIndex = index
+                                    scope.launch {
+                                        drawerState.close()
+                                    }
+                                },
+                                icon = {
+                                    Icon(
+                                        imageVector = if (index == selectedItemIndex) item.selectedIcon else item.unselectedIcon,
+                                        contentDescription = item.title
+                                    )
+                                },
+                                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                                colors = navigationDrawerItemColorsObject()
+                            )
+                        }
                     }
-                }
-            },
-            drawerState = drawerState
-        ) {
-            if (currentRoute !in noScaffoldRoutes) {
+                }, drawerState = drawerState
+            ) {
                 Scaffold(
                     containerColor = MaterialTheme.colorScheme.background,
                     contentColor = MaterialTheme.colorScheme.primary,
                     topBar = {
-                        TopAppBar(
-                            colors = topAppBarColorsObject(),
-                            title = {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    MyIcon(
-                                        { navController.navigate(NewCosplayScreen) },
-                                        Icons.Default.Add,
-                                        "Add new cosplay"
-                                    )
-                                    SearchBar()
-                                }
-                            },
-                            navigationIcon = {
-                                IconButton(onClick = {
-                                    scope.launch {
-                                        drawerState.open()
-                                    }
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Menu,
-                                        contentDescription = "Menu"
-                                    )
-                                }
-                            },
-                            actions = {
-                                MyIcon({}, Icons.Default.Search, "Filter")
-                                MyIcon({}, Icons.Default.AccountCircle, "Sort by")
-                                MyIcon({}, Icons.Default.KeyboardArrowDown, "Order by")
+                        TopAppBar(colors = topAppBarColorsObject(), title = {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                MyIcon(
+                                    { navController.navigate(NewCosplayScreen) },
+                                    Icons.Default.Add,
+                                    "Add new cosplay"
+                                )
+                                SearchBar()
                             }
-                        )
-                    }
-                )
-                { padding ->
+                        }, navigationIcon = {
+                            IconButton(onClick = {
+                                scope.launch {
+                                    drawerState.open()
+                                }
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Menu,
+                                    contentDescription = "Menu"
+                                )
+                            }
+                        }, actions = {
+                            MyIcon({}, Icons.Default.Search, "Filter")
+                            MyIcon({}, Icons.Default.AccountCircle, "Sort by")
+                            MyIcon({}, Icons.Default.KeyboardArrowDown, "Order by")
+                        })
+                    }) { padding ->
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -155,9 +146,9 @@ fun Drawer(
                         MainNavigation(navController)
                     }
                 }
-            } else {
-                MainNavigation(navController)
             }
+        } else {
+            MainNavigation(navController)
         }
     }
 }
