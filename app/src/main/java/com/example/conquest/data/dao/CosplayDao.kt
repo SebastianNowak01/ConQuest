@@ -5,15 +5,16 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.example.conquest.data.entity.Cosplay
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CosplayDao {
     @Insert
-    fun insertCosplay(cosplay: Cosplay): Long
+    suspend fun insertCosplay(cosplay: Cosplay): Long
 
     @Delete
-    fun delete(cosplay: Cosplay)
+    suspend fun delete(cosplay: Cosplay)
 
     @Query("SELECT * FROM cosplays")
-    fun getAllCosplays(): List<Cosplay>
+    fun getAllCosplays(): Flow<List<Cosplay>>
 }

@@ -21,7 +21,7 @@ fun MainNavigation(navController: NavHostController) {
             SettingsScreen(it)
         }
         composable<NewCosplayScreen> {
-            NewCosplayScreen({}, {})
+            NewCosplayScreen(navController)
         }
     }
 }

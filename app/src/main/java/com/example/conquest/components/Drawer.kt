@@ -56,11 +56,14 @@ val routes = listOf(
     SettingsScreenParams(name = null, age = 0)
 )
 
-val noScaffoldRoutes = listOf(NewCosplayScreen.route)
+val noScaffoldRoutes = listOf(
+    "com.example.conquest.screens.NewCosplayScreen"
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Drawer() {
+fun Drawer(
+) {
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {

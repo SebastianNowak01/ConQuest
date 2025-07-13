@@ -1,8 +1,5 @@
 package com.example.conquest.screens
 
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,35 +9,34 @@ import androidx.compose.ui.Modifier
 import kotlinx.serialization.Serializable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import java.text.SimpleDateFormat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.conquest.CosplayViewModel
 import java.util.*
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.PointerEventPass
+import com.example.conquest.components.DatePickerFieldToModal
+import com.example.conquest.components.getCurrentDate
+import com.example.conquest.data.entity.Cosplay
 
 @Serializable
-object NewCosplayScreen {
-    const val route = "com.example.conquest.screens.NewCosplayScreen"
-}
+object NewCosplayScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewCosplayScreen(
-    onSave: (CosplayProject) -> Unit,
-    onCancel: () -> Unit
+    navController: NavController,
 ) {
+    val cosplayViewModel: CosplayViewModel = viewModel()
     var characterName by remember { mutableStateOf("") }
     var series by remember { mutableStateOf("") }
     var initialDate by remember { mutableStateOf<Date?>(getCurrentDate()) }
     var dueDate by remember { mutableStateOf<Date?>(getCurrentDate()) }
     var budget by remember { mutableStateOf("") }
-    var isInProgress by remember { mutableStateOf(true) }
+    var inProgress by remember { mutableStateOf(true) }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -63,12 +59,12 @@ fun NewCosplayScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = if (isInProgress) "In Progress" else "Planned",
+                    text = if (inProgress) "In Progress" else "Planned",
                     modifier = Modifier.weight(1f)
                 )
                 Switch(
-                    checked = isInProgress,
-                    onCheckedChange = { isInProgress = it }
+                    checked = inProgress,
+                    onCheckedChange = { inProgress = it }
                 )
             }
 
@@ -119,7 +115,7 @@ fun NewCosplayScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             OutlinedButton(
-                onClick = onCancel,
+                onClick = {navController.popBackStack()},
                 modifier = Modifier.weight(1f)
             ) {
                 Text("Cancel")
@@ -128,15 +124,17 @@ fun NewCosplayScreen(
             Button(
                 onClick = {
                     if (characterName.isNotBlank() && series.isNotBlank() && initialDate != null) {
-                        val cosplayProject = CosplayProject(
-                            characterName = characterName,
+                        val newCosplay = Cosplay(
+                            name = characterName,
                             series = series,
                             initialDate = initialDate!!,
                             dueDate = dueDate,
                             budget = budget.takeIf { it.isNotBlank() }?.toDoubleOrNull(),
-                            isInProgress = isInProgress
+                            inProgress = inProgress,
+                            uid = 0,
                         )
-                        onSave(cosplayProject)
+                        cosplayViewModel.insertCosplay(newCosplay)
+                        navController.popBackStack()
                     }
                 },
                 modifier = Modifier.weight(1f),
@@ -146,91 +144,4 @@ fun NewCosplayScreen(
             }
         }
     }
-}
-
-data class CosplayProject(
-    val characterName: String,
-    val series: String,
-    val initialDate: Date,
-    val dueDate: Date? = null,
-    val budget: Double? = null,
-    val isInProgress: Boolean = true
-)
-
-private fun getCurrentDate(): Date {
-    return Calendar.getInstance().time
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DatePickerModal(
-    onDateSelected: (Date?) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val datePickerState = rememberDatePickerState()
-
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = {
-                val selectedMillis = datePickerState.selectedDateMillis
-                onDateSelected(selectedMillis?.let { Date(it) })
-                onDismiss()
-            }) {
-                Text("OK")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        }
-    ) {
-        DatePicker(state = datePickerState)
-    }
-}
-
-@Composable
-fun DatePickerFieldToModal(
-    label: String,
-    selectedDate: Date?,
-    onDateSelected: (Date?) -> Unit
-) {
-    var showModal by remember { mutableStateOf(false) }
-
-    OutlinedTextField(
-        value = selectedDate?.let { convertDateToString(it) } ?: "",
-        onValueChange = { },
-        label = { Text(label) },
-        placeholder = { Text("DD/MM/YYYY") },
-        trailingIcon = {
-            Icon(Icons.Default.DateRange, contentDescription = "Select date")
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .pointerInput(Unit) {
-                awaitEachGesture {
-                    awaitFirstDown(pass = PointerEventPass.Initial)
-                    val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
-                    if (upEvent != null) {
-                        showModal = true
-                    }
-                }
-            }
-    )
-
-    if (showModal) {
-        DatePickerModal(
-            onDateSelected = {
-                onDateSelected(it)
-                showModal = false
-            },
-            onDismiss = { showModal = false }
-        )
-    }
-}
-
-fun convertDateToString(date: Date): String {
-    val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-    return formatter.format(date)
 }
