@@ -82,6 +82,20 @@ fun Drawer(
                         drawerContainerColor = MaterialTheme.colorScheme.background,
                     ) {
                         Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            text = "ConQuest",
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .padding(horizontal = 24.dp, vertical = 8.dp)
+                        )
+                        HorizontalDivider(
+                            thickness = 1.dp,
+                            color = MaterialTheme.colorScheme.outline,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
                         navigationItems.forEachIndexed { index, item ->
                             NavigationDrawerItem(
                                 label = { Text(text = item.title) },

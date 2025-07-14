@@ -62,8 +62,7 @@ fun NewCosplayScreen(
             Text(
                 text = "New Cosplay Project",
                 style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.5.sp
+                    fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp
                 ),
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
@@ -155,10 +154,13 @@ fun NewCosplayScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             OutlinedButton(
-                onClick = { navController.popBackStack() }, modifier = Modifier.weight(1f).height(40.dp)
+                onClick = { navController.popBackStack() },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(40.dp)
             ) {
-                Text("Cancel",
-                    fontSize = 18.sp
+                Text(
+                    "Cancel", fontSize = 18.sp
                 )
             }
 
@@ -180,18 +182,20 @@ fun NewCosplayScreen(
                     } else {
                         coroutineScope.launch {
                             snackbarHostState.showSnackbar(
-                                message = "Please fill all required fields!"
+                                message = "Please fill out all required fields!"
                             )
                         }
                     }
-                }, modifier = Modifier.weight(1f).height(40.dp), // Increase button height
-                    colors = ButtonDefaults.buttonColors(
+                }, modifier = Modifier
+                    .weight(1f)
+                    .height(40.dp),
+                colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Text("Save",
-                        fontSize = 18.sp
+                Text(
+                    "Save", fontSize = 18.sp
                 )
             }
         }
