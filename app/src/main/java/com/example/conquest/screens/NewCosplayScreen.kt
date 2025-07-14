@@ -1,5 +1,6 @@
 package com.example.conquest.screens
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +25,9 @@ import com.example.conquest.components.getCurrentDate
 import com.example.conquest.data.entity.Cosplay
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 
 @Serializable
@@ -56,26 +60,52 @@ fun NewCosplayScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "New Cosplay Project", style = MaterialTheme.typography.headlineMedium
+                text = "New Cosplay Project",
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp
+                ),
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .padding(bottom = 8.dp, top = 8.dp)
+                    .fillMaxWidth(),
+                textAlign = TextAlign.Center
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outline,
+                        shape = RoundedCornerShape(32.dp)
+                    ),
+                shape = RoundedCornerShape(32.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
             ) {
-                Text(
-                    text = if (inProgress) "In Progress" else "Planned",
-                    modifier = Modifier.weight(1f)
-                )
-                Switch(
-                    checked = inProgress,
-                    onCheckedChange = { inProgress = it },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colorScheme.primary,
-                        checkedTrackColor = MaterialTheme.colorScheme.secondary,
-                        uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        uncheckedTrackColor = MaterialTheme.colorScheme.secondary
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = 18.dp, vertical = 4.dp
+                        ),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        text = if (inProgress) "In Progress" else "Planned",
                     )
-                )
+
+                    Switch(
+                        checked = inProgress,
+                        onCheckedChange = { inProgress = it },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colorScheme.primary,
+                            checkedTrackColor = MaterialTheme.colorScheme.secondary,
+                            uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            uncheckedTrackColor = MaterialTheme.colorScheme.secondary
+                        )
+                    )
+                }
             }
 
             OutlinedTextField(
@@ -94,7 +124,6 @@ fun NewCosplayScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(32.dp)
-
             )
 
             DatePickerFieldToModal(
@@ -125,9 +154,14 @@ fun NewCosplayScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             OutlinedButton(
-                onClick = { navController.popBackStack() }, modifier = Modifier.weight(1f)
+                onClick = { navController.popBackStack() },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(40.dp)
             ) {
-                Text("Cancel")
+                Text(
+                    "Cancel", fontSize = 18.sp
+                )
             }
 
             Button(
@@ -148,16 +182,21 @@ fun NewCosplayScreen(
                     } else {
                         coroutineScope.launch {
                             snackbarHostState.showSnackbar(
-                                message = "Please fill all required fields!"
+                                message = "Please fill out all required fields!"
                             )
                         }
                     }
-                }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(
+                }, modifier = Modifier
+                    .weight(1f)
+                    .height(40.dp),
+                colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Text("Save")
+                Text(
+                    "Save", fontSize = 18.sp
+                )
             }
         }
         SnackbarHost(
