@@ -36,6 +36,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -63,6 +64,7 @@ val noDrawerRoutes = listOf(
 @Composable
 fun Drawer(
 ) {
+    var searchQuery by rememberSaveable { mutableStateOf("") }
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -118,7 +120,10 @@ fun Drawer(
                                     Icons.Default.Add,
                                     "Add new cosplay"
                                 )
-                                SearchBar()
+                                SearchBar(
+                                    value = searchQuery,
+                                    onValueChange = { searchQuery = it }
+                                )
                             }
                         }, navigationIcon = {
                             IconButton(onClick = {
@@ -143,12 +148,12 @@ fun Drawer(
                             .padding(padding) // Apply padding from the drawer
                     ) {
                         HorizontalDivider(thickness = 1.dp)
-                        MainNavigation(navController)
+                        MainNavigation(navController, searchQuery)
                     }
                 }
             }
         } else {
-            MainNavigation(navController)
+            MainNavigation(navController, "")
         }
     }
 }

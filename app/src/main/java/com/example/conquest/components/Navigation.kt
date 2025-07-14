@@ -8,13 +8,13 @@ import com.example.conquest.screens.NewCosplayScreen
 import com.example.conquest.screens.SettingsScreenParams
 
 @Composable
-fun MainNavigation(navController: NavHostController) {
+fun MainNavigation(navController: NavHostController, searchQuery: String) {
     val navController = navController
     NavHost(
         navController = navController, startDestination = MainScreen
     ) {
         composable<MainScreen> {
-            MainScreen(navController)
+            MainScreen(navController, searchQuery)
         }
         composable<SettingsScreenParams> { it ->
             SettingsScreen(it)
