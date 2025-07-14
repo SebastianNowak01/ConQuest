@@ -186,7 +186,8 @@ fun NewCosplayScreen(
                             )
                         }
                     }
-                }, modifier = Modifier
+                },
+                modifier = Modifier
                     .weight(1f)
                     .height(40.dp),
                 colors = ButtonDefaults.buttonColors(
