@@ -1,6 +1,7 @@
 package com.example.conquest.screens
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -42,12 +43,16 @@ fun MainScreen(navController: NavController, searchQuery: String) {
     ) {
         items(filteredCosplays) { cosplay ->
             Card(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .border(
                         width = 1.dp,
                         color = MaterialTheme.colorScheme.outline,
                         shape = RoundedCornerShape(24.dp)
-                    ),
+                    )
+                    .clickable {
+                        navController.navigate(MainCosplayScreen(cosplay.uid))
+                    },
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                 shape = RoundedCornerShape(32.dp)

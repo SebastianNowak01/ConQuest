@@ -2,6 +2,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.conquest.screens.MainCosplayScreen
 import com.example.conquest.screens.MainScreen
 import com.example.conquest.screens.SettingsScreen
 import com.example.conquest.screens.NewCosplayScreen
@@ -21,6 +22,9 @@ fun MainNavigation(navController: NavHostController, searchQuery: String) {
         }
         composable<NewCosplayScreen> {
             NewCosplayScreen(navController)
+        }
+        composable<MainCosplayScreen> { backStackEntry ->
+            MainCosplayScreen(backStackEntry)
         }
     }
 }
