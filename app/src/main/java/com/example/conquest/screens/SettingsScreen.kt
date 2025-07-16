@@ -1,19 +1,14 @@
 package com.example.conquest.screens
 
 import android.content.Context
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -23,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
@@ -33,74 +27,95 @@ import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.window.PopupProperties
+import androidx.compose.material3.MenuAnchorType
 
 @Serializable
 object SettingsScreenParams
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen() {
     val context = LocalContext.current
-    val darkModeFlow = remember { getDarkMode(context) }
-    val darkMode by darkModeFlow.collectAsState(initial = false)
+    val darkModeFlow = remember { getDarkModeOption(context) }
+    val selectedOption by darkModeFlow.collectAsState(initial = "automatic")
     val coroutineScope = rememberCoroutineScope()
 
+    val options = listOf("dark", "light", "automatic")
+    var expanded by remember { mutableStateOf(false) }
+
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 32.dp)
+            .background(MaterialTheme.colorScheme.background),
+
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.outline,
-                    shape = RoundedCornerShape(32.dp)
-                ),
-            shape = RoundedCornerShape(32.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
-        ) {
-            Row(
+        ExposedDropdownMenuBox(
+            expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+            OutlinedTextField(
+                value = selectedOption.replaceFirstChar { it.uppercase() },
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Theme") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 18.dp, vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
+                    .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true)
+                    .fillMaxWidth(0.9f),
+                shape = RoundedCornerShape(32.dp),
+                textStyle = MaterialTheme.typography.bodyLarge
+            )
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .background(
+                        color = MaterialTheme.colorScheme.tertiary,
+                    ),
+                properties = PopupProperties(clippingEnabled = true)
             ) {
-                Text(
-                    text = "Dark Mode",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-
-                Switch(
-                    checked = darkMode,
-                    onCheckedChange = { enabled ->
-                        coroutineScope.launch {
-                            setDarkMode(context, enabled)
-                        }
-                    },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colorScheme.primary,
-                        checkedTrackColor = MaterialTheme.colorScheme.secondary,
-                        uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        uncheckedTrackColor = MaterialTheme.colorScheme.secondary
+                options.forEach { selectionOption ->
+                    DropdownMenuItem(
+                        text = { Text(selectionOption.replaceFirstChar { it.uppercase() }) },
+                        onClick = {
+                            coroutineScope.launch {
+                                setDarkModeOption(context, selectionOption)
+                            }
+                            expanded = false
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp)
                     )
-                )
+                }
             }
         }
     }
 }
 
+
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
-val DARK_MODE_KEY = booleanPreferencesKey("dark_mode_enabled")
+val DARK_MODE_KEY = stringPreferencesKey("dark_mode_option")
 
-suspend fun setDarkMode(context: Context, enabled: Boolean) {
+suspend fun setDarkModeOption(context: Context, option: String) {
     context.dataStore.edit { prefs ->
-        prefs[DARK_MODE_KEY] = enabled
+        prefs[DARK_MODE_KEY] = option
     }
 }
 
-fun getDarkMode(context: Context): Flow<Boolean> = context.dataStore.data.map { prefs ->
-    prefs[DARK_MODE_KEY] == true
+fun getDarkModeOption(context: Context): Flow<String> = context.dataStore.data.map { prefs ->
+    prefs[DARK_MODE_KEY] ?: "automatic"
+}
+
+@Composable
+fun rememberThemePreference(context: Context): State<String> {
+    val flow = remember { getDarkModeOption(context) }
+    return flow.collectAsState(initial = "automatic")
 }
