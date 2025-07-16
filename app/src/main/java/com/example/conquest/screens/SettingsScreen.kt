@@ -40,8 +40,7 @@ object SettingsScreenParams
 @Composable
 fun SettingsScreen() {
     val context = LocalContext.current
-    val darkModeFlow = remember { getDarkModeOption(context) }
-    val selectedOption by darkModeFlow.collectAsState(initial = "automatic")
+    val selectedOption by rememberThemePreference(context)
     val coroutineScope = rememberCoroutineScope()
 
     val options = listOf("dark", "light", "automatic")
