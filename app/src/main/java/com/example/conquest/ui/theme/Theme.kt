@@ -3,7 +3,6 @@ package com.example.conquest.ui.theme
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -57,7 +56,6 @@ private val HighContrastScheme = darkColorScheme(
 @Composable
 fun ConQuestTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
@@ -66,24 +64,14 @@ fun ConQuestTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
-
-    val typographyScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> TypographyDark
-        else -> TypographyWhite
-    }
+    val typographyScheme = if (darkTheme) TypographyDark else TypographyWhite
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = typographyScheme as Typography,
+        typography = typographyScheme,
         content = content
     )
 }

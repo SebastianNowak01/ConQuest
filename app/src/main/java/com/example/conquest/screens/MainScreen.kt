@@ -19,6 +19,7 @@ import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
 import kotlinx.serialization.Serializable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
 
@@ -45,10 +46,11 @@ fun MainScreen(navController: NavController, searchQuery: String) {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clip(RoundedCornerShape(32.dp))
                     .border(
                         width = 1.dp,
                         color = MaterialTheme.colorScheme.outline,
-                        shape = RoundedCornerShape(24.dp)
+                        shape = RoundedCornerShape(32.dp)
                     )
                     .clickable {
                         navController.navigate(MainCosplayScreen(cosplay.uid))

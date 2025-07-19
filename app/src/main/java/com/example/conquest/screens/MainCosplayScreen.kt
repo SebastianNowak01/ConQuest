@@ -23,7 +23,7 @@ fun MainCosplayScreen(navBackStackEntry: NavBackStackEntry) {
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
-    )  {
+    ) {
         Text(text = "Cosplay UID: ${args.uid}")
     }
 }

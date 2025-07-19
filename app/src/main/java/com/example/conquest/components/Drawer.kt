@@ -53,7 +53,7 @@ import kotlinx.coroutines.launch
 
 
 val routes = listOf(
-    MainScreen, SettingsScreenParams(name = null, age = 0)
+    MainScreen, SettingsScreenParams
 )
 
 val noDrawerRoutes = listOf(

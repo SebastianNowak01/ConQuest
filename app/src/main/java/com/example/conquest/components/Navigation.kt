@@ -17,8 +17,8 @@ fun MainNavigation(navController: NavHostController, searchQuery: String) {
         composable<MainScreen> {
             MainScreen(navController, searchQuery)
         }
-        composable<SettingsScreenParams> { it ->
-            SettingsScreen(it)
+        composable<SettingsScreenParams> {
+            SettingsScreen()
         }
         composable<NewCosplayScreen> {
             NewCosplayScreen(navController)
