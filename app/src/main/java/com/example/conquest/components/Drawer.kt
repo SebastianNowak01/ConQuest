@@ -87,8 +87,7 @@ fun Drawer(
                             text = "ConQuest",
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier
-                                .padding(horizontal = 24.dp, vertical = 8.dp)
+                            modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
                         )
                         HorizontalDivider(
                             thickness = 1.dp,
@@ -135,9 +134,7 @@ fun Drawer(
                                     "Add new cosplay"
                                 )
                                 SearchBar(
-                                    value = searchQuery,
-                                    onValueChange = { searchQuery = it }
-                                )
+                                    value = searchQuery, onValueChange = { searchQuery = it })
                             }
                         }, navigationIcon = {
                             IconButton(onClick = {
@@ -146,8 +143,7 @@ fun Drawer(
                                 }
                             }) {
                                 Icon(
-                                    imageVector = Icons.Default.Menu,
-                                    contentDescription = "Menu"
+                                    imageVector = Icons.Default.Menu, contentDescription = "Menu"
                                 )
                             }
                         }, actions = {
@@ -159,7 +155,7 @@ fun Drawer(
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(padding) // Apply padding from the drawer
+                            .padding(padding)
                     ) {
                         HorizontalDivider(thickness = 1.dp)
                         MainNavigation(navController, searchQuery)

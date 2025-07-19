@@ -52,8 +52,7 @@ fun SettingsScreen() {
             .padding(top = 32.dp)
             .background(MaterialTheme.colorScheme.background),
 
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+        verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ExposedDropdownMenuBox(
             expanded = expanded, onExpandedChange = { expanded = !expanded }) {

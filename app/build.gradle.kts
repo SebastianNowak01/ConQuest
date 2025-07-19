@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.coil.compose)
     ksp(libs.androidx.room.compiler.v250)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

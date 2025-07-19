@@ -6,13 +6,20 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.SharingStarted
 import androidx.lifecycle.viewModelScope
 import com.example.conquest.data.entity.Cosplay
+import com.example.conquest.data.entity.CosplayPhoto
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
 class CosplayViewModel(application: Application) : AndroidViewModel(application) {
     internal val dao = (application as ConQuestApplication).database.cosplayDao()
+    internal val photoDao = (application as ConQuestApplication).database.cosplayPhotoDao()
 
-    val allCosplays = dao.getAllCosplays()
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList<Cosplay>())
+    val allCosplays =
+        dao.getAllCosplays().stateIn(viewModelScope, SharingStarted.Lazily, emptyList<Cosplay>())
 
     fun insertCosplay(cosplay: Cosplay) {
         viewModelScope.launch {
@@ -23,6 +30,23 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     fun deleteCosplay(cosplay: Cosplay) {
         viewModelScope.launch {
             dao.delete(cosplay)
+        }
+    }
+
+    private val _cosplayId = MutableStateFlow<Int?>(0)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val photos: StateFlow<List<CosplayPhoto>> = _cosplayId
+        .filterNotNull()
+        .flatMapLatest { id -> photoDao.getPhotosForCosplay(id) }
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    fun setCosplayId(id: Int) {
+        _cosplayId.value = id
+    }
+
+    fun addPhoto(cosplayId: Int, path: String) {
+        viewModelScope.launch {
+            photoDao.insertPhoto(CosplayPhoto(cosplayId = cosplayId, path = path))
         }
     }
 }

@@ -64,14 +64,13 @@ fun ConQuestTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
+
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
     val typographyScheme = if (darkTheme) TypographyDark else TypographyWhite
 
     MaterialTheme(
-        colorScheme = colorScheme,
-        typography = typographyScheme,
-        content = content
+        colorScheme = colorScheme, typography = typographyScheme, content = content
     )
 }
