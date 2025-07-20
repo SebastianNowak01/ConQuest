@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
@@ -16,6 +17,8 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -128,11 +131,6 @@ fun Drawer(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                MyIcon(
-                                    { navController.navigate(NewCosplayScreen) },
-                                    Icons.Default.Add,
-                                    "Add new cosplay"
-                                )
                                 SearchBar(
                                     value = searchQuery, onValueChange = { searchQuery = it })
                             }
@@ -151,7 +149,21 @@ fun Drawer(
                             MyIcon({}, Icons.Default.AccountCircle, "Sort by")
                             MyIcon({}, Icons.Default.KeyboardArrowDown, "Order by")
                         })
-                    }) { padding ->
+                    },
+                    floatingActionButton = {
+                        FloatingActionButton(
+                            onClick = {
+                                navController.navigate(NewCosplayScreen)
+                            },
+                            containerColor = MaterialTheme.colorScheme.tertiary,
+                            contentColor = MaterialTheme.colorScheme.primary,
+                            shape = CircleShape
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = "Add new cosplay")
+                        }
+                    },
+                    floatingActionButtonPosition = FabPosition.Center
+                ) { padding ->
                     Column(
                         modifier = Modifier
                             .fillMaxSize()

@@ -33,8 +33,8 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.TheaterComedy
 import androidx.compose.ui.graphics.vector.ImageVector
 
 @Serializable
@@ -117,7 +117,7 @@ data class TabIcon(
 @Composable
 fun CosplayTabs(navBackStackEntry: NavBackStackEntry) {
     val tabIcons = listOf(
-        TabIcon(Icons.Filled.AccountCircle, "Cosplay Elements"),
+        TabIcon(Icons.Filled.TheaterComedy, "Cosplay Elements"),
         TabIcon(Icons.AutoMirrored.Filled.List, "Tasks"),
         TabIcon(Icons.Filled.Image, "Reference Images")
     )

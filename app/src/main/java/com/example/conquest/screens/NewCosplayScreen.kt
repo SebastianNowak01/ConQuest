@@ -11,6 +11,9 @@ import kotlinx.serialization.Serializable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -60,7 +63,7 @@ fun NewCosplayScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "New Cosplay Project",
+                text = "New Project",
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp
                 ),
@@ -146,25 +149,27 @@ fun NewCosplayScreen(
             )
 
         }
-        Row(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 70.dp, start = 16.dp, end = 16.dp)
-                .fillMaxWidth(0.9f),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            OutlinedButton(
-                onClick = { navController.popBackStack() },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(40.dp)
-            ) {
-                Text(
-                    "Cancel", fontSize = 18.sp
-                )
-            }
 
-            Button(
+        IconButton(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 16.dp, end = 16.dp)
+                .statusBarsPadding()
+                .size(60.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Cancel,
+                contentDescription = "Cancel",
+                tint = MaterialTheme.colorScheme.onBackground
+            )
+        }
+
+        Box(
+            modifier = Modifier.align(Alignment.BottomCenter)
+        ) {
+
+            FloatingActionButton(
                 onClick = {
                     if (characterName.isNotBlank() && series.isNotBlank() && initialDate != null) {
                         val newCosplay = Cosplay(
@@ -187,17 +192,15 @@ fun NewCosplayScreen(
                         }
                     }
                 },
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(50),
                 modifier = Modifier
-                    .weight(1f)
-                    .height(40.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.primary
-                )
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 16.dp)
+                    .navigationBarsPadding()
             ) {
-                Text(
-                    "Save", fontSize = 18.sp
-                )
+                Icon(Icons.Default.Add, contentDescription = "Save")
             }
         }
         SnackbarHost(
