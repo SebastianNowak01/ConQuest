@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,49 +24,29 @@ import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import coil.compose.AsyncImage
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.ui.graphics.vector.ImageVector
 
 @Serializable
 data class MainCosplayScreen(
     val uid: Int
 )
 
-
 @Composable
 fun MainCosplayScreen(
     navBackStackEntry: NavBackStackEntry
 ) {
-    val args = navBackStackEntry.toRoute<MainCosplayScreen>()
-    val context = LocalContext.current
-    val cosplayViewModel: CosplayViewModel = viewModel()
-
-    LaunchedEffect(args.uid) {
-        cosplayViewModel.setCosplayId(args.uid)
-    }
-
-    val photos by cosplayViewModel.photos.collectAsState()
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = "Cosplay UID: ${args.uid}")
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        PickAndSaveImage(context) { savedPath ->
-            cosplayViewModel.addPhoto(args.uid, savedPath)
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text("All Photos:")
-        CosplayPhotoList(photos)
-    }
+    CosplayTabs(navBackStackEntry)
 }
 
 @Composable
@@ -128,5 +107,94 @@ fun CosplayPhotoList(photos: List<CosplayPhoto>) {
                 )
             }
         }
+    }
+}
+
+data class TabIcon(
+    val imageVector: ImageVector, val contentDescription: String
+)
+
+@Composable
+fun CosplayTabs(navBackStackEntry: NavBackStackEntry) {
+    val tabIcons = listOf(
+        TabIcon(Icons.Filled.AccountCircle, "Cosplay Elements"),
+        TabIcon(Icons.AutoMirrored.Filled.List, "Tasks"),
+        TabIcon(Icons.Filled.Image, "Reference Images")
+    )
+    val pagerState = rememberPagerState { tabIcons.size }
+    var selectedTab by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(selectedTab) {
+        if (pagerState.currentPage != selectedTab) {
+            pagerState.animateScrollToPage(selectedTab)
+        }
+    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        TabRow(
+            selectedTabIndex = pagerState.currentPage, modifier = Modifier.fillMaxWidth()
+        ) {
+            tabIcons.forEachIndexed { index, icon ->
+                Tab(icon = {
+                    Icon(
+                        imageVector = icon.imageVector,
+                        contentDescription = icon.contentDescription
+                    )
+                }, selected = pagerState.currentPage == index, onClick = { selectedTab = index })
+            }
+        }
+
+        HorizontalPager(
+            state = pagerState, modifier = Modifier.weight(1f)
+        ) { page ->
+            when (page) {
+                0 -> CosplayElementsTab()
+                1 -> TasksTab()
+                2 -> ReferenceImagesTab(navBackStackEntry)
+            }
+        }
+    }
+}
+
+@Composable
+fun CosplayElementsTab() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text("Cosplay Elements Content")
+    }
+}
+
+@Composable
+fun TasksTab() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text("Tasks Content")
+    }
+}
+
+@Composable
+fun ReferenceImagesTab(navBackStackEntry: NavBackStackEntry) {
+    val args = navBackStackEntry.toRoute<MainCosplayScreen>()
+    val context = LocalContext.current
+    val cosplayViewModel: CosplayViewModel = viewModel()
+
+    LaunchedEffect(args.uid) {
+        cosplayViewModel.setCosplayId(args.uid)
+    }
+
+    val photos by cosplayViewModel.photos.collectAsState()
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        PickAndSaveImage(context) { savedPath ->
+            cosplayViewModel.addPhoto(args.uid, savedPath)
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text("All Photos:")
+        CosplayPhotoList(photos)
     }
 }
