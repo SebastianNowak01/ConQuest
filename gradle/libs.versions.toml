@@ -7,21 +7,22 @@ coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-kotlinxCoroutinesAndroid = "1.7.3"
-lifecycleRuntimeKtx = "2.9.1"
+kotlinxCoroutinesAndroid = "1.8.1"
+lifecycleRuntimeKtx = "2.9.2"
 activityCompose = "1.10.1"
-composeBom = "2025.06.00"
+composeBom = "2025.07.00"
 materialIconsExtended = "1.7.8"
-navigationCompose = "2.9.0"
-roomCompiler = "2.5.0"
-roomRuntime = "2.7.1"
-composeNavigation = "2.9.0"
-serialization = "1.6.3"
+navigationCompose = "2.9.2"
+roomCompiler = "2.7.2"
+roomRuntime = "2.7.2"
+composeNavigation = "2.9.2"
+serialization = "1.7.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
+#noinspection SimilarGradleDependency
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-room-compiler-v250 = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
@@ -41,6 +42,7 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
+#noinspection SimilarGradleDependency
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
 
