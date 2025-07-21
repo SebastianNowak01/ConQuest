@@ -6,12 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
+import com.example.conquest.components.MyFab
 
 @Serializable
 object MainScreen
@@ -80,19 +77,9 @@ fun MainScreen(navController: NavController, searchQuery: String) {
                 }
             }
         }
-        FloatingActionButton(
-            onClick = {
-                navController.navigate(NewCosplayScreen)
-            },
-            containerColor = MaterialTheme.colorScheme.tertiary,
-            contentColor = MaterialTheme.colorScheme.primary,
-            shape = RoundedCornerShape(50),
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp)
-                .statusBarsPadding()
-        ) {
-            Icon(Icons.Default.Add, contentDescription = "Save")
-        }
+        MyFab(
+            onClick = { navController.navigate(NewCosplayScreen) },
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }
