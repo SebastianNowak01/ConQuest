@@ -57,7 +57,9 @@ fun MainScreen(navController: NavController, searchQuery: String) {
                     selectionMode = false
                     selectedIds = emptySet()
                 },
-                modifier = Modifier.align(Alignment.BottomCenter).zIndex(2f),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .zIndex(2f),
                 containerColor = MaterialTheme.colorScheme.secondary,
                 contentColor = MaterialTheme.colorScheme.primary,
                 icon = Icons.Default.Close,

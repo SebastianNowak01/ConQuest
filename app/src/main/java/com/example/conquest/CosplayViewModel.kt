@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.SharingStarted
 import androidx.lifecycle.viewModelScope
 import com.example.conquest.data.entity.Cosplay
+import com.example.conquest.data.entity.CosplayElement
 import com.example.conquest.data.entity.CosplayPhoto
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 class CosplayViewModel(application: Application) : AndroidViewModel(application) {
     internal val dao = (application as ConQuestApplication).database.cosplayDao()
     internal val photoDao = (application as ConQuestApplication).database.cosplayPhotoDao()
+    internal val elementDao = (application as ConQuestApplication).database.cosplayElementDao()
 
     val allCosplays =
         dao.getAllCosplays().stateIn(viewModelScope, SharingStarted.Lazily, emptyList<Cosplay>())
@@ -34,11 +36,11 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private val _cosplayId = MutableStateFlow<Int?>(0)
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    val photos: StateFlow<List<CosplayPhoto>> = _cosplayId
-        .filterNotNull()
-        .flatMapLatest { id -> photoDao.getPhotosForCosplay(id) }
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+    val photos: StateFlow<List<CosplayPhoto>> =
+        _cosplayId.filterNotNull().flatMapLatest { id -> photoDao.getPhotosForCosplay(id) }
+            .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     fun setCosplayId(id: Int) {
         _cosplayId.value = id
@@ -48,5 +50,23 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch {
             photoDao.insertPhoto(CosplayPhoto(cosplayId = cosplayId, path = path))
         }
+    }
+
+    fun insertElement(element: CosplayElement) {
+        viewModelScope.launch {
+            elementDao.insertElement(element)
+        }
+    }
+
+    private val _elementCosplayId = MutableStateFlow<Int?>(0)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val elements: StateFlow<List<CosplayElement>> =
+        _elementCosplayId.filterNotNull()
+            .flatMapLatest { id -> elementDao.getElementsForCosplay(id) }
+            .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    fun setElementCosplayId(id: Int) {
+        _elementCosplayId.value = id
     }
 }

@@ -9,15 +9,97 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
+import androidx.navigation.toRoute
 import com.example.conquest.components.MyFab
-
+import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.runtime.*
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.conquest.CosplayViewModel
 
 @Composable
-fun CosplayElementsTab() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Cosplay Elements Content")
+fun CosplayElementsTab(navController: NavController, navBackStackEntry: NavBackStackEntry) {
+    val mainArgs = navBackStackEntry.toRoute<MainCosplayScreen>()
+    val cosplayId = mainArgs.uid
+
+    val cosplayViewModel: CosplayViewModel = viewModel()
+
+    LaunchedEffect(cosplayId) {
+        cosplayViewModel.setElementCosplayId(cosplayId)
+    }
+
+    val elements by cosplayViewModel.elements.collectAsState()
+
+    var selectionMode by remember { mutableStateOf(false) }
+    var selectedIds by remember { mutableStateOf(setOf<Int>()) }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp)
+        ) {
+            items(elements) { element ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(32.dp))
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(32.dp)
+                        )
+                        .combinedClickable(onClick = {}, onLongClick = {
+                            selectionMode = true
+                            selectedIds = selectedIds + element.id
+                        }),
+                    colors = CardDefaults.cardColors(
+                        containerColor = if (selectedIds.contains(element.id)) MaterialTheme.colorScheme.secondaryContainer
+                        else MaterialTheme.colorScheme.background
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                    shape = RoundedCornerShape(32.dp)) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = element.name,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        if (element.cost != null) {
+                            Text(
+                                text = "Cost: $${element.cost}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                        Row {
+                            if (element.ready) Text(
+                                "Ready", color = MaterialTheme.colorScheme.secondary
+                            )
+                            if (element.bought) Text(
+                                " • Bought", color = MaterialTheme.colorScheme.secondary
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
         MyFab(
-            onClick = {},
+            onClick = { navController.navigate(NewCosplayElementScreen(cosplayId)) },
             modifier = Modifier.align(Alignment.BottomCenter),
             containerColor = MaterialTheme.colorScheme.tertiary,
             contentColor = MaterialTheme.colorScheme.primary,

@@ -15,6 +15,7 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.TheaterComedy
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavController
 
 @Serializable
 data class MainCosplayScreen(
@@ -23,9 +24,10 @@ data class MainCosplayScreen(
 
 @Composable
 fun MainCosplayScreen(
-    navBackStackEntry: NavBackStackEntry
+    navBackStackEntry: NavBackStackEntry,
+    navController: NavController
 ) {
-    CosplayTabs(navBackStackEntry)
+    CosplayTabs(navBackStackEntry, navController)
 }
 
 data class TabIcon(
@@ -33,7 +35,7 @@ data class TabIcon(
 )
 
 @Composable
-fun CosplayTabs(navBackStackEntry: NavBackStackEntry) {
+fun CosplayTabs(navBackStackEntry: NavBackStackEntry, navController: NavController) {
     val tabIcons = listOf(
         TabIcon(Icons.Filled.TheaterComedy, "Cosplay Elements"),
         TabIcon(Icons.AutoMirrored.Filled.List, "Tasks"),
@@ -65,7 +67,7 @@ fun CosplayTabs(navBackStackEntry: NavBackStackEntry) {
             state = pagerState, modifier = Modifier.weight(1f)
         ) { page ->
             when (page) {
-                0 -> CosplayElementsTab()
+                0 -> CosplayElementsTab(navController, navBackStackEntry)
                 1 -> TasksTab()
                 2 -> ReferenceImagesTab(navBackStackEntry)
             }
