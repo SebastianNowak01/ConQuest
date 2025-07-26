@@ -122,29 +122,47 @@ fun Drawer(
                     containerColor = MaterialTheme.colorScheme.background,
                     contentColor = MaterialTheme.colorScheme.primary,
                     topBar = {
-                        TopAppBar(colors = topAppBarColorsObject(), title = {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                SearchBar(
-                                    value = searchQuery, onValueChange = { searchQuery = it })
-                            }
-                        }, navigationIcon = {
-                            IconButton(onClick = {
-                                scope.launch {
-                                    drawerState.open()
+                        if (currentRoute == "com.example.conquest.screens.SettingsScreenParams") {
+                            TopAppBar(
+                                colors = topAppBarColorsObject(),
+                                title = { Text("Settings screen") },
+                                navigationIcon = {
+                                    IconButton(onClick = {
+                                        scope.launch { drawerState.open() }
+                                    }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Menu,
+                                            contentDescription = "Menu"
+                                        )
+                                    }
+                                },
+                                actions = {} // No actions on settings screen
+                            )
+                        } else {
+                            TopAppBar(colors = topAppBarColorsObject(), title = {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    SearchBar(
+                                        value = searchQuery,
+                                        onValueChange = { searchQuery = it })
                                 }
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Default.Menu, contentDescription = "Menu"
-                                )
-                            }
-                        }, actions = {
-                            MyIcon({}, Icons.Default.Search, "Filter")
-                            MyIcon({}, Icons.Default.AccountCircle, "Sort by")
-                            MyIcon({}, Icons.Default.KeyboardArrowDown, "Order by")
-                        })
+                            }, navigationIcon = {
+                                IconButton(onClick = {
+                                    scope.launch { drawerState.open() }
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Menu,
+                                        contentDescription = "Menu"
+                                    )
+                                }
+                            }, actions = {
+                                MyIcon({}, Icons.Default.Search, "Filter")
+                                MyIcon({}, Icons.Default.AccountCircle, "Sort by")
+                                MyIcon({}, Icons.Default.KeyboardArrowDown, "Order by")
+                            })
+                        }
                     }) { padding ->
                     Column(
                         modifier = Modifier
