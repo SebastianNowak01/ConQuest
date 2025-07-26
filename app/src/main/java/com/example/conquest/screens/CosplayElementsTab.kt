@@ -19,11 +19,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.conquest.CosplayViewModel
 
@@ -44,6 +46,23 @@ fun CosplayElementsTab(navController: NavController, navBackStackEntry: NavBackS
     var selectedIds by remember { mutableStateOf(setOf<Int>()) }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        if (selectionMode) {
+            MyFab(
+                onClick = {
+                    cosplayViewModel.deleteElementsByIds(selectedIds)
+                    selectionMode = false
+                    selectedIds = emptySet()
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .zIndex(2f),
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.primary,
+                icon = Icons.Default.Close,
+                contentDescription = "Delete",
+            )
+        }
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -60,7 +79,16 @@ fun CosplayElementsTab(navController: NavController, navBackStackEntry: NavBackS
                             color = MaterialTheme.colorScheme.outline,
                             shape = RoundedCornerShape(32.dp)
                         )
-                        .combinedClickable(onClick = {}, onLongClick = {
+                        .combinedClickable(onClick = {
+                            if (selectionMode) {
+                                val id = element.id
+                                selectedIds =
+                                    if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
+                                if (selectedIds.isEmpty()) selectionMode = false
+                            } else {
+//                                navController.navigate(MainCosplayScreen(cosplay.uid))
+                            }
+                        }, onLongClick = {
                             selectionMode = true
                             selectedIds = selectedIds + element.id
                         }),

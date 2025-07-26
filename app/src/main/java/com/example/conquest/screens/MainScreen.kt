@@ -51,9 +51,7 @@ fun MainScreen(navController: NavController, searchQuery: String) {
         if (selectionMode) {
             MyFab(
                 onClick = {
-                    filteredCosplays.filter { selectedIds.contains(it.uid) }.forEach {
-                        cosplayViewModel.deleteCosplay(it)
-                    }
+                    cosplayViewModel.deleteCosplaysByIds(selectedIds)
                     selectionMode = false
                     selectedIds = emptySet()
                 },

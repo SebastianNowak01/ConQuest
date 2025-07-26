@@ -29,9 +29,9 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun deleteCosplay(cosplay: Cosplay) {
+    fun deleteCosplaysByIds(ids: Set<Int>) {
         viewModelScope.launch {
-            dao.delete(cosplay)
+            dao.deleteCosplaysByIds(ids)
         }
     }
 
@@ -68,5 +68,12 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
 
     fun setElementCosplayId(id: Int) {
         _elementCosplayId.value = id
+    }
+
+    fun deleteElementsByIds(ids: Set<Int>) {
+        viewModelScope.launch {
+            elementDao.deleteElementsByIds(ids)
+
+        }
     }
 }
