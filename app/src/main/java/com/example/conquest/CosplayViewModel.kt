@@ -29,9 +29,12 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun deleteCosplaysByIds(ids: Set<Int>) {
+    fun deleteCosplaysByIds(cosplayIds: Set<Int>) {
         viewModelScope.launch {
-            dao.deleteCosplaysByIds(ids)
+            val photos = photoDao.getPhotosForCosplayOnce(cosplayIds)
+            photoDao.deletePhotos(photos)
+            photos.forEach { deleteFileByPath(it.path) }
+            dao.deleteCosplaysByIds(cosplayIds)
         }
     }
 
@@ -75,5 +78,14 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
             elementDao.deleteElementsByIds(ids)
 
         }
+    }
+}
+
+fun deleteFileByPath(path: String) {
+    try {
+        val file = java.io.File(path)
+        if (file.exists()) file.delete()
+    } catch (e: Exception) {
+        e.printStackTrace()
     }
 }
