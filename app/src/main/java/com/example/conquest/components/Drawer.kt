@@ -56,7 +56,8 @@ val routes = listOf(
 
 val noDrawerRoutes = listOf(
     "com.example.conquest.screens.NewCosplayScreen",
-    "com.example.conquest.screens.NewCosplayElementScreen/{cosplayId}"
+    "com.example.conquest.screens.NewCosplayElementScreen/{cosplayId}",
+    "com.example.conquest.screens.NewCosplayTaskScreen/{cosplayId}"
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -145,8 +146,7 @@ fun Drawer(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     SearchBar(
-                                        value = searchQuery,
-                                        onValueChange = { searchQuery = it })
+                                        value = searchQuery, onValueChange = { searchQuery = it })
                                 }
                             }, navigationIcon = {
                                 IconButton(onClick = {

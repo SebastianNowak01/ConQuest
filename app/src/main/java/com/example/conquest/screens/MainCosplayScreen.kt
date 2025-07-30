@@ -24,8 +24,7 @@ data class MainCosplayScreen(
 
 @Composable
 fun MainCosplayScreen(
-    navBackStackEntry: NavBackStackEntry,
-    navController: NavController
+    navBackStackEntry: NavBackStackEntry, navController: NavController
 ) {
     CosplayTabs(navBackStackEntry, navController)
 }
@@ -68,7 +67,7 @@ fun CosplayTabs(navBackStackEntry: NavBackStackEntry, navController: NavControll
         ) { page ->
             when (page) {
                 0 -> CosplayElementsTab(navController, navBackStackEntry)
-                1 -> TasksTab()
+                1 -> CosplayTasksTab(navController, navBackStackEntry)
                 2 -> ReferenceImagesTab(navBackStackEntry)
             }
         }

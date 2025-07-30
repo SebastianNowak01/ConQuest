@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.conquest.data.entity.Cosplay
 import com.example.conquest.data.entity.CosplayElement
 import com.example.conquest.data.entity.CosplayPhoto
+import com.example.conquest.data.entity.CosplayTask
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +20,7 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     internal val dao = (application as ConQuestApplication).database.cosplayDao()
     internal val photoDao = (application as ConQuestApplication).database.cosplayPhotoDao()
     internal val elementDao = (application as ConQuestApplication).database.cosplayElementDao()
+    internal val taskDao = (application as ConQuestApplication).database.cosplayTaskDao()
 
     val allCosplays =
         dao.getAllCosplays().stateIn(viewModelScope, SharingStarted.Lazily, emptyList<Cosplay>())
@@ -64,10 +66,9 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     private val _elementCosplayId = MutableStateFlow<Int?>(0)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val elements: StateFlow<List<CosplayElement>> =
-        _elementCosplayId.filterNotNull()
-            .flatMapLatest { id -> elementDao.getElementsForCosplay(id) }
-            .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+    val elements: StateFlow<List<CosplayElement>> = _elementCosplayId.filterNotNull()
+        .flatMapLatest { id -> elementDao.getElementsForCosplay(id) }
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     fun setElementCosplayId(id: Int) {
         _elementCosplayId.value = id
@@ -76,7 +77,29 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     fun deleteElementsByIds(ids: Set<Int>) {
         viewModelScope.launch {
             elementDao.deleteElementsByIds(ids)
+        }
+    }
 
+    private val _taskCosplayId = MutableStateFlow<Int?>(0)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val tasks: StateFlow<List<CosplayTask>> =
+        _taskCosplayId.filterNotNull().flatMapLatest { id -> taskDao.getTasksForCosplay(id) }
+            .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    fun setTaskCosplayId(id: Int) {
+        _taskCosplayId.value = id
+    }
+
+    fun insertTask(task: CosplayTask) {
+        viewModelScope.launch {
+            taskDao.insertTask(task)
+        }
+    }
+
+    fun deleteTasksByIds(ids: Set<Int>) {
+        viewModelScope.launch {
+            taskDao.deleteTasksByIds(ids)
         }
     }
 }
