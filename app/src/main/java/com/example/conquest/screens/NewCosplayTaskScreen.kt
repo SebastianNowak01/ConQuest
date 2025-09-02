@@ -126,7 +126,11 @@ fun NewCosplayTaskScreen(
         }
 
         IconButton(
-            onClick = { navController.popBackStack() },
+            onClick = {
+                navController.navigate(MainCosplayScreen(uid = cosplayId, initialTab = 1)) {
+                    popUpTo(MainCosplayScreen(uid = cosplayId)) { inclusive = true }
+                }
+            },
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(top = 16.dp, end = 16.dp)
@@ -155,7 +159,9 @@ fun NewCosplayTaskScreen(
                             notes = null
                         )
                         cosplayViewModel.insertTask(task)
-                        navController.popBackStack()
+                        navController.navigate(MainCosplayScreen(uid = cosplayId, initialTab = 1)) {
+                            popUpTo(MainCosplayScreen(uid = cosplayId)) { inclusive = true }
+                        }
                     } else {
                         coroutineScope.launch {
                             snackbarHostState.showSnackbar(

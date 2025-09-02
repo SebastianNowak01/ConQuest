@@ -7,7 +7,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavBackStackEntry
 import kotlinx.serialization.Serializable
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -16,17 +15,24 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.TheaterComedy
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
+import androidx.navigation.toRoute
+import kotlinx.coroutines.launch
 
 @Serializable
 data class MainCosplayScreen(
-    val uid: Int
+    val uid: Int, val initialTab: Int = 0
 )
 
 @Composable
 fun MainCosplayScreen(
     navBackStackEntry: NavBackStackEntry, navController: NavController
 ) {
-    CosplayTabs(navBackStackEntry, navController)
+    val args = navBackStackEntry.toRoute<MainCosplayScreen>()
+    CosplayTabs(
+        navBackStackEntry = navBackStackEntry,
+        navController = navController,
+        initialTab = args.initialTab
+    )
 }
 
 data class TabIcon(
@@ -34,31 +40,29 @@ data class TabIcon(
 )
 
 @Composable
-fun CosplayTabs(navBackStackEntry: NavBackStackEntry, navController: NavController) {
+fun CosplayTabs(
+    navBackStackEntry: NavBackStackEntry, navController: NavController, initialTab: Int
+) {
     val tabIcons = listOf(
         TabIcon(Icons.Filled.TheaterComedy, "Cosplay Elements"),
         TabIcon(Icons.AutoMirrored.Filled.List, "Tasks"),
         TabIcon(Icons.Filled.Image, "Reference Images")
     )
-    val pagerState = rememberPagerState { tabIcons.size }
-    var selectedTab by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(selectedTab) {
-        if (pagerState.currentPage != selectedTab) {
-            pagerState.animateScrollToPage(selectedTab)
-        }
-    }
+    val pagerState = rememberPagerState(initialPage = initialTab) { tabIcons.size }
+    val coroutineScope = rememberCoroutineScope()
 
     Column(modifier = Modifier.fillMaxSize()) {
-        TabRow(
-            selectedTabIndex = pagerState.currentPage, modifier = Modifier.fillMaxWidth()
-        ) {
+        TabRow(selectedTabIndex = pagerState.currentPage) {
             tabIcons.forEachIndexed { index, icon ->
-                Tab(icon = {
-                    Icon(
-                        imageVector = icon.imageVector, contentDescription = icon.contentDescription
-                    )
-                }, selected = pagerState.currentPage == index, onClick = { selectedTab = index })
+                Tab(
+                    icon = { Icon(icon.imageVector, icon.contentDescription) },
+                    selected = pagerState.currentPage == index,
+                    onClick = {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(index)
+                        }
+                    })
             }
         }
 
