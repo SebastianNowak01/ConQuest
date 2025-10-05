@@ -18,16 +18,23 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
+import androidx.compose.foundation.background
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material3.Icon
+
 
 @Composable
 fun CosplayElementsTab(navController: NavController, navBackStackEntry: NavBackStackEntry) {
@@ -86,7 +93,7 @@ fun CosplayElementsTab(navController: NavController, navBackStackEntry: NavBackS
                                     if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
                                 if (selectedIds.isEmpty()) selectionMode = false
                             } else {
-//                                navController.navigate(MainCosplayScreen(cosplay.uid))
+                                // navController.navigate(...)
                             }
                         }, onLongClick = {
                             selectionMode = true
@@ -98,28 +105,77 @@ fun CosplayElementsTab(navController: NavController, navBackStackEntry: NavBackS
                     ),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     shape = RoundedCornerShape(32.dp)) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
+                    Row(
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text(
-                            text = element.name,
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        if (element.cost != null) {
-                            Text(
-                                text = "Cost: $${element.cost}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onBackground
+                        // Image or placeholder
+                        if (element.photoPath != "") {
+                            AsyncImage(
+                                model = element.photoPath,
+                                contentDescription = "Element image",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .size(64.dp)
+                                    .clip(CircleShape)
                             )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .size(64.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Image,
+                                    contentDescription = "Placeholder image",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
-                        Row {
-                            if (element.ready) Text(
-                                "Ready", color = MaterialTheme.colorScheme.secondary
+
+                        // Text content
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                text = element.name,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.primary
                             )
-                            if (element.bought) Text(
-                                " • Bought", color = MaterialTheme.colorScheme.secondary
-                            )
+                            if (element.cost != null) {
+                                Text(
+                                    text = "Cost: $${element.cost}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+                        }
+
+                        // Status labels in one line
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (element.ready) {
+                                Text(
+                                    "Ready",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            }
+                            if (element.bought) {
+                                Text(
+                                    "Bought",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            }
                         }
                     }
                 }

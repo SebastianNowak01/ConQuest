@@ -1,5 +1,8 @@
 package com.example.conquest.screens
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,6 +14,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -18,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.data.entity.CosplayElement
 import kotlinx.coroutines.launch
@@ -34,12 +40,30 @@ fun NewCosplayElementScreen(
     val cosplayViewModel: CosplayViewModel = viewModel()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     var name by remember { mutableStateOf("") }
     var cost by remember { mutableStateOf("") }
     var ready by remember { mutableStateOf(false) }
     var highlight by remember { mutableStateOf(false) }
     var bought by remember { mutableStateOf(false) }
+    var photoPath by remember { mutableStateOf("") }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            try {
+                val fileName = "cosplay_element_${System.currentTimeMillis()}.jpg"
+                val savedPath = copyUriToInternalStorage(context, it, fileName)
+                photoPath = savedPath
+            } catch (e: Exception) {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar("Failed to save image: ${e.localizedMessage}")
+                }
+            }
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -82,6 +106,23 @@ fun NewCosplayElementScreen(
                 shape = RoundedCornerShape(32.dp)
             )
 
+            // Image picker button
+            Button(
+                onClick = { launcher.launch("image/*") }, shape = RoundedCornerShape(32.dp)
+            ) {
+                Text("Pick Image")
+            }
+
+            // Show preview if image selected
+            AsyncImage(
+                model = photoPath,
+                contentDescription = "Selected image",
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(RoundedCornerShape(16.dp))
+            )
+
+            // Ready switch
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -114,6 +155,7 @@ fun NewCosplayElementScreen(
                 }
             }
 
+            // Bought switch
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -174,7 +216,7 @@ fun NewCosplayElementScreen(
                             name = name.trim(),
                             cost = cost.takeIf { it.isNotBlank() }?.toDoubleOrNull(),
                             ready = ready,
-                            photoPath = null,
+                            photoPath = photoPath, // ✅ store image path
                             highlight = highlight,
                             bought = bought,
                             notes = null
