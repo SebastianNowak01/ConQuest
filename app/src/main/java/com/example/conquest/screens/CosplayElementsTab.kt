@@ -119,13 +119,13 @@ fun CosplayElementsTab(navController: NavController, navBackStackEntry: NavBackS
                                 contentDescription = "Element image",
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
-                                    .size(64.dp)
+                                    .size(48.dp)
                                     .clip(CircleShape)
                             )
                         } else {
                             Box(
                                 modifier = Modifier
-                                    .size(64.dp)
+                                    .size(48.dp)
                                     .clip(CircleShape)
                                     .background(MaterialTheme.colorScheme.surfaceVariant),
                                 contentAlignment = Alignment.Center
