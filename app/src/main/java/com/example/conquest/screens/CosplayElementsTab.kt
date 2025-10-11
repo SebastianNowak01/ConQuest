@@ -93,7 +93,7 @@ fun CosplayElementsTab(navController: NavController, navBackStackEntry: NavBackS
                                     if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
                                 if (selectedIds.isEmpty()) selectionMode = false
                             } else {
-                                // navController.navigate(...)
+                                navController.navigate(EditCosplayElementScreen(element.id))
                             }
                         }, onLongClick = {
                             selectionMode = true
@@ -104,7 +104,8 @@ fun CosplayElementsTab(navController: NavController, navBackStackEntry: NavBackS
                         else MaterialTheme.colorScheme.background
                     ),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                    shape = RoundedCornerShape(32.dp)) {
+                    shape = RoundedCornerShape(32.dp)
+                ) {
                     Row(
                         modifier = Modifier
                             .padding(12.dp)

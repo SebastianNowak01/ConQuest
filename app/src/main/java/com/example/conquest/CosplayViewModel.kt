@@ -10,6 +10,7 @@ import com.example.conquest.data.entity.CosplayElement
 import com.example.conquest.data.entity.CosplayPhoto
 import com.example.conquest.data.entity.CosplayTask
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -100,6 +101,24 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     fun deleteTasksByIds(ids: Set<Int>) {
         viewModelScope.launch {
             taskDao.deleteTasksByIds(ids)
+        }
+    }
+
+    fun getElementById(id: Int): Flow<CosplayElement?> {
+        return elementDao.getElementById(id)
+    }
+
+    fun updateElement(
+        id: Int,
+        name: String,
+        cost: Double?,
+        ready: Boolean,
+        bought: Boolean,
+        photoPath: String,
+        notes: String
+    ) {
+        viewModelScope.launch {
+            elementDao.updateElement(id, name, cost, ready, bought, photoPath, notes)
         }
     }
 }
