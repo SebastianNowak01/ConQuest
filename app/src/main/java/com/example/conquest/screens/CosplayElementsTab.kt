@@ -114,7 +114,7 @@ fun CosplayElementsTab(navController: NavController, navBackStackEntry: NavBackS
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         // Image or placeholder
-                        if (element.photoPath != "") {
+                        if (element.photoPath.isNullOrEmpty()) {
                             AsyncImage(
                                 model = element.photoPath,
                                 contentDescription = "Element image",

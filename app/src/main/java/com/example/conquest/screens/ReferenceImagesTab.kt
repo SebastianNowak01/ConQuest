@@ -1,7 +1,9 @@
 package com.example.conquest.screens
 
+import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
+import android.webkit.MimeTypeMap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -66,18 +68,26 @@ fun ReferenceImagesTab(navBackStackEntry: NavBackStackEntry) {
     }
 }
 
+fun getFileExtension(context: Context, uri: Uri): String? {
+    val contentResolver: ContentResolver = context.contentResolver
+    val mimeTypeMap = MimeTypeMap.getSingleton()
+    val mimeType = contentResolver.getType(uri)
+    return mimeTypeMap.getExtensionFromMimeType(mimeType)
+}
+
 @Composable
 fun PickAndSaveImage(
     context: Context, modifier: Modifier, onImageSaved: (String) -> Unit,
 ) {
-    var error by remember { mutableStateOf<String?>("") }
+    var error by remember { mutableStateOf<String?>(null) }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
             try {
-                val fileName = "cosplay_photo_${System.currentTimeMillis()}.jpg"
+                val extension = getFileExtension(context, uri) ?: "jpg"
+                val fileName = "cosplay_photo_${System.currentTimeMillis()}.$extension"
                 val savedPath = copyUriToInternalStorage(context, uri, fileName)
                 onImageSaved(savedPath)
             } catch (e: Exception) {
@@ -87,7 +97,8 @@ fun PickAndSaveImage(
     }
 
     MyFab(
-        onClick = { launcher.launch("image/*") }, modifier = modifier,
+        onClick = { launcher.launch("image/*") },
+        modifier = modifier,
         containerColor = MaterialTheme.colorScheme.tertiary,
         contentColor = MaterialTheme.colorScheme.primary,
         icon = Icons.Default.Add,

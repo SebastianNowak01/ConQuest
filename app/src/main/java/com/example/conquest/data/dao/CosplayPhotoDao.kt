@@ -15,7 +15,7 @@ interface CosplayPhotoDao {
     @Delete
     suspend fun deletePhotos(photos: List<CosplayPhoto>)
 
-    @Query("SELECT * FROM cosplay_photos WHERE cosplay_id = :cosplaysId")
+    @Query("SELECT * FROM cosplay_photos WHERE cosplay_id IN (:cosplaysId)")
     suspend fun getPhotosForCosplayOnce(cosplaysId: Set<Int>): List<CosplayPhoto>
 
     @Query("SELECT * FROM cosplay_photos WHERE cosplay_id = :cosplayId")
