@@ -246,15 +246,17 @@ fun EditCosplayElementScreen(
 
             MyFab(
                 onClick = {
-                    cosplayViewModel.updateElement(
-                        id = elementId,
-                        name = name,
-                        cost = cost.toDoubleOrNull(),
-                        ready = ready,
-                        bought = bought,
-                        photoPath = photoPath,
-                        notes = notes
-                    )
+                    element?.let {
+                        val updatedElement = it.copy(
+                            name = name,
+                            cost = cost.toDoubleOrNull(),
+                            ready = ready,
+                            bought = bought,
+                            photoPath = photoPath,
+                            notes = notes
+                        )
+                        cosplayViewModel.updateElement(updatedElement)
+                    }
                     navController.popBackStack()
                 },
                 containerColor = MaterialTheme.colorScheme.secondary,

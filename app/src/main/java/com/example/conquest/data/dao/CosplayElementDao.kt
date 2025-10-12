@@ -3,6 +3,7 @@ package com.example.conquest.data.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.example.conquest.data.entity.CosplayElement
 import kotlinx.coroutines.flow.Flow
 
@@ -20,12 +21,6 @@ interface CosplayElementDao {
     @Query("SELECT * FROM cosplay_elements WHERE id = :id LIMIT 1")
     fun getElementById(id: Int): Flow<CosplayElement?>
 
-    @Query(
-        """
-        UPDATE cosplay_elements 
-        SET name = :name, cost = :cost, ready = :ready, bought = :bought, photo_path = :photoPath, notes = :notes
-        WHERE id = :id
-        """
-    )
-    suspend fun updateElement(id: Int, name: String, cost: Double?, ready: Boolean, bought: Boolean, photoPath: String, notes: String)
+    @Update
+    suspend fun updateElement(cosplayElement: CosplayElement)
 }

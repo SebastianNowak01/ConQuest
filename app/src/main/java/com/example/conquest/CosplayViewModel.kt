@@ -109,16 +109,10 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun updateElement(
-        id: Int,
-        name: String,
-        cost: Double?,
-        ready: Boolean,
-        bought: Boolean,
-        photoPath: String,
-        notes: String
+        cosplayElement: CosplayElement
     ) {
         viewModelScope.launch {
-            elementDao.updateElement(id, name, cost, ready, bought, photoPath, notes)
+            elementDao.updateElement(cosplayElement)
         }
     }
 }
