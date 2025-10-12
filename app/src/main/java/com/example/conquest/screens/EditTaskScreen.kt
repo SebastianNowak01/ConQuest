@@ -16,7 +16,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.MyFab
+import com.example.conquest.components.getCurrentDate
 import kotlinx.serialization.Serializable
+import java.util.Date
 
 @Serializable
 data class EditTaskScreen(val taskId: Int)
@@ -31,6 +33,7 @@ fun EditTaskScreen(
     var done by remember { mutableStateOf(false) }
     var alarm by remember { mutableStateOf(false) }
     var notes by remember { mutableStateOf("") }
+    var date: Date? by remember { mutableStateOf(task?.date ?: getCurrentDate()) }
     var error by remember { mutableStateOf("") }
 
     LaunchedEffect(task) {
@@ -39,6 +42,7 @@ fun EditTaskScreen(
             done = it.done
             alarm = it.alarm
             notes = it.notes ?: ""
+            date = it.date ?: getCurrentDate()
         }
     }
 
@@ -137,6 +141,11 @@ fun EditTaskScreen(
                     }
                 }
             }
+            com.example.conquest.components.DatePickerFieldToModal(
+                label = "Task date*",
+                selectedDate = date,
+                onDateSelected = { date = it }
+            )
             OutlinedTextField(
                 value = notes,
                 onValueChange = { notes = it },
@@ -171,7 +180,8 @@ fun EditTaskScreen(
                             taskName = taskName,
                             done = done,
                             alarm = alarm,
-                            notes = notes
+                            notes = notes,
+                            date = date
                         )
                         cosplayViewModel.updateTask(updatedTask)
                     }

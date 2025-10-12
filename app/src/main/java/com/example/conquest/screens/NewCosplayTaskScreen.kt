@@ -43,9 +43,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.components.getCurrentDate
 import com.example.conquest.data.entity.CosplayTask
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import java.util.Date
 
 @Serializable
 data class NewCosplayTaskScreen(val cosplayId: Int)
@@ -62,6 +64,7 @@ fun NewCosplayTaskScreen(
     var name by remember { mutableStateOf("") }
     var done by remember { mutableStateOf(false) }
     var alarm by remember { mutableStateOf(false) }
+    var date: Date? by remember { mutableStateOf(getCurrentDate()) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -168,6 +171,12 @@ fun NewCosplayTaskScreen(
                     }
                 }
             }
+
+            com.example.conquest.components.DatePickerFieldToModal(
+                label = "Task date*",
+                selectedDate = date,
+                onDateSelected = { date = it }
+            )
         }
 
         IconButton(
@@ -202,7 +211,7 @@ fun NewCosplayTaskScreen(
                             taskName = name.trim(),
                             alarm = alarm,
                             notes = null,
-                            date = null
+                            date = if (alarm) date else null,
                         )
                         cosplayViewModel.insertTask(task)
                         navController.navigate(MainCosplayScreen(uid = cosplayId, initialTab = 1)) {
