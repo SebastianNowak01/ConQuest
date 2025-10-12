@@ -3,10 +3,12 @@ package com.example.conquest.data.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
+import androidx.room.TypeConverters
+import com.example.conquest.data.DateConverter
 import java.util.Date
 
 @Entity(tableName = "cosplays")
+@TypeConverters(DateConverter::class)
 data class Cosplay(
     @PrimaryKey(autoGenerate = true) val uid: Int,
     @ColumnInfo(name = "in_progress") val inProgress: Boolean,
@@ -17,15 +19,3 @@ data class Cosplay(
     @ColumnInfo(name = "due_date") val dueDate: Date?,
     @ColumnInfo(name = "budget") val budget: Double?
 )
-
-class DateConverter {
-    @TypeConverter
-    fun fromTimestamp(value: Long?): Date? {
-        return value?.let { Date(it) }
-    }
-
-    @TypeConverter
-    fun dateToTimestamp(date: Date?): Long? {
-        return date?.time
-    }
-}
