@@ -211,7 +211,7 @@ fun NewCosplayTaskScreen(
                             taskName = name.trim(),
                             alarm = alarm,
                             notes = null,
-                            date = if (alarm) date else null,
+                            date = date,
                         )
                         cosplayViewModel.insertTask(task)
                         navController.navigate(MainCosplayScreen(uid = cosplayId, initialTab = 1)) {
