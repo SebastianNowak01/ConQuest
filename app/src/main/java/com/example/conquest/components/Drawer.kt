@@ -1,6 +1,5 @@
 package com.example.conquest.components
 
-import MainNavigation
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

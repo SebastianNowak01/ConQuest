@@ -4,12 +4,15 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,6 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.components.MyFab
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -43,7 +47,7 @@ fun EditCosplayElementScreen(
     var notes by remember { mutableStateOf("") }
     var error by remember { mutableStateOf("") }
 
-// Image picker launcher
+    // Image picker launcher
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = GetContent()
     ) { uri: Uri? ->
@@ -58,7 +62,7 @@ fun EditCosplayElementScreen(
         }
     }
 
-// Load element data
+    // Load element data
     LaunchedEffect(element) {
         element?.let {
             name = it.name
@@ -70,126 +74,194 @@ fun EditCosplayElementScreen(
         }
     }
 
-// Scrollable content so Save button is always visible
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp) // reduced horizontal padding
-            .padding(top = 12.dp),       // reduced top padding
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // Image section with less padding
-        Text(
-            text = "Element Image",
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-        )
-        Box(
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
             modifier = Modifier
-                .size(80.dp) // smaller image size
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .clickable { imagePickerLauncher.launch("image/*") },
-            contentAlignment = Alignment.Center
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+                .padding(top = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            if (photoPath.isNotEmpty()) {
-                AsyncImage(
-                    model = photoPath,
-                    contentDescription = "Element image",
-                    contentScale = ContentScale.Crop,
+            Text(
+                text = "Element Image",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+            )
+            Box(
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .clickable { imagePickerLauncher.launch("image/*") },
+                contentAlignment = Alignment.Center
+            ) {
+                if (photoPath.isNotEmpty()) {
+                    AsyncImage(
+                        model = photoPath,
+                        contentDescription = "Element image",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape)
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Image,
+                        contentDescription = "Pick image",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            if (error.isNotEmpty()) {
+                Text(error, color = MaterialTheme.colorScheme.error)
+            }
+
+            Text(
+                text = "Basic Information",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+            )
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text("Name") },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                singleLine = true
+            )
+
+            OutlinedTextField(
+                value = cost,
+                onValueChange = { cost = it },
+                label = { Text("Cost") },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                singleLine = true
+            )
+
+            Text(
+                text = "Status",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Ready switch
+                Card(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .clip(CircleShape)
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.Image,
-                    contentDescription = "Pick image",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(32.dp)
+                        ),
+                    shape = RoundedCornerShape(32.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 18.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text(text = "Ready")
+                        Switch(
+                            checked = ready,
+                            onCheckedChange = { ready = it },
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = MaterialTheme.colorScheme.primary,
+                                checkedTrackColor = MaterialTheme.colorScheme.secondary,
+                                uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                uncheckedTrackColor = MaterialTheme.colorScheme.secondary
+                            )
+                        )
+                    }
+                }
+                Card(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(32.dp)
+                        ),
+                    shape = RoundedCornerShape(32.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 18.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text(text = "Bought")
+                        Switch(
+                            checked = bought,
+                            onCheckedChange = { bought = it },
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = MaterialTheme.colorScheme.primary,
+                                checkedTrackColor = MaterialTheme.colorScheme.secondary,
+                                uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                uncheckedTrackColor = MaterialTheme.colorScheme.secondary
+                            )
+                        )
+                    }
+                }
             }
+
+            Text(
+                text = "Notes",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+            )
+            OutlinedTextField(
+                value = notes,
+                onValueChange = { notes = it },
+                label = { Text("Notes") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp),
+                shape = RoundedCornerShape(20.dp),
+                maxLines = 6
+            )
         }
 
-        if (error.isNotEmpty()) {
-            Text(error, color = MaterialTheme.colorScheme.error)
-        }
-
-        // Inputs with more rounded corners
-        Text(
-            text = "Basic Information",
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-        )
-        OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Name") },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp), // more rounded
-            singleLine = true
-        )
-
-        OutlinedTextField(
-            value = cost,
-            onValueChange = { cost = it },
-            label = { Text("Cost") },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp), // more rounded
-            singleLine = true
-        )
-
-        Text(
-            text = "Status",
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-        )
+        // ✅ Row with two FABs centered at bottom
         Row(
-            horizontalArrangement = Arrangement.spacedBy(24.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(checked = ready, onCheckedChange = { ready = it })
-                Text("Ready")
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(checked = bought, onCheckedChange = { bought = it })
-                Text("Bought")
-            }
-        }
-
-        Text(
-            text = "Notes",
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-        )
-        OutlinedTextField(
-            value = notes,
-            onValueChange = { notes = it },
-            label = { Text("Notes") },
             modifier = Modifier
-                .fillMaxWidth()
-                .height(120.dp),
-            shape = RoundedCornerShape(20.dp), // more rounded
-            maxLines = 6
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Save button always visible
-        Button(
-            onClick = {
-                cosplayViewModel.updateElement(
-                    id = elementId,
-                    name = name,
-                    cost = cost.toDoubleOrNull(),
-                    ready = ready,
-                    bought = bought,
-                    photoPath = photoPath,
-                    notes = notes
-                )
-                navController.popBackStack()
-            }, modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp), // consistent button height
-            shape = RoundedCornerShape(20.dp) // more rounded
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            Text("Save", style = MaterialTheme.typography.titleMedium)
+            MyFab(
+                onClick = { navController.popBackStack() },
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.primary,
+                icon = Icons.Default.Close,
+                contentDescription = "Discard"
+            )
+
+            MyFab(
+                onClick = {
+                    cosplayViewModel.updateElement(
+                        id = elementId,
+                        name = name,
+                        cost = cost.toDoubleOrNull(),
+                        ready = ready,
+                        bought = bought,
+                        photoPath = photoPath,
+                        notes = notes
+                    )
+                    navController.popBackStack()
+                },
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.primary,
+                icon = Icons.Default.Check,
+                contentDescription = "Save"
+            )
         }
     }
 }
