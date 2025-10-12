@@ -2,58 +2,67 @@ package com.example.conquest.screens
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import kotlinx.serialization.Serializable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
-import java.util.*
-import com.example.conquest.components.DatePickerFieldToModal
-import com.example.conquest.components.getCurrentDate
-import com.example.conquest.data.entity.Cosplay
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.sp
+import com.example.conquest.data.entity.CosplayTask
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
 @Serializable
-object NewCosplayScreen
+data class NewCosplayTaskScreen(val cosplayId: Int)
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewCosplayScreen(
+fun NewCosplayTaskScreen(
+    cosplayId: Int,
     navController: NavController,
 ) {
     val cosplayViewModel: CosplayViewModel = viewModel()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
-    var characterName by remember { mutableStateOf("") }
-    var series by remember { mutableStateOf("") }
-    var initialDate by remember { mutableStateOf<Date?>(getCurrentDate()) }
-    var dueDate by remember { mutableStateOf<Date?>(getCurrentDate()) }
-    var budget by remember { mutableStateOf("") }
-    var inProgress by remember { mutableStateOf(true) }
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-    ) {
+    var name by remember { mutableStateOf("") }
+    var done by remember { mutableStateOf(false) }
+
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -63,7 +72,7 @@ fun NewCosplayScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "New Project",
+                text = "Add Task",
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp
                 ),
@@ -72,6 +81,15 @@ fun NewCosplayScreen(
                     .padding(bottom = 8.dp, top = 8.dp)
                     .fillMaxWidth(),
                 textAlign = TextAlign.Center
+            )
+
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text("Task Name*") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                shape = RoundedCornerShape(32.dp)
             )
 
             Card(
@@ -88,19 +106,14 @@ fun NewCosplayScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(
-                            horizontal = 18.dp, vertical = 4.dp
-                        ),
+                        .padding(horizontal = 18.dp, vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Text(
-                        text = if (inProgress) "In Progress" else "Planned",
-                    )
-
+                    Text(text = "Done")
                     Switch(
-                        checked = inProgress,
-                        onCheckedChange = { inProgress = it },
+                        checked = done,
+                        onCheckedChange = { done = it },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = MaterialTheme.colorScheme.primary,
                             checkedTrackColor = MaterialTheme.colorScheme.secondary,
@@ -110,48 +123,14 @@ fun NewCosplayScreen(
                     )
                 }
             }
-
-            OutlinedTextField(
-                value = characterName,
-                onValueChange = { characterName = it },
-                label = { Text("Character Name*") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                shape = RoundedCornerShape(32.dp)
-            )
-
-            OutlinedTextField(
-                value = series,
-                onValueChange = { series = it },
-                label = { Text("Series*") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                shape = RoundedCornerShape(32.dp)
-            )
-
-            DatePickerFieldToModal(
-                label = "Initial date*",
-                selectedDate = initialDate,
-                onDateSelected = { initialDate = it })
-
-            DatePickerFieldToModal(
-                label = "Due date", selectedDate = dueDate, onDateSelected = { dueDate = it })
-
-            OutlinedTextField(
-                value = budget,
-                onValueChange = { budget = it.filter { it.isDigit() || it == '.' } },
-                label = { Text("Budget (Optional)") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                leadingIcon = { Text("$") },
-                shape = RoundedCornerShape(32.dp)
-            )
-
         }
 
         IconButton(
-            onClick = { navController.popBackStack() },
+            onClick = {
+                navController.navigate(MainCosplayScreen(uid = cosplayId, initialTab = 1)) {
+                    popUpTo(MainCosplayScreen(uid = cosplayId)) { inclusive = true }
+                }
+            },
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(top = 16.dp, end = 16.dp)
@@ -168,22 +147,21 @@ fun NewCosplayScreen(
         Box(
             modifier = Modifier.align(Alignment.BottomCenter)
         ) {
-
             FloatingActionButton(
                 onClick = {
-                    if (characterName.isNotBlank() && series.isNotBlank() && initialDate != null) {
-                        val newCosplay = Cosplay(
-                            name = characterName,
-                            series = series,
-                            initialDate = initialDate!!,
-                            dueDate = dueDate,
-                            budget = budget.takeIf { it.isNotBlank() }?.toDoubleOrNull(),
-                            inProgress = inProgress,
-                            uid = 0,
-                            finished = false
+                    if (name.isNotBlank()) {
+                        val task = CosplayTask(
+                            id = 0,
+                            cosplayId = cosplayId,
+                            done = done,
+                            taskName = name.trim(),
+                            alarm = false,
+                            notes = null
                         )
-                        cosplayViewModel.insertCosplay(newCosplay)
-                        navController.popBackStack()
+                        cosplayViewModel.insertTask(task)
+                        navController.navigate(MainCosplayScreen(uid = cosplayId, initialTab = 1)) {
+                            popUpTo(MainCosplayScreen(uid = cosplayId)) { inclusive = true }
+                        }
                     } else {
                         coroutineScope.launch {
                             snackbarHostState.showSnackbar(
@@ -203,6 +181,7 @@ fun NewCosplayScreen(
                 Icon(Icons.Default.Add, contentDescription = "Save")
             }
         }
+
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier

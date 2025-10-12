@@ -1,6 +1,5 @@
 package com.example.conquest.components
 
-import MainNavigation
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
@@ -47,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.conquest.screens.MainScreen
-import com.example.conquest.screens.NewCosplayScreen
 import com.example.conquest.screens.SettingsScreenParams
 import kotlinx.coroutines.launch
 
@@ -57,7 +54,9 @@ val routes = listOf(
 )
 
 val noDrawerRoutes = listOf(
-    "com.example.conquest.screens.NewCosplayScreen"
+    "com.example.conquest.screens.NewCosplayScreen",
+    "com.example.conquest.screens.NewCosplayElementScreen/{cosplayId}",
+    "com.example.conquest.screens.NewCosplayTaskScreen/{cosplayId}"
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -87,8 +86,7 @@ fun Drawer(
                             text = "ConQuest",
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier
-                                .padding(horizontal = 24.dp, vertical = 8.dp)
+                            modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
                         )
                         HorizontalDivider(
                             thickness = 1.dp,
@@ -124,42 +122,51 @@ fun Drawer(
                     containerColor = MaterialTheme.colorScheme.background,
                     contentColor = MaterialTheme.colorScheme.primary,
                     topBar = {
-                        TopAppBar(colors = topAppBarColorsObject(), title = {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                MyIcon(
-                                    { navController.navigate(NewCosplayScreen) },
-                                    Icons.Default.Add,
-                                    "Add new cosplay"
-                                )
-                                SearchBar(
-                                    value = searchQuery,
-                                    onValueChange = { searchQuery = it }
-                                )
-                            }
-                        }, navigationIcon = {
-                            IconButton(onClick = {
-                                scope.launch {
-                                    drawerState.open()
+                        if (currentRoute == "com.example.conquest.screens.SettingsScreenParams") {
+                            TopAppBar(
+                                colors = topAppBarColorsObject(),
+                                title = { Text("Settings screen") },
+                                navigationIcon = {
+                                    IconButton(onClick = {
+                                        scope.launch { drawerState.open() }
+                                    }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Menu,
+                                            contentDescription = "Menu"
+                                        )
+                                    }
+                                },
+                                actions = {} // No actions on settings screen
+                            )
+                        } else {
+                            TopAppBar(colors = topAppBarColorsObject(), title = {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    SearchBar(
+                                        value = searchQuery, onValueChange = { searchQuery = it })
                                 }
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Default.Menu,
-                                    contentDescription = "Menu"
-                                )
-                            }
-                        }, actions = {
-                            MyIcon({}, Icons.Default.Search, "Filter")
-                            MyIcon({}, Icons.Default.AccountCircle, "Sort by")
-                            MyIcon({}, Icons.Default.KeyboardArrowDown, "Order by")
-                        })
+                            }, navigationIcon = {
+                                IconButton(onClick = {
+                                    scope.launch { drawerState.open() }
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Menu,
+                                        contentDescription = "Menu"
+                                    )
+                                }
+                            }, actions = {
+                                MyIcon({}, Icons.Default.Search, "Filter")
+                                MyIcon({}, Icons.Default.AccountCircle, "Sort by")
+                                MyIcon({}, Icons.Default.KeyboardArrowDown, "Order by")
+                            })
+                        }
                     }) { padding ->
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(padding) // Apply padding from the drawer
+                            .padding(padding)
                     ) {
                         HorizontalDivider(thickness = 1.dp)
                         MainNavigation(navController, searchQuery)

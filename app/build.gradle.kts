@@ -42,7 +42,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -57,6 +56,8 @@ dependencies {
     implementation(libs.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.coil.compose)
+    implementation (libs.androidx.material.icons.extended)
     ksp(libs.androidx.room.compiler.v250)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

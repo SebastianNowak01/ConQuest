@@ -2,7 +2,12 @@ package com.example.conquest.screens
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,35 +19,36 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import com.example.conquest.CosplayViewModel
-import kotlinx.serialization.Serializable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
+import androidx.navigation.toRoute
+import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.MyFab
 
-@Serializable
-object MainScreen
-
 @Composable
-fun MainScreen(navController: NavController, searchQuery: String) {
-    val cosplayViewModel: CosplayViewModel = viewModel()
-    val cosplays by cosplayViewModel.allCosplays.collectAsState()
+fun CosplayTasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry) {
+    val mainArgs = navBackStackEntry.toRoute<MainCosplayScreen>()
+    val cosplayId = mainArgs.uid
 
-    val filteredCosplays = remember(cosplays, searchQuery) {
-        if (searchQuery.isBlank()) cosplays
-        else cosplays.filter { it.name.contains(searchQuery, ignoreCase = true) }
+    val cosplayViewModel: CosplayViewModel = viewModel()
+
+    LaunchedEffect(cosplayId) {
+        cosplayViewModel.setTaskCosplayId(cosplayId)
     }
+
+    val tasks by cosplayViewModel.tasks.collectAsState()
 
     var selectionMode by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(setOf<Int>()) }
@@ -51,7 +57,7 @@ fun MainScreen(navController: NavController, searchQuery: String) {
         if (selectionMode) {
             MyFab(
                 onClick = {
-                    cosplayViewModel.deleteCosplaysByIds(selectedIds)
+                    cosplayViewModel.deleteTasksByIds(selectedIds)
                     selectionMode = false
                     selectedIds = emptySet()
                 },
@@ -71,7 +77,7 @@ fun MainScreen(navController: NavController, searchQuery: String) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
-            items(filteredCosplays) { cosplay ->
+            items(tasks) { task ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -83,19 +89,17 @@ fun MainScreen(navController: NavController, searchQuery: String) {
                         )
                         .combinedClickable(onClick = {
                             if (selectionMode) {
-                                val id = cosplay.uid
+                                val id = task.id
                                 selectedIds =
                                     if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
                                 if (selectedIds.isEmpty()) selectionMode = false
-                            } else {
-                                navController.navigate(MainCosplayScreen(cosplay.uid))
                             }
                         }, onLongClick = {
                             selectionMode = true
-                            selectedIds = selectedIds + cosplay.uid
+                            selectedIds = selectedIds + task.id
                         }),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (selectedIds.contains(cosplay.uid)) MaterialTheme.colorScheme.secondaryContainer
+                        containerColor = if (selectedIds.contains(task.id)) MaterialTheme.colorScheme.secondaryContainer
                         else MaterialTheme.colorScheme.background
                     ),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -105,17 +109,24 @@ fun MainScreen(navController: NavController, searchQuery: String) {
                         modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            text = cosplay.name,
+                            text = task.taskName,
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
                         )
+                        if (task.done) {
+                            Text(
+                                text = "Done",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        }
                     }
                 }
             }
         }
+
         MyFab(
-            onClick = { navController.navigate(NewCosplayScreen) },
+            onClick = { navController.navigate(NewCosplayTaskScreen(cosplayId)) },
             modifier = Modifier.align(Alignment.BottomCenter),
             containerColor = MaterialTheme.colorScheme.tertiary,
             contentColor = MaterialTheme.colorScheme.primary,
