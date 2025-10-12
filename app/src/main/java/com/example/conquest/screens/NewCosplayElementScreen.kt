@@ -261,7 +261,7 @@ fun NewCosplayElementScreen(
                             name = name.trim(),
                             cost = cost.takeIf { it.isNotBlank() }?.toDoubleOrNull(),
                             ready = ready,
-                            photoPath = photoPath, // ✅ store image path
+                            photoPath = photoPath,
                             highlight = highlight,
                             bought = bought,
                             notes = null

@@ -17,6 +17,7 @@ import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.MyFab
 import com.example.conquest.components.getCurrentDate
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.util.Date
 
@@ -33,8 +34,9 @@ fun EditTaskScreen(
     var done by remember { mutableStateOf(false) }
     var alarm by remember { mutableStateOf(false) }
     var notes by remember { mutableStateOf("") }
-    var date: Date? by remember { mutableStateOf(task?.date ?: getCurrentDate()) }
-    var error by remember { mutableStateOf("") }
+    var date: Date? by remember { mutableStateOf(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(task) {
         task?.let {
@@ -156,9 +158,6 @@ fun EditTaskScreen(
                 shape = RoundedCornerShape(20.dp),
                 maxLines = 6
             )
-            if (error.isNotEmpty()) {
-                Text(error, color = MaterialTheme.colorScheme.error)
-            }
         }
         Row(
             modifier = Modifier
@@ -175,6 +174,12 @@ fun EditTaskScreen(
             )
             MyFab(
                 onClick = {
+                    if (taskName.isBlank()) {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar("Task name cannot be empty!")
+                        }
+                        return@MyFab
+                    }
                     task?.let {
                         val updatedTask = it.copy(
                             taskName = taskName,
@@ -193,5 +198,19 @@ fun EditTaskScreen(
                 contentDescription = "Save"
             )
         }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(horizontal = 16.dp, vertical = 140.dp),
+            snackbar = { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    shape = RoundedCornerShape(32.dp),
+                )
+            }
+        )
     }
 }
