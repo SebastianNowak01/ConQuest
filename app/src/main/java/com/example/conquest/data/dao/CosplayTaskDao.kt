@@ -3,6 +3,7 @@ package com.example.conquest.data.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.example.conquest.data.entity.CosplayTask
 import kotlinx.coroutines.flow.Flow
 
@@ -16,4 +17,10 @@ interface CosplayTaskDao {
 
     @Query("SELECT * FROM cosplay_tasks WHERE cosplay_id = :cosplayId")
     fun getTasksForCosplay(cosplayId: Int): Flow<List<CosplayTask>>
+
+    @Query("SELECT * FROM cosplay_tasks WHERE id = :id")
+    fun getTaskById(id: Int): Flow<CosplayTask?>
+
+    @Update
+    suspend fun updateTask(task: CosplayTask)
 }

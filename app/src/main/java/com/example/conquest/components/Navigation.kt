@@ -13,6 +13,7 @@ import com.example.conquest.screens.NewCosplayScreen
 import com.example.conquest.screens.NewCosplayTaskScreen
 import com.example.conquest.screens.SettingsScreenParams
 import com.example.conquest.screens.EditCosplayElementScreen
+import com.example.conquest.screens.EditTaskScreen
 
 @Composable
 fun MainNavigation(navController: NavHostController, searchQuery: String) {
@@ -44,6 +45,12 @@ fun MainNavigation(navController: NavHostController, searchQuery: String) {
             val args = backStackEntry.toRoute<EditCosplayElementScreen>()
             EditCosplayElementScreen(
                 elementId = args.elementId, navController = navController
+            )
+        }
+        composable<EditTaskScreen> { backStackEntry ->
+            val args = backStackEntry.toRoute<EditTaskScreen>()
+            EditTaskScreen(
+                taskId = args.taskId, navController = navController
             )
         }
     }

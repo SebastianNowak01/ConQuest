@@ -115,6 +115,16 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
             elementDao.updateElement(cosplayElement)
         }
     }
+
+    fun getTaskById(id: Int): Flow<CosplayTask?> {
+        return taskDao.getTaskById(id)
+    }
+
+    fun updateTask(task: CosplayTask) {
+        viewModelScope.launch {
+            taskDao.updateTask(task)
+        }
+    }
 }
 
 fun deleteFileByPath(path: String) {
