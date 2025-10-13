@@ -72,7 +72,7 @@ fun CosplayTabs(
             when (page) {
                 0 -> CosplayElementsTab(navController, navBackStackEntry)
                 1 -> CosplayTasksTab(navController, navBackStackEntry)
-                2 -> ReferenceImagesTab(navBackStackEntry)
+                2 -> ReferenceImagesTab(navBackStackEntry, navController)
             }
         }
     }
