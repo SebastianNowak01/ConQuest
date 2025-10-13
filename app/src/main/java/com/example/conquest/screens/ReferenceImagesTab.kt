@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
 import androidx.navigation.toRoute
 import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
@@ -50,7 +51,7 @@ import java.io.InputStream
 import java.io.OutputStream
 
 @Composable
-fun ReferenceImagesTab(navBackStackEntry: NavBackStackEntry) {
+fun ReferenceImagesTab(navBackStackEntry: NavBackStackEntry, navController: NavController) {
     val args = navBackStackEntry.toRoute<MainCosplayScreen>()
     val context = LocalContext.current
     val cosplayViewModel: CosplayViewModel = viewModel()
@@ -90,23 +91,19 @@ fun ReferenceImagesTab(navBackStackEntry: NavBackStackEntry) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        CosplayPhotoList(
-            photos = photos,
-            selectedIds = selectedIds,
-            onItemClick = { photo ->
-                if (selectionMode) {
-                    val id = photo.id
-                    val newSet =
-                        if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
-                    selectedIds = newSet
-                    if (newSet.isEmpty()) selectionMode = false
-                }
-            },
-            onItemLongClick = { photo ->
-                selectionMode = true
-                selectedIds = selectedIds + photo.id
+        CosplayPhotoList(photos = photos, selectedIds = selectedIds, onItemClick = { photo ->
+            if (selectionMode) {
+                val id = photo.id
+                val newSet = if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
+                selectedIds = newSet
+                if (newSet.isEmpty()) selectionMode = false
+            } else {
+                navController.navigate(EditReferenceImageScreen(photo.id))
             }
-        )
+        }, onItemLongClick = { photo ->
+            selectionMode = true
+            selectedIds = selectedIds + photo.id
+        })
     }
 }
 
@@ -182,8 +179,7 @@ fun CosplayPhotoList(
         }
     } else {
         LazyRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(items = photos, key = { it.id }) { photo ->
                 Card(
@@ -197,13 +193,10 @@ fun CosplayPhotoList(
                         )
                         .combinedClickable(
                             onClick = { onItemClick(photo) },
-                            onLongClick = { onItemLongClick(photo) }
-                        ),
+                            onLongClick = { onItemLongClick(photo) }),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (selectedIds.contains(photo.id))
-                            MaterialTheme.colorScheme.secondaryContainer
-                        else
-                            MaterialTheme.colorScheme.background
+                        containerColor = if (selectedIds.contains(photo.id)) MaterialTheme.colorScheme.secondaryContainer
+                        else MaterialTheme.colorScheme.background
                     ),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     shape = RoundedCornerShape(16.dp)

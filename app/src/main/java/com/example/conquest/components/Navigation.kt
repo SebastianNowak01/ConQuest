@@ -14,6 +14,7 @@ import com.example.conquest.screens.NewCosplayTaskScreen
 import com.example.conquest.screens.SettingsScreenParams
 import com.example.conquest.screens.EditCosplayElementScreen
 import com.example.conquest.screens.EditTaskScreen
+import com.example.conquest.screens.EditReferenceImageScreen
 
 @Composable
 fun MainNavigation(navController: NavHostController, searchQuery: String) {
@@ -51,6 +52,12 @@ fun MainNavigation(navController: NavHostController, searchQuery: String) {
             val args = backStackEntry.toRoute<EditTaskScreen>()
             EditTaskScreen(
                 taskId = args.taskId, navController = navController
+            )
+        }
+        composable<EditReferenceImageScreen> { backStackEntry ->
+            val args = backStackEntry.toRoute<EditReferenceImageScreen>()
+            EditReferenceImageScreen(
+                photoId = args.photoId, navController = navController
             )
         }
     }

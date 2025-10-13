@@ -17,5 +17,6 @@ import androidx.room.PrimaryKey
 data class CosplayPhoto(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "cosplay_id") val cosplayId: Int,
-    @ColumnInfo(name = "path") val path: String
+    @ColumnInfo(name = "path") val path: String,
+    @ColumnInfo(name = "notes") val notes: String? = null
 )
