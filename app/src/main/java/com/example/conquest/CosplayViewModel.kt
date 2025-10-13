@@ -58,6 +58,14 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    fun deletePhotosByIds(ids: Set<Int>) {
+        viewModelScope.launch {
+            val toDelete = photoDao.getPhotosByIdsOnce(ids)
+            photoDao.deletePhotosByIds(ids)
+            toDelete.forEach { deleteFileByPath(it.path) }
+        }
+    }
+
     fun insertElement(element: CosplayElement) {
         viewModelScope.launch {
             elementDao.insertElement(element)

@@ -20,4 +20,10 @@ interface CosplayPhotoDao {
 
     @Query("SELECT * FROM cosplay_photos WHERE cosplay_id = :cosplayId")
     fun getPhotosForCosplay(cosplayId: Int): Flow<List<CosplayPhoto>>
+
+    @Query("SELECT * FROM cosplay_photos WHERE id IN (:ids)")
+    suspend fun getPhotosByIdsOnce(ids: Set<Int>): List<CosplayPhoto>
+
+    @Query("DELETE FROM cosplay_photos WHERE id IN (:ids)")
+    suspend fun deletePhotosByIds(ids: Set<Int>)
 }
