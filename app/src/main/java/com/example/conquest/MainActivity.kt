@@ -1,6 +1,5 @@
 package com.example.conquest
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,7 +15,6 @@ import com.example.conquest.screens.rememberThemePreference
 
 class MainActivity : ComponentActivity() {
 
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -30,8 +28,8 @@ class MainActivity : ComponentActivity() {
             }
 
             ConQuestTheme(darkTheme = darkTheme) {
-                Scaffold {
-                    Drawer()
+                Scaffold { padding ->
+                    Drawer(padding)
                 }
             }
         }

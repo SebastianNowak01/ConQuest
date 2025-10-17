@@ -46,7 +46,7 @@ fun CosplayTabs(
     val tabIcons = listOf(
         TabIcon(Icons.Filled.TheaterComedy, "Cosplay Elements"),
         TabIcon(Icons.AutoMirrored.Filled.List, "Tasks"),
-        TabIcon(Icons.Filled.Image, "Reference Images")
+        TabIcon(Icons.Filled.Image, "Reference Photos")
     )
 
     val pagerState = rememberPagerState(initialPage = initialTab) { tabIcons.size }
@@ -71,7 +71,7 @@ fun CosplayTabs(
         ) { page ->
             when (page) {
                 0 -> ElementsTab(navController, navBackStackEntry)
-                1 -> CosplayTasksTab(navController, navBackStackEntry)
+                1 -> TasksTab(navController, navBackStackEntry)
                 2 -> PhotosTab(navBackStackEntry, navController)
             }
         }

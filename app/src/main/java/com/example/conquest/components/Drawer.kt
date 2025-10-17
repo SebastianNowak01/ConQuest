@@ -2,6 +2,7 @@ package com.example.conquest.components
 
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -64,8 +65,7 @@ val noDrawerRoutes = listOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Drawer(
-) {
+fun Drawer(padding: PaddingValues) {
     var searchQuery by rememberSaveable { mutableStateOf("") }
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -177,7 +177,13 @@ fun Drawer(
                 }
             }
         } else {
-            MainNavigation(navController, "")
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+            ) {
+                MainNavigation(navController, "")
+            }
         }
     }
 }

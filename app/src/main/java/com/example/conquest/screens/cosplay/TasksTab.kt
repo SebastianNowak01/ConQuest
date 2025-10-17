@@ -41,7 +41,7 @@ import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.MyFab
 
 @Composable
-fun CosplayTasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry) {
+fun TasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry) {
     val mainArgs = navBackStackEntry.toRoute<MainCosplayScreen>()
     val cosplayId = mainArgs.uid
 

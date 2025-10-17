@@ -72,7 +72,7 @@ fun NewTask(
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .fillMaxWidth(0.9f)
-                .padding(top = 70.dp, start = 16.dp, end = 16.dp),
+                .padding(start = 16.dp, end = 16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
