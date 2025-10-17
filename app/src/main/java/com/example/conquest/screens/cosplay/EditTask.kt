@@ -1,76 +1,51 @@
-package com.example.conquest.screens
+package com.example.conquest.screens.cosplay
 
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts.GetContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.components.DatePickerFieldToModal
 import com.example.conquest.components.MyFab
+import com.example.conquest.components.getCurrentDate
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import java.util.Date
 
 @Serializable
-data class EditCosplayElementScreen(val elementId: Int)
+data class EditTask(val taskId: Int)
 
 @Composable
-fun EditCosplayElementScreen(
-    elementId: Int, navController: NavController, cosplayViewModel: CosplayViewModel = viewModel()
+fun EditTask(
+    taskId: Int, navController: NavController, cosplayViewModel: CosplayViewModel = viewModel()
 ) {
-    val context = LocalContext.current
-    val element by cosplayViewModel.getElementById(elementId).collectAsState(initial = null)
+    val task by cosplayViewModel.getTaskById(taskId).collectAsState(initial = null)
 
-    var name by remember { mutableStateOf("") }
-    var cost by remember { mutableStateOf("") }
-    var ready by remember { mutableStateOf(false) }
-    var bought by remember { mutableStateOf(false) }
-    var photoPath by remember { mutableStateOf("") }
+    var taskName by remember { mutableStateOf("") }
+    var done by remember { mutableStateOf(false) }
+    var alarm by remember { mutableStateOf(false) }
     var notes by remember { mutableStateOf("") }
-    var error by remember { mutableStateOf("") }
+    var date: Date? by remember { mutableStateOf(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
-    // Image picker launcher
-    val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = GetContent()
-    ) { uri: Uri? ->
-        if (uri != null) {
-            try {
-                val fileName = "cosplay_element_${System.currentTimeMillis()}.jpg"
-                val savedPath = copyUriToInternalStorage(context, uri, fileName)
-                photoPath = savedPath
-            } catch (e: Exception) {
-                error = "Failed to save image: ${e.localizedMessage}"
-            }
-        }
-    }
-
-    // Load element data
-    LaunchedEffect(element) {
-        element?.let {
-            name = it.name
-            cost = it.cost?.toString() ?: ""
-            ready = it.ready
-            bought = it.bought
-            photoPath = it.photoPath ?: ""
+    LaunchedEffect(task) {
+        task?.let {
+            taskName = it.taskName
+            done = it.done
+            alarm = it.alarm
             notes = it.notes ?: ""
+            date = it.date ?: getCurrentDate()
         }
     }
 
@@ -83,61 +58,17 @@ fun EditCosplayElementScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Element Image",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-            )
-            Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .clickable { imagePickerLauncher.launch("image/*") },
-                contentAlignment = Alignment.Center
-            ) {
-                if (photoPath.isNotEmpty()) {
-                    AsyncImage(
-                        model = photoPath,
-                        contentDescription = "Element image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(CircleShape)
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Image,
-                        contentDescription = "Pick image",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            if (error.isNotEmpty()) {
-                Text(error, color = MaterialTheme.colorScheme.error)
-            }
-
-            Text(
-                text = "Basic Information",
+                text = "Edit Task",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
             OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Name") },
+                value = taskName,
+                onValueChange = { taskName = it },
+                label = { Text("Task Name") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
                 singleLine = true
             )
-
-            OutlinedTextField(
-                value = cost,
-                onValueChange = { cost = it },
-                label = { Text("Cost") },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                singleLine = true
-            )
-
             Text(
                 text = "Status",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
@@ -146,7 +77,7 @@ fun EditCosplayElementScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Ready switch
+                // Done switch
                 Card(
                     modifier = Modifier
                         .weight(1f)
@@ -166,10 +97,10 @@ fun EditCosplayElementScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Text(text = "Ready")
+                        Text(text = "Done")
                         Switch(
-                            checked = ready,
-                            onCheckedChange = { ready = it },
+                            checked = done,
+                            onCheckedChange = { done = it },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = MaterialTheme.colorScheme.primary,
                                 checkedTrackColor = MaterialTheme.colorScheme.secondary,
@@ -179,6 +110,7 @@ fun EditCosplayElementScreen(
                         )
                     }
                 }
+                // Alarm switch
                 Card(
                     modifier = Modifier
                         .weight(1f)
@@ -198,10 +130,10 @@ fun EditCosplayElementScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Text(text = "Bought")
+                        Text(text = "Alarm")
                         Switch(
-                            checked = bought,
-                            onCheckedChange = { bought = it },
+                            checked = alarm,
+                            onCheckedChange = { alarm = it },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = MaterialTheme.colorScheme.primary,
                                 checkedTrackColor = MaterialTheme.colorScheme.secondary,
@@ -212,10 +144,10 @@ fun EditCosplayElementScreen(
                     }
                 }
             }
-
-            Text(
-                text = "Notes",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+            DatePickerFieldToModal(
+                label = "Task date*",
+                selectedDate = date,
+                onDateSelected = { date = it }
             )
             OutlinedTextField(
                 value = notes,
@@ -228,8 +160,6 @@ fun EditCosplayElementScreen(
                 maxLines = 6
             )
         }
-
-        // ✅ Row with two FABs centered at bottom
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -243,19 +173,23 @@ fun EditCosplayElementScreen(
                 icon = Icons.Default.Close,
                 contentDescription = "Discard"
             )
-
             MyFab(
                 onClick = {
-                    element?.let {
-                        val updatedElement = it.copy(
-                            name = name,
-                            cost = cost.toDoubleOrNull(),
-                            ready = ready,
-                            bought = bought,
-                            photoPath = photoPath,
-                            notes = notes
+                    if (taskName.isBlank()) {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar("Task name cannot be empty!")
+                        }
+                        return@MyFab
+                    }
+                    task?.let {
+                        val updatedTask = it.copy(
+                            taskName = taskName,
+                            done = done,
+                            alarm = alarm,
+                            notes = notes,
+                            date = date
                         )
-                        cosplayViewModel.updateElement(updatedElement)
+                        cosplayViewModel.updateTask(updatedTask)
                     }
                     navController.popBackStack()
                 },
@@ -265,5 +199,19 @@ fun EditCosplayElementScreen(
                 contentDescription = "Save"
             )
         }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(horizontal = 16.dp, vertical = 140.dp),
+            snackbar = { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    shape = RoundedCornerShape(32.dp),
+                )
+            }
+        )
     }
 }

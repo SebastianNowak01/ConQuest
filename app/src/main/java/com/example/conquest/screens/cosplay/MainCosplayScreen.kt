@@ -1,4 +1,4 @@
-package com.example.conquest.screens
+package com.example.conquest.screens.cosplay
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -70,9 +70,9 @@ fun CosplayTabs(
             state = pagerState, modifier = Modifier.weight(1f)
         ) { page ->
             when (page) {
-                0 -> CosplayElementsTab(navController, navBackStackEntry)
+                0 -> ElementsTab(navController, navBackStackEntry)
                 1 -> CosplayTasksTab(navController, navBackStackEntry)
-                2 -> ReferenceImagesTab(navBackStackEntry, navController)
+                2 -> PhotosTab(navBackStackEntry, navController)
             }
         }
     }

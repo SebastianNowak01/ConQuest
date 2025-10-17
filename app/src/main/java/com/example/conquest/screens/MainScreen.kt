@@ -30,6 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.zIndex
 import com.example.conquest.components.MyFab
+import com.example.conquest.screens.cosplay.MainCosplayScreen
+import com.example.conquest.screens.cosplay.NewCosplay
 
 @Serializable
 object MainScreen
@@ -115,7 +117,7 @@ fun MainScreen(navController: NavController, searchQuery: String) {
             }
         }
         MyFab(
-            onClick = { navController.navigate(NewCosplayScreen) },
+            onClick = { navController.navigate(NewCosplay) },
             modifier = Modifier.align(Alignment.BottomCenter),
             containerColor = MaterialTheme.colorScheme.tertiary,
             contentColor = MaterialTheme.colorScheme.primary,

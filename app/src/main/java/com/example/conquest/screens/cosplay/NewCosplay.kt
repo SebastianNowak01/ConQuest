@@ -1,4 +1,4 @@
-package com.example.conquest.screens
+package com.example.conquest.screens.cosplay
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -34,11 +34,11 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 
 @Serializable
-object NewCosplayScreen
+object NewCosplay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewCosplayScreen(
+fun NewCosplay(
     navController: NavController,
 ) {
     val cosplayViewModel: CosplayViewModel = viewModel()

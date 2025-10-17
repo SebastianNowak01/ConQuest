@@ -5,16 +5,16 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.example.conquest.screens.MainCosplayScreen
+import com.example.conquest.screens.cosplay.MainCosplayScreen
 import com.example.conquest.screens.MainScreen
-import com.example.conquest.screens.NewCosplayElementScreen
+import com.example.conquest.screens.cosplay.NewElement
 import com.example.conquest.screens.SettingsScreen
-import com.example.conquest.screens.NewCosplayScreen
-import com.example.conquest.screens.NewCosplayTaskScreen
+import com.example.conquest.screens.cosplay.NewCosplay
+import com.example.conquest.screens.cosplay.NewTask
 import com.example.conquest.screens.SettingsScreenParams
-import com.example.conquest.screens.EditCosplayElementScreen
-import com.example.conquest.screens.EditTaskScreen
-import com.example.conquest.screens.EditReferenceImageScreen
+import com.example.conquest.screens.cosplay.EditElement
+import com.example.conquest.screens.cosplay.EditTask
+import com.example.conquest.screens.cosplay.EditPhoto
 
 @Composable
 fun MainNavigation(navController: NavHostController, searchQuery: String) {
@@ -28,35 +28,35 @@ fun MainNavigation(navController: NavHostController, searchQuery: String) {
         composable<SettingsScreenParams> {
             SettingsScreen()
         }
-        composable<NewCosplayScreen> {
-            NewCosplayScreen(navController)
+        composable<NewCosplay> {
+            NewCosplay(navController)
         }
         composable<MainCosplayScreen> { backStackEntry ->
             MainCosplayScreen(backStackEntry, navController)
         }
-        composable<NewCosplayElementScreen> { backStackEntry ->
-            val args = backStackEntry.toRoute<NewCosplayElementScreen>()
-            NewCosplayElementScreen(args.cosplayId, navController)
+        composable<NewElement> { backStackEntry ->
+            val args = backStackEntry.toRoute<NewElement>()
+            NewElement(args.cosplayId, navController)
         }
-        composable<NewCosplayTaskScreen> { backStackEntry ->
-            val args = backStackEntry.toRoute<NewCosplayTaskScreen>()
-            NewCosplayTaskScreen(args.cosplayId, navController)
+        composable<NewTask> { backStackEntry ->
+            val args = backStackEntry.toRoute<NewTask>()
+            NewTask(args.cosplayId, navController)
         }
-        composable<EditCosplayElementScreen> { backStackEntry ->
-            val args = backStackEntry.toRoute<EditCosplayElementScreen>()
-            EditCosplayElementScreen(
+        composable<EditElement> { backStackEntry ->
+            val args = backStackEntry.toRoute<EditElement>()
+            EditElement(
                 elementId = args.elementId, navController = navController
             )
         }
-        composable<EditTaskScreen> { backStackEntry ->
-            val args = backStackEntry.toRoute<EditTaskScreen>()
-            EditTaskScreen(
+        composable<EditTask> { backStackEntry ->
+            val args = backStackEntry.toRoute<EditTask>()
+            EditTask(
                 taskId = args.taskId, navController = navController
             )
         }
-        composable<EditReferenceImageScreen> { backStackEntry ->
-            val args = backStackEntry.toRoute<EditReferenceImageScreen>()
-            EditReferenceImageScreen(
+        composable<EditPhoto> { backStackEntry ->
+            val args = backStackEntry.toRoute<EditPhoto>()
+            EditPhoto(
                 photoId = args.photoId, navController = navController
             )
         }

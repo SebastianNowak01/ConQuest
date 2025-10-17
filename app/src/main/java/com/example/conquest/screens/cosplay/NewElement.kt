@@ -1,4 +1,4 @@
-package com.example.conquest.screens
+package com.example.conquest.screens.cosplay
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -35,10 +35,10 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class NewCosplayElementScreen(val cosplayId: Int)
+data class NewElement(val cosplayId: Int)
 
 @Composable
-fun NewCosplayElementScreen(
+fun NewElement(
     cosplayId: Int,
     navController: NavController,
 ) {

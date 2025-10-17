@@ -1,4 +1,4 @@
-package com.example.conquest.screens
+package com.example.conquest.screens.cosplay
 
 import android.content.ContentResolver
 import android.content.Context
@@ -51,7 +51,7 @@ import java.io.InputStream
 import java.io.OutputStream
 
 @Composable
-fun ReferenceImagesTab(navBackStackEntry: NavBackStackEntry, navController: NavController) {
+fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController) {
     val args = navBackStackEntry.toRoute<MainCosplayScreen>()
     val context = LocalContext.current
     val cosplayViewModel: CosplayViewModel = viewModel()
@@ -98,7 +98,7 @@ fun ReferenceImagesTab(navBackStackEntry: NavBackStackEntry, navController: NavC
                 selectedIds = newSet
                 if (newSet.isEmpty()) selectionMode = false
             } else {
-                navController.navigate(EditReferenceImageScreen(photo.id))
+                navController.navigate(EditPhoto(photo.id))
             }
         }, onItemLongClick = { photo ->
             selectionMode = true

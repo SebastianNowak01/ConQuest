@@ -54,9 +54,12 @@ val routes = listOf(
 )
 
 val noDrawerRoutes = listOf(
-    "com.example.conquest.screens.NewCosplayScreen",
-    "com.example.conquest.screens.NewCosplayElementScreen/{cosplayId}",
-    "com.example.conquest.screens.NewCosplayTaskScreen/{cosplayId}"
+    "com.example.conquest.screens.cosplay.NewCosplay",
+    "com.example.conquest.screens.cosplay.NewElement/{cosplayId}",
+    "com.example.conquest.screens.cosplay.NewTask/{cosplayId}",
+    "com.example.conquest.screens.cosplay.EditElement/{elementId}",
+    "com.example.conquest.screens.cosplay.EditTask/{taskId}",
+    "com.example.conquest.screens.cosplay.EditPhoto/{photoId}",
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
