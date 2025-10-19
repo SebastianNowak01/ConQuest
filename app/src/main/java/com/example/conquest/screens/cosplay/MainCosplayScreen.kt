@@ -49,8 +49,17 @@ fun CosplayTabs(
         TabIcon(Icons.Filled.Image, "Reference Photos")
     )
 
-    val pagerState = rememberPagerState(initialPage = initialTab) { tabIcons.size }
-    val coroutineScope = rememberCoroutineScope()
+    val handle = navBackStackEntry.savedStateHandle
+    val savedPage = handle.get<Int>("tab") ?: initialTab
+
+    val pagerState = rememberPagerState(
+        initialPage = savedPage.coerceIn(0, tabIcons.lastIndex), pageCount = { tabIcons.size })
+
+    LaunchedEffect(pagerState.currentPage) {
+        handle["tab"] = pagerState.currentPage
+    }
+
+    val scope = rememberCoroutineScope()
 
     Column(modifier = Modifier.fillMaxSize()) {
         TabRow(selectedTabIndex = pagerState.currentPage) {
@@ -58,14 +67,9 @@ fun CosplayTabs(
                 Tab(
                     icon = { Icon(icon.imageVector, icon.contentDescription) },
                     selected = pagerState.currentPage == index,
-                    onClick = {
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(index)
-                        }
-                    })
+                    onClick = { scope.launch { pagerState.animateScrollToPage(index) } })
             }
         }
-
         HorizontalPager(
             state = pagerState, modifier = Modifier.weight(1f)
         ) { page ->

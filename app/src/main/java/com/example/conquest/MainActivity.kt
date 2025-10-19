@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.getValue
@@ -58,7 +59,7 @@ class MainActivity : ComponentActivity() {
                 else -> isSystemInDarkTheme()
             }
 
-            val navController = rememberNavController() // single, hoisted
+            val navController = rememberNavController()
             val drawerState = rememberDrawerState(DrawerValue.Closed)
             val scope = rememberCoroutineScope()
 
@@ -77,7 +78,7 @@ class MainActivity : ComponentActivity() {
                             if (isSettings) {
                                 TopAppBar(
                                     colors = topAppBarColorsObject(),
-                                    title = { androidx.compose.material3.Text("Settings screen") },
+                                    title = { Text("Settings screen") },
                                     navigationIcon = {
                                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
                                             Icon(
@@ -117,7 +118,6 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }) { padding ->
-                    // Drawer only wraps content; NavHost stays composed either way
                     Drawer(
                         navController = navController,
                         drawerState = drawerState,
@@ -131,7 +131,7 @@ class MainActivity : ComponentActivity() {
                             if (!isNoDrawerRoute) {
                                 HorizontalDivider(thickness = 1.dp)
                             }
-                            MainNavigation( // Single NavHost lives here
+                            MainNavigation(
                                 navController = navController,
                                 searchQuery = if (isNoDrawerRoute) "" else searchQuery
                             )
