@@ -57,53 +57,53 @@ fun Drawer(
     val scope = rememberCoroutineScope()
     var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
 
-    if (currentRoute !in noDrawerRoutes) {
-        ModalNavigationDrawer(
-            drawerState = drawerState, drawerContent = {
-                ModalDrawerSheet(
-                    drawerContainerColor = MaterialTheme.colorScheme.background
-                ) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "ConQuest",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
-                    )
-                    HorizontalDivider(
-                        thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.outline,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    navigationItems.forEachIndexed { index, item ->
-                        NavigationDrawerItem(
-                            label = { Text(text = item.title) },
-                            selected = index == selectedItemIndex,
-                            onClick = {
-                                // Navigate without duplicating and restore state
-                                navController.navigate(routes[index]) {
-                                    launchSingleTop = true
-                                    restoreState = true
-                                    popUpTo(navController.graph.startDestinationId) {
-                                        saveState = true
-                                    }
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(
+                drawerContainerColor = MaterialTheme.colorScheme.background
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "ConQuest",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+                )
+                HorizontalDivider(
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                navigationItems.forEachIndexed { index, item ->
+                    NavigationDrawerItem(
+                        label = { Text(text = item.title) },
+                        selected = index == selectedItemIndex,
+                        onClick = {
+                            // Navigate without duplicating and restore state
+                            navController.navigate(routes[index]) {
+                                launchSingleTop = true
+                                restoreState = true
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
                                 }
-                                selectedItemIndex = index
-                                scope.launch { drawerState.close() }
-                            },
-                            icon = {
-                                Icon(
-                                    imageVector = if (index == selectedItemIndex) item.selectedIcon else item.unselectedIcon,
-                                    contentDescription = item.title
-                                )
-                            },
-                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-                            colors = navigationDrawerItemColorsObject()
-                        )
-                    }
+                            }
+                            selectedItemIndex = index
+                            scope.launch { drawerState.close() }
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = if (index == selectedItemIndex) item.selectedIcon else item.unselectedIcon,
+                                contentDescription = item.title
+                            )
+                        },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                        colors = navigationDrawerItemColorsObject()
+                    )
                 }
-            }) { content() }
-    } else {
+            }
+        }
+    ) {
         content()
     }
 }
