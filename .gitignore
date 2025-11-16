@@ -18,3 +18,5 @@ local.properties
 .idea/copilot.data.migration.*.*
 .idea/Project_Default.xml
 .idea/studiobot.xml
+.idea/copilotDiffState.xml
+.idea/deviceManager.xml
