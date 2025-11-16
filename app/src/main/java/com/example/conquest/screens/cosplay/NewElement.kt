@@ -12,7 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -30,6 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.components.MyFab
 import com.example.conquest.data.entity.CosplayElement
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -234,25 +235,22 @@ fun NewElement(
             }
         }
 
-        IconButton(
-            onClick = { navController.popBackStack() },
+        Row(
             modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top = 16.dp, end = 16.dp)
-                .statusBarsPadding()
-                .size(60.dp)
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 16.dp)
+                .navigationBarsPadding(),
+            horizontalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            Icon(
-                imageVector = Icons.Default.Cancel,
-                contentDescription = "Cancel",
-                tint = MaterialTheme.colorScheme.onBackground
+            MyFab(
+                onClick = { navController.popBackStack() },
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.primary,
+                icon = Icons.Default.Close,
+                contentDescription = "Cancel"
             )
-        }
 
-        Box(
-            modifier = Modifier.align(Alignment.BottomCenter)
-        ) {
-            FloatingActionButton(
+            MyFab(
                 onClick = {
                     if (name.isNotBlank()) {
                         val element = CosplayElement(
@@ -278,14 +276,9 @@ fun NewElement(
                 },
                 containerColor = MaterialTheme.colorScheme.secondary,
                 contentColor = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(50),
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 16.dp)
-                    .navigationBarsPadding()
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Save")
-            }
+                icon = Icons.Default.Add,
+                contentDescription = "Save"
+            )
         }
 
         SnackbarHost(

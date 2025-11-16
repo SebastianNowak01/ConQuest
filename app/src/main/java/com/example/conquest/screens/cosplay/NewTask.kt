@@ -9,17 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Snackbar
@@ -44,6 +39,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.DatePickerFieldToModal
+import com.example.conquest.components.MyFab
 import com.example.conquest.components.getCurrentDate
 import com.example.conquest.data.entity.CosplayTask
 import kotlinx.coroutines.launch
@@ -180,29 +176,26 @@ fun NewTask(
             )
         }
 
-        IconButton(
-            onClick = {
-                navController.navigate(MainCosplayScreen(uid = cosplayId, initialTab = 1)) {
-                    popUpTo(MainCosplayScreen(uid = cosplayId)) { inclusive = true }
-                }
-            },
+        Row(
             modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top = 16.dp, end = 16.dp)
-                .statusBarsPadding()
-                .size(60.dp)
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 16.dp)
+                .navigationBarsPadding(),
+            horizontalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            Icon(
-                imageVector = Icons.Default.Cancel,
-                contentDescription = "Cancel",
-                tint = MaterialTheme.colorScheme.onBackground
+            MyFab(
+                onClick = {
+                    navController.navigate(MainCosplayScreen(uid = cosplayId, initialTab = 1)) {
+                        popUpTo(MainCosplayScreen(uid = cosplayId)) { inclusive = true }
+                    }
+                },
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.primary,
+                icon = Icons.Default.Close,
+                contentDescription = "Cancel"
             )
-        }
 
-        Box(
-            modifier = Modifier.align(Alignment.BottomCenter)
-        ) {
-            FloatingActionButton(
+            MyFab(
                 onClick = {
                     if (name.isNotBlank()) {
                         val task = CosplayTask(
@@ -228,14 +221,9 @@ fun NewTask(
                 },
                 containerColor = MaterialTheme.colorScheme.secondary,
                 contentColor = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(50),
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 16.dp)
-                    .navigationBarsPadding()
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Save")
-            }
+                icon = Icons.Default.Add,
+                contentDescription = "Save"
+            )
         }
 
         SnackbarHost(
