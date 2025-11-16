@@ -67,10 +67,8 @@ class MainActivity : ComponentActivity() {
                             config = topBarConfig,
                             searchQuery = searchQuery,
                             onSearchQueryChange = { searchQuery = it },
-                            onMenuClick = { scope.launch { drawerState.open() } }
-                        )
-                    }
-                ) { padding ->
+                            onMenuClick = { scope.launch { drawerState.open() } })
+                    }) { padding ->
                     Drawer(
                         navController = navController,
                         drawerState = drawerState,
