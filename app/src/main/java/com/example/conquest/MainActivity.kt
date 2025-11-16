@@ -121,7 +121,6 @@ class MainActivity : ComponentActivity() {
                     Drawer(
                         navController = navController,
                         drawerState = drawerState,
-                        currentRoute = currentRoute
                     ) {
                         Column(
                             modifier = Modifier

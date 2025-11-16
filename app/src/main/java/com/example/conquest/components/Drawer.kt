@@ -1,5 +1,3 @@
-// Kotlin
-// File: app/src/main/java/com/example/conquest/components/Drawer.kt
 package com.example.conquest.components
 
 import androidx.compose.foundation.layout.Spacer
@@ -49,17 +47,13 @@ val noDrawerRoutes = listOf(
 
 @Composable
 fun Drawer(
-    navController: NavHostController,
-    drawerState: DrawerState,
-    currentRoute: String?,
-    content: @Composable () -> Unit
+    navController: NavHostController, drawerState: DrawerState, content: @Composable () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
 
     ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
+        drawerState = drawerState, drawerContent = {
             ModalDrawerSheet(
                 drawerContainerColor = MaterialTheme.colorScheme.background
             ) {
@@ -80,14 +74,7 @@ fun Drawer(
                         label = { Text(text = item.title) },
                         selected = index == selectedItemIndex,
                         onClick = {
-                            // Navigate without duplicating and restore state
-                            navController.navigate(routes[index]) {
-                                launchSingleTop = true
-                                restoreState = true
-                                popUpTo(navController.graph.startDestinationId) {
-                                    saveState = true
-                                }
-                            }
+                            navController.navigate(routes[index])
                             selectedItemIndex = index
                             scope.launch { drawerState.close() }
                         },
@@ -102,8 +89,7 @@ fun Drawer(
                     )
                 }
             }
-        }
-    ) {
+        }) {
         content()
     }
 }
