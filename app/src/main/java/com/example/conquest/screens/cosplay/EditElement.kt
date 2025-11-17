@@ -1,4 +1,4 @@
-package com.example.conquest.screens
+package com.example.conquest.screens.cosplay
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -30,10 +30,10 @@ import com.example.conquest.components.MyFab
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class EditCosplayElementScreen(val elementId: Int)
+data class EditElement(val elementId: Int)
 
 @Composable
-fun EditCosplayElementScreen(
+fun EditElement(
     elementId: Int, navController: NavController, cosplayViewModel: CosplayViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -77,10 +77,11 @@ fun EditCosplayElementScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
-                .padding(top = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .align(Alignment.TopCenter)
+                .fillMaxWidth(0.9f)
+                .padding(start = 16.dp, end = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = "Element Image",

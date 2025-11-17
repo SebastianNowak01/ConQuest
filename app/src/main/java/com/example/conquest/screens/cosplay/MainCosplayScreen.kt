@@ -1,4 +1,4 @@
-package com.example.conquest.screens
+package com.example.conquest.screens.cosplay
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -46,11 +46,20 @@ fun CosplayTabs(
     val tabIcons = listOf(
         TabIcon(Icons.Filled.TheaterComedy, "Cosplay Elements"),
         TabIcon(Icons.AutoMirrored.Filled.List, "Tasks"),
-        TabIcon(Icons.Filled.Image, "Reference Images")
+        TabIcon(Icons.Filled.Image, "Reference Photos")
     )
 
-    val pagerState = rememberPagerState(initialPage = initialTab) { tabIcons.size }
-    val coroutineScope = rememberCoroutineScope()
+    val handle = navBackStackEntry.savedStateHandle
+    val savedPage = handle.get<Int>("tab") ?: initialTab
+
+    val pagerState = rememberPagerState(
+        initialPage = savedPage.coerceIn(0, tabIcons.lastIndex), pageCount = { tabIcons.size })
+
+    LaunchedEffect(pagerState.currentPage) {
+        handle["tab"] = pagerState.currentPage
+    }
+
+    val scope = rememberCoroutineScope()
 
     Column(modifier = Modifier.fillMaxSize()) {
         TabRow(selectedTabIndex = pagerState.currentPage) {
@@ -58,21 +67,16 @@ fun CosplayTabs(
                 Tab(
                     icon = { Icon(icon.imageVector, icon.contentDescription) },
                     selected = pagerState.currentPage == index,
-                    onClick = {
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(index)
-                        }
-                    })
+                    onClick = { scope.launch { pagerState.animateScrollToPage(index) } })
             }
         }
-
         HorizontalPager(
             state = pagerState, modifier = Modifier.weight(1f)
         ) { page ->
             when (page) {
-                0 -> CosplayElementsTab(navController, navBackStackEntry)
-                1 -> CosplayTasksTab(navController, navBackStackEntry)
-                2 -> ReferenceImagesTab(navBackStackEntry, navController)
+                0 -> ElementsTab(navController, navBackStackEntry)
+                1 -> TasksTab(navController, navBackStackEntry)
+                2 -> PhotosTab(navBackStackEntry, navController)
             }
         }
     }

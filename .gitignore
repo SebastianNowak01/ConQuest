@@ -15,5 +15,8 @@
 local.properties
 
 # Ignore Copilot migration agent files
-copilot.data.migration.agent.xml
-copilot.data.migration.agent.*
+.idea/copilot.data.migration.*.*
+.idea/Project_Default.xml
+.idea/studiobot.xml
+.idea/copilotDiffState.xml
+.idea/deviceManager.xml

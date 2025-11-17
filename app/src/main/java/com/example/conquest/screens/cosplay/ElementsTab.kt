@@ -1,4 +1,4 @@
-package com.example.conquest.screens
+package com.example.conquest.screens.cosplay
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,9 +35,8 @@ import androidx.compose.foundation.background
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Icon
 
-
 @Composable
-fun CosplayElementsTab(navController: NavController, navBackStackEntry: NavBackStackEntry) {
+fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEntry) {
     val mainArgs = navBackStackEntry.toRoute<MainCosplayScreen>()
     val cosplayId = mainArgs.uid
 
@@ -93,7 +92,7 @@ fun CosplayElementsTab(navController: NavController, navBackStackEntry: NavBackS
                                     if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
                                 if (selectedIds.isEmpty()) selectionMode = false
                             } else {
-                                navController.navigate(EditCosplayElementScreen(element.id))
+                                navController.navigate(EditElement(element.id))
                             }
                         }, onLongClick = {
                             selectionMode = true
@@ -184,7 +183,7 @@ fun CosplayElementsTab(navController: NavController, navBackStackEntry: NavBackS
         }
 
         MyFab(
-            onClick = { navController.navigate(NewCosplayElementScreen(cosplayId)) },
+            onClick = { navController.navigate(NewElement(cosplayId)) },
             modifier = Modifier.align(Alignment.BottomCenter),
             containerColor = MaterialTheme.colorScheme.tertiary,
             contentColor = MaterialTheme.colorScheme.primary,

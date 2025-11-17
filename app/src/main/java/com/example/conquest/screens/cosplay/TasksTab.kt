@@ -1,4 +1,4 @@
-package com.example.conquest.screens
+package com.example.conquest.screens.cosplay
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
@@ -18,6 +18,8 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,7 +41,7 @@ import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.MyFab
 
 @Composable
-fun CosplayTasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry) {
+fun TasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry) {
     val mainArgs = navBackStackEntry.toRoute<MainCosplayScreen>()
     val cosplayId = mainArgs.uid
 
@@ -95,7 +97,7 @@ fun CosplayTasksTab(navController: NavController, navBackStackEntry: NavBackStac
                                     if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
                                 if (selectedIds.isEmpty()) selectionMode = false
                             } else {
-                                navController.navigate(EditTaskScreen(task.id))
+                                navController.navigate(EditTask(task.id))
                             }
                         }, onLongClick = {
                             selectionMode = true
@@ -140,11 +142,11 @@ fun CosplayTasksTab(navController: NavController, navBackStackEntry: NavBackStac
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                 ) {
                                     Text(text = "Done")
-                                    androidx.compose.material3.Switch(
+                                    Switch(
                                         checked = task.done,
                                         onCheckedChange = null,
                                         enabled = false,
-                                        colors = androidx.compose.material3.SwitchDefaults.colors(
+                                        colors = SwitchDefaults.colors(
                                             checkedThumbColor = MaterialTheme.colorScheme.primary,
                                             checkedTrackColor = MaterialTheme.colorScheme.secondary,
                                             uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -173,11 +175,11 @@ fun CosplayTasksTab(navController: NavController, navBackStackEntry: NavBackStac
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                 ) {
                                     Text(text = "Alarm")
-                                    androidx.compose.material3.Switch(
+                                    Switch(
                                         checked = task.alarm,
                                         onCheckedChange = null,
                                         enabled = false,
-                                        colors = androidx.compose.material3.SwitchDefaults.colors(
+                                        colors = SwitchDefaults.colors(
                                             checkedThumbColor = MaterialTheme.colorScheme.primary,
                                             checkedTrackColor = MaterialTheme.colorScheme.secondary,
                                             uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -193,7 +195,7 @@ fun CosplayTasksTab(navController: NavController, navBackStackEntry: NavBackStac
         }
 
         MyFab(
-            onClick = { navController.navigate(NewCosplayTaskScreen(cosplayId)) },
+            onClick = { navController.navigate(NewTask(cosplayId)) },
             modifier = Modifier.align(Alignment.BottomCenter),
             containerColor = MaterialTheme.colorScheme.tertiary,
             contentColor = MaterialTheme.colorScheme.primary,

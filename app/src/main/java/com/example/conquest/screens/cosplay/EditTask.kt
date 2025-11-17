@@ -1,101 +1,75 @@
-package com.example.conquest.screens
+package com.example.conquest.screens.cosplay
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.components.DatePickerFieldToModal
+import com.example.conquest.components.MyFab
 import com.example.conquest.components.getCurrentDate
-import com.example.conquest.data.entity.CosplayTask
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.util.Date
 
 @Serializable
-data class NewCosplayTaskScreen(val cosplayId: Int)
+data class EditTask(val taskId: Int)
 
 @Composable
-fun NewCosplayTaskScreen(
-    cosplayId: Int,
-    navController: NavController,
+fun EditTask(
+    taskId: Int, navController: NavController, cosplayViewModel: CosplayViewModel = viewModel()
 ) {
-    val cosplayViewModel: CosplayViewModel = viewModel()
+    val task by cosplayViewModel.getTaskById(taskId).collectAsState(initial = null)
+
+    var taskName by remember { mutableStateOf("") }
+    var done by remember { mutableStateOf(false) }
+    var alarm by remember { mutableStateOf(false) }
+    var notes by remember { mutableStateOf("") }
+    var date: Date? by remember { mutableStateOf(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
-    var name by remember { mutableStateOf("") }
-    var done by remember { mutableStateOf(false) }
-    var alarm by remember { mutableStateOf(false) }
-    var date: Date? by remember { mutableStateOf(getCurrentDate()) }
+    LaunchedEffect(task) {
+        task?.let {
+            taskName = it.taskName
+            done = it.done
+            alarm = it.alarm
+            notes = it.notes ?: ""
+            date = it.date ?: getCurrentDate()
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .fillMaxWidth(0.9f)
-                .padding(top = 70.dp, start = 16.dp, end = 16.dp),
+                .padding(start = 16.dp, end = 16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Add Task",
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp
-                ),
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .padding(bottom = 8.dp, top = 8.dp)
-                    .fillMaxWidth(),
-                textAlign = TextAlign.Center
+                text = "Edit Task",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
-
             OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Task Name*") },
+                value = taskName,
+                onValueChange = { taskName = it },
+                label = { Text("Task Name") },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                shape = RoundedCornerShape(32.dp)
+                shape = RoundedCornerShape(20.dp),
+                singleLine = true
             )
-
             Text(
                 text = "Status",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
@@ -171,72 +145,61 @@ fun NewCosplayTaskScreen(
                     }
                 }
             }
-
-            com.example.conquest.components.DatePickerFieldToModal(
+            DatePickerFieldToModal(
                 label = "Task date*",
                 selectedDate = date,
                 onDateSelected = { date = it }
             )
-        }
-
-        IconButton(
-            onClick = {
-                navController.navigate(MainCosplayScreen(uid = cosplayId, initialTab = 1)) {
-                    popUpTo(MainCosplayScreen(uid = cosplayId)) { inclusive = true }
-                }
-            },
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top = 16.dp, end = 16.dp)
-                .statusBarsPadding()
-                .size(60.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Cancel,
-                contentDescription = "Cancel",
-                tint = MaterialTheme.colorScheme.onBackground
+            OutlinedTextField(
+                value = notes,
+                onValueChange = { notes = it },
+                label = { Text("Notes") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp),
+                shape = RoundedCornerShape(20.dp),
+                maxLines = 6
             )
         }
-
-        Box(
-            modifier = Modifier.align(Alignment.BottomCenter)
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            FloatingActionButton(
+            MyFab(
+                onClick = { navController.popBackStack() },
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.primary,
+                icon = Icons.Default.Close,
+                contentDescription = "Discard"
+            )
+            MyFab(
                 onClick = {
-                    if (name.isNotBlank()) {
-                        val task = CosplayTask(
-                            id = 0,
-                            cosplayId = cosplayId,
-                            done = done,
-                            taskName = name.trim(),
-                            alarm = alarm,
-                            notes = null,
-                            date = date,
-                        )
-                        cosplayViewModel.insertTask(task)
-                        navController.navigate(MainCosplayScreen(uid = cosplayId, initialTab = 1)) {
-                            popUpTo(MainCosplayScreen(uid = cosplayId)) { inclusive = true }
-                        }
-                    } else {
+                    if (taskName.isBlank()) {
                         coroutineScope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = "Please fill out all required fields!"
-                            )
+                            snackbarHostState.showSnackbar("Task name cannot be empty!")
                         }
+                        return@MyFab
                     }
+                    task?.let {
+                        val updatedTask = it.copy(
+                            taskName = taskName,
+                            done = done,
+                            alarm = alarm,
+                            notes = notes,
+                            date = date
+                        )
+                        cosplayViewModel.updateTask(updatedTask)
+                    }
+                    navController.popBackStack()
                 },
                 containerColor = MaterialTheme.colorScheme.secondary,
                 contentColor = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(50),
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 16.dp)
-                    .navigationBarsPadding()
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Save")
-            }
+                icon = Icons.Default.Check,
+                contentDescription = "Save"
+            )
         }
-
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier
@@ -249,6 +212,7 @@ fun NewCosplayTaskScreen(
                     contentColor = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(32.dp),
                 )
-            })
+            }
+        )
     }
 }
