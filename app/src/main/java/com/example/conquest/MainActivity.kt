@@ -5,9 +5,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -59,20 +61,20 @@ class MainActivity : ComponentActivity() {
             val topBarConfig = getTopAppBarConfig(currentRoute, noDrawerRoutes)
 
             ConQuestTheme(darkTheme = darkTheme) {
-                Scaffold(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.primary,
-                    topBar = {
-                        MyTopAppBar(
-                            config = topBarConfig,
-                            searchQuery = searchQuery,
-                            onSearchQueryChange = { searchQuery = it },
-                            onMenuClick = { scope.launch { drawerState.open() } })
-                    }) { padding ->
-                    Drawer(
-                        navController = navController,
-                        drawerState = drawerState,
-                    ) {
+                Drawer(
+                    navController = navController,
+                    drawerState = drawerState,
+                ) {
+                    Scaffold(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                        topBar = {
+                            MyTopAppBar(
+                                config = topBarConfig,
+                                searchQuery = searchQuery,
+                                onSearchQueryChange = { searchQuery = it },
+                                onMenuClick = { scope.launch { drawerState.open() } })
+                        }) { padding ->
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -81,14 +83,24 @@ class MainActivity : ComponentActivity() {
                             if (!isNoDrawerRoute) {
                                 HorizontalDivider(thickness = 1.dp)
                             }
-                            MainNavigation(
-                                navController = navController,
-                                searchQuery = if (isNoDrawerRoute) "" else searchQuery
-                            )
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = androidx.compose.ui.Alignment.TopCenter
+                            ) {
+                                Box(
+                                    modifier = Modifier.widthIn(max = 600.dp)
+                                ) {
+                                    MainNavigation(
+                                        navController = navController,
+                                        searchQuery = if (isNoDrawerRoute) "" else searchQuery
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
+
         }
     }
 }
