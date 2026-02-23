@@ -34,6 +34,7 @@ import com.example.conquest.CosplayViewModel
 import androidx.compose.foundation.background
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Icon
+import com.example.conquest.ui.theme.UIConsts
 
 @Composable
 fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEntry) {

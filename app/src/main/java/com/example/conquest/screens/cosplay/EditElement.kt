@@ -62,7 +62,6 @@ fun EditElement(
         }
     }
 
-    // Load element data
     LaunchedEffect(element) {
         element?.let {
             name = it.name
@@ -230,7 +229,6 @@ fun EditElement(
             )
         }
 
-        // ✅ Row with two FABs centered at bottom
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)

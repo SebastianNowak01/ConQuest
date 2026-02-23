@@ -43,6 +43,7 @@ import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.MyFab
 import kotlinx.serialization.Serializable
+import com.example.conquest.ui.theme.UIConsts
 
 @Serializable
 data class EditPhoto(val photoId: Int)
@@ -85,7 +86,7 @@ fun EditPhoto(
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .fillMaxWidth(0.9f)
-                .padding(start = 16.dp, end = 16.dp),
+                .padding(start = UIConsts.paddingSize, end = UIConsts.paddingSize),
             verticalArrangement = Arrangement.spacedBy(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -95,8 +96,8 @@ fun EditPhoto(
             )
             Box(
                 modifier = Modifier
-                    .size(120.dp)
-                    .clip(RoundedCornerShape(16.dp))
+                    .size(UIConsts.defaultHeight)
+                    .clip(RoundedCornerShape(UIConsts.editScreenMiscellaneousSize))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .clickable { imagePickerLauncher.launch("image/*") },
                 contentAlignment = Alignment.Center
@@ -108,7 +109,7 @@ fun EditPhoto(
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxSize()
-                            .clip(RoundedCornerShape(16.dp))
+                            .clip(RoundedCornerShape(UIConsts.editScreenMiscellaneousSize))
                     )
                 } else {
                     Icon(
@@ -133,8 +134,8 @@ fun EditPhoto(
                 label = { Text("Notes") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(120.dp),
-                shape = RoundedCornerShape(20.dp),
+                    .height(UIConsts.defaultHeight),
+                shape = RoundedCornerShape(UIConsts.editScreenMiscellaneousSize),
                 maxLines = 6
             )
         }
@@ -142,7 +143,7 @@ fun EditPhoto(
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp),
+                .padding(bottom = UIConsts.paddingSize),
             horizontalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             MyFab(
@@ -157,7 +158,7 @@ fun EditPhoto(
                 onClick = {
                     photo?.let { current ->
                         val oldPath = current.path
-                        val newPath = if (photoPath.isNotEmpty()) photoPath else oldPath
+                        val newPath = photoPath.ifEmpty { oldPath }
                         val updated = current.copy(path = newPath, notes = notes.ifBlank { null })
                         val deleteOld = if (newPath != oldPath) oldPath else null
                         cosplayViewModel.updatePhoto(updated, oldPathToDelete = deleteOld)
