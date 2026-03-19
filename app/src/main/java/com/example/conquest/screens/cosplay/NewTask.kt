@@ -39,6 +39,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.DatePickerFieldToModal
+import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyFab
 import com.example.conquest.components.getCurrentDate
 import com.example.conquest.data.entity.CosplayTask
@@ -64,14 +65,7 @@ fun NewTask(
     var date: Date? by remember { mutableStateOf(getCurrentDate()) }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .fillMaxWidth(0.9f)
-                .padding(start = 16.dp, end = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        MyColumn {
             Text(
                 text = "Add Task",
                 style = MaterialTheme.typography.headlineMedium.copy(

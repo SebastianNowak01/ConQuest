@@ -32,6 +32,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import com.example.conquest.components.MyColumn
 import kotlinx.coroutines.launch
 
 @Serializable
@@ -55,14 +56,7 @@ fun NewCosplay(
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
-        Column(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .fillMaxWidth(0.9f)
-                .padding(start = 16.dp, end = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        MyColumn {
             Text(
                 text = "New Project",
                 style = MaterialTheme.typography.headlineMedium.copy(
@@ -156,8 +150,7 @@ fun NewCosplay(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 16.dp)
-                .navigationBarsPadding(),
-            horizontalArrangement = Arrangement.spacedBy(24.dp)
+                .navigationBarsPadding(), horizontalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             MyFab(
                 onClick = { navController.popBackStack() },

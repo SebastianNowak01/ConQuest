@@ -41,6 +41,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyFab
 import kotlinx.serialization.Serializable
 import com.example.conquest.ui.theme.UIConsts
@@ -82,14 +83,7 @@ fun EditPhoto(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .fillMaxWidth(0.9f)
-                .padding(start = UIConsts.paddingSize, end = UIConsts.paddingSize),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        MyColumn {
             Text(
                 text = "Reference Image",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)

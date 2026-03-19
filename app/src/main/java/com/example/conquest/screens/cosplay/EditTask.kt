@@ -16,6 +16,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.DatePickerFieldToModal
+import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyFab
 import com.example.conquest.components.getCurrentDate
 import kotlinx.coroutines.launch
@@ -50,14 +51,7 @@ fun EditTask(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .fillMaxWidth(0.9f)
-                .padding(start = 16.dp, end = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        MyColumn {
             Text(
                 text = "Edit Task",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
@@ -146,10 +140,7 @@ fun EditTask(
                 }
             }
             DatePickerFieldToModal(
-                label = "Task date*",
-                selectedDate = date,
-                onDateSelected = { date = it }
-            )
+                label = "Task date*", selectedDate = date, onDateSelected = { date = it })
             OutlinedTextField(
                 value = notes,
                 onValueChange = { notes = it },
@@ -212,7 +203,6 @@ fun EditTask(
                     contentColor = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(32.dp),
                 )
-            }
-        )
+            })
     }
 }

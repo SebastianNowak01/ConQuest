@@ -30,6 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyFab
 import com.example.conquest.data.entity.CosplayElement
 import kotlinx.coroutines.launch
@@ -72,14 +73,7 @@ fun NewElement(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .fillMaxWidth(0.9f)
-                .padding(start = 16.dp, end = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        MyColumn {
             Text(
                 text = "Add Element",
                 style = MaterialTheme.typography.headlineMedium.copy(
@@ -130,8 +124,7 @@ fun NewElement(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Pick Image",
-                    style = MaterialTheme.typography.bodyMedium
+                    text = "Pick Image", style = MaterialTheme.typography.bodyMedium
                 )
             }
 
@@ -239,8 +232,7 @@ fun NewElement(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 16.dp)
-                .navigationBarsPadding(),
-            horizontalArrangement = Arrangement.spacedBy(24.dp)
+                .navigationBarsPadding(), horizontalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             MyFab(
                 onClick = { navController.popBackStack() },
