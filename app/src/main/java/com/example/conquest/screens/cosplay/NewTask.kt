@@ -3,7 +3,6 @@ package com.example.conquest.screens.cosplay
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,8 +16,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -41,6 +38,7 @@ import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.DatePickerFieldToModal
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyFab
+import com.example.conquest.components.MySnackbarHost
 import com.example.conquest.components.getCurrentDate
 import com.example.conquest.data.entity.CosplayTask
 import kotlinx.coroutines.launch
@@ -164,18 +162,14 @@ fun NewTask(
             }
 
             DatePickerFieldToModal(
-                label = "Task date*",
-                selectedDate = date,
-                onDateSelected = { date = it }
-            )
+                label = "Task date*", selectedDate = date, onDateSelected = { date = it })
         }
 
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 16.dp)
-                .navigationBarsPadding(),
-            horizontalArrangement = Arrangement.spacedBy(24.dp)
+                .navigationBarsPadding(), horizontalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             MyFab(
                 onClick = {
@@ -220,18 +214,6 @@ fun NewTask(
             )
         }
 
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(horizontal = 16.dp, vertical = 140.dp),
-            snackbar = { data ->
-                Snackbar(
-                    snackbarData = data,
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(32.dp),
-                )
-            })
+        MySnackbarHost(hostState = snackbarHostState)
     }
 }

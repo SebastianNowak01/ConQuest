@@ -2,7 +2,6 @@ package com.example.conquest.screens.cosplay
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,12 +26,12 @@ import com.example.conquest.components.DatePickerFieldToModal
 import com.example.conquest.components.getCurrentDate
 import com.example.conquest.components.MyFab
 import com.example.conquest.data.entity.Cosplay
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.example.conquest.components.MyColumn
+import com.example.conquest.components.MySnackbarHost
 import kotlinx.coroutines.launch
 
 @Serializable
@@ -190,18 +189,6 @@ fun NewCosplay(
             )
         }
 
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(horizontal = 16.dp, vertical = 140.dp),
-            snackbar = { data ->
-                Snackbar(
-                    snackbarData = data,
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(32.dp),
-                )
-            })
+        MySnackbarHost(hostState = snackbarHostState)
     }
 }

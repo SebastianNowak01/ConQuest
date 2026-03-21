@@ -32,6 +32,7 @@ import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyFab
+import com.example.conquest.components.MySnackbarHost
 import com.example.conquest.data.entity.CosplayElement
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -273,18 +274,6 @@ fun NewElement(
             )
         }
 
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(horizontal = 16.dp, vertical = 140.dp),
-            snackbar = { data ->
-                Snackbar(
-                    snackbarData = data,
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(32.dp),
-                )
-            })
+        MySnackbarHost(hostState = snackbarHostState)
     }
 }
