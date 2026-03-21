@@ -44,6 +44,7 @@ import androidx.navigation.NavController
 import androidx.navigation.toRoute
 import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.components.MyBox
 import com.example.conquest.components.MyFab
 import com.example.conquest.data.entity.CosplayPhoto
 import java.io.File
@@ -65,9 +66,7 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
     var selectionMode by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(setOf<Int>()) }
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-    ) {
+    MyBox {
         if (selectionMode) {
             MyFab(
                 onClick = {

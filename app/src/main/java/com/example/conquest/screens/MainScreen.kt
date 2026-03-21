@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.zIndex
+import com.example.conquest.components.MyBox
 import com.example.conquest.components.MyFab
 import com.example.conquest.screens.cosplay.MainCosplayScreen
 import com.example.conquest.screens.cosplay.NewCosplay
@@ -49,7 +50,7 @@ fun MainScreen(navController: NavController, searchQuery: String) {
     var selectionMode by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(setOf<Int>()) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    MyBox {
         if (selectionMode) {
             MyFab(
                 onClick = {

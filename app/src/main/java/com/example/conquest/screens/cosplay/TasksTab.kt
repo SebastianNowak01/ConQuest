@@ -3,7 +3,6 @@ package com.example.conquest.screens.cosplay
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,6 +37,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.toRoute
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.components.MyBox
 import com.example.conquest.components.MyFab
 
 @Composable
@@ -56,7 +56,7 @@ fun TasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry)
     var selectionMode by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(setOf<Int>()) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    MyBox {
         if (selectionMode) {
             MyFab(
                 onClick = {

@@ -2,7 +2,6 @@ package com.example.conquest.screens.cosplay
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -30,6 +29,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import com.example.conquest.components.MyBox
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MySnackbarHost
 import kotlinx.coroutines.launch
@@ -52,9 +52,7 @@ fun NewCosplay(
     var budget by remember { mutableStateOf("") }
     var inProgress by remember { mutableStateOf(true) }
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-    ) {
+    MyBox {
         MyColumn {
             Text(
                 text = "New Project",

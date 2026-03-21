@@ -7,7 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,6 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.components.MyBox
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyFab
 import kotlinx.serialization.Serializable
@@ -82,7 +82,7 @@ fun EditPhoto(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    MyBox {
         MyColumn {
             Text(
                 text = "Reference Image",

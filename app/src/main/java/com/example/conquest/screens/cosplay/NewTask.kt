@@ -2,9 +2,7 @@ package com.example.conquest.screens.cosplay
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -36,6 +34,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.DatePickerFieldToModal
+import com.example.conquest.components.MyBox
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyFab
 import com.example.conquest.components.MySnackbarHost
@@ -62,7 +61,7 @@ fun NewTask(
     var alarm by remember { mutableStateOf(false) }
     var date: Date? by remember { mutableStateOf(getCurrentDate()) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    MyBox {
         MyColumn {
             Text(
                 text = "Add Task",

@@ -16,6 +16,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.DatePickerFieldToModal
+import com.example.conquest.components.MyBox
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyFab
 import com.example.conquest.components.getCurrentDate
@@ -50,7 +51,7 @@ fun EditTask(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    MyBox {
         MyColumn {
             Text(
                 text = "Edit Task",
