@@ -20,7 +20,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -37,7 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
@@ -45,6 +43,7 @@ import androidx.navigation.toRoute
 import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.MyBox
+import com.example.conquest.components.MyDeleteFab
 import com.example.conquest.components.MyFab
 import com.example.conquest.data.entity.CosplayPhoto
 import java.io.File
@@ -68,20 +67,11 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
 
     MyBox {
         if (selectionMode) {
-            MyFab(
-                onClick = {
-                    cosplayViewModel.deletePhotosByIds(selectedIds)
-                    selectionMode = false
-                    selectedIds = emptySet()
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .zIndex(2f),
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.primary,
-                icon = Icons.Default.Close,
-                contentDescription = "Delete"
-            )
+            MyDeleteFab(onClick = {
+                cosplayViewModel.deletePhotosByIds(selectedIds)
+                selectionMode = false
+                selectedIds = emptySet()
+            })
         }
 
         PickAndSaveImage(context, Modifier.align(Alignment.BottomCenter)) { savedPath ->

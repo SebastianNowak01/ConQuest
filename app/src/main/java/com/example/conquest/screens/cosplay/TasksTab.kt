@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -31,13 +30,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.toRoute
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.MyBox
+import com.example.conquest.components.MyDeleteFab
 import com.example.conquest.components.MyFab
 
 @Composable
@@ -58,20 +57,11 @@ fun TasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry)
 
     MyBox {
         if (selectionMode) {
-            MyFab(
-                onClick = {
-                    cosplayViewModel.deleteTasksByIds(selectedIds)
-                    selectionMode = false
-                    selectedIds = emptySet()
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .zIndex(2f),
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.primary,
-                icon = Icons.Default.Close,
-                contentDescription = "Delete",
-            )
+            MyDeleteFab(onClick = {
+                cosplayViewModel.deleteTasksByIds(selectedIds)
+                selectionMode = false
+                selectedIds = emptySet()
+            })
         }
 
         LazyColumn(
