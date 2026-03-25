@@ -20,19 +20,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
-import java.util.*
 import com.example.conquest.components.DatePickerFieldToModal
-import com.example.conquest.components.getCurrentDate
-import com.example.conquest.components.MyFab
-import com.example.conquest.data.entity.Cosplay
-import androidx.compose.material3.SnackbarHostState
+import com.example.conquest.components.MySaveCancelRow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.example.conquest.components.MyBox
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MySnackbarHost
-import kotlinx.coroutines.launch
+import com.example.conquest.data.classes.NewCosplayFormState
 
 @Serializable
 object NewCosplay
@@ -45,12 +41,8 @@ fun NewCosplay(
     val cosplayViewModel: CosplayViewModel = viewModel()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
-    var characterName by remember { mutableStateOf("") }
-    var series by remember { mutableStateOf("") }
-    var initialDate by remember { mutableStateOf<Date?>(getCurrentDate()) }
-    var dueDate by remember { mutableStateOf<Date?>(getCurrentDate()) }
-    var budget by remember { mutableStateOf("") }
     var inProgress by remember { mutableStateOf(true) }
+    var form by remember { mutableStateOf(NewCosplayFormState()) }
 
     MyBox {
         MyColumn {
@@ -104,8 +96,8 @@ fun NewCosplay(
             }
 
             OutlinedTextField(
-                value = characterName,
-                onValueChange = { characterName = it },
+                value = form.characterName,
+                onValueChange = { form = form.copy(characterName = it) },
                 label = { Text("Character Name*") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -113,8 +105,8 @@ fun NewCosplay(
             )
 
             OutlinedTextField(
-                value = series,
-                onValueChange = { series = it },
+                value = form.series,
+                onValueChange = { form = form.copy(series = it) },
                 label = { Text("Series*") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -123,15 +115,19 @@ fun NewCosplay(
 
             DatePickerFieldToModal(
                 label = "Initial date*",
-                selectedDate = initialDate,
-                onDateSelected = { initialDate = it })
+                selectedDate = form.initialDate,
+                onDateSelected = { form = form.copy(initialDate = it) })
 
             DatePickerFieldToModal(
-                label = "Due date", selectedDate = dueDate, onDateSelected = { dueDate = it })
+                label = "Due date",
+                selectedDate = form.dueDate,
+                onDateSelected = { form = form.copy(dueDate = it) })
 
             OutlinedTextField(
-                value = budget,
-                onValueChange = { budget = it.filter { it.isDigit() || it == '.' } },
+                value = form.budget,
+                onValueChange = {
+                    form = form.copy(budget = it.filter { it.isDigit() || it == '.' })
+                },
                 label = { Text("Budget (Optional)") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -142,50 +138,16 @@ fun NewCosplay(
 
         }
 
-        // ✅ Row with two FABs centered at bottom
-        Row(
+        MySaveCancelRow(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp)
-                .navigationBarsPadding(), horizontalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            MyFab(
-                onClick = { navController.popBackStack() },
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.primary,
-                icon = Icons.Default.Close,
-                contentDescription = "Cancel"
-            )
-
-            MyFab(
-                onClick = {
-                    if (characterName.isNotBlank() && series.isNotBlank() && initialDate != null) {
-                        val newCosplay = Cosplay(
-                            name = characterName,
-                            series = series,
-                            initialDate = initialDate!!,
-                            dueDate = dueDate,
-                            budget = budget.takeIf { it.isNotBlank() }?.toDoubleOrNull(),
-                            inProgress = inProgress,
-                            uid = 0,
-                            finished = false
-                        )
-                        cosplayViewModel.insertCosplay(newCosplay)
-                        navController.popBackStack()
-                    } else {
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = "Please fill out all required fields!"
-                            )
-                        }
-                    }
-                },
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.primary,
-                icon = Icons.Default.Add,
-                contentDescription = "Save"
-            )
-        }
+                .padding(bottom = 16.dp),
+            snackbarHostState = snackbarHostState,
+            isValid = form.isValid,
+            onCancel = { navController.popBackStack() },
+            onCommit = { cosplayViewModel.insertCosplay(form.toEntity(uid = 0, finished = false)) },
+            postCommit = { navController.popBackStack() },
+        )
 
         MySnackbarHost(hostState = snackbarHostState)
     }

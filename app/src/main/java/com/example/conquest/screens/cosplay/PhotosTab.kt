@@ -3,6 +3,7 @@ package com.example.conquest.screens.cosplay
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -49,6 +50,7 @@ import com.example.conquest.data.entity.CosplayPhoto
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
+import kotlin.math.log
 
 @Composable
 fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController) {
@@ -159,13 +161,7 @@ fun CosplayPhotoList(
     onItemLongClick: (CosplayPhoto) -> Unit
 ) {
     if (photos.isEmpty()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp), contentAlignment = Alignment.Center
-        ) {
-            Text("No images added yet.")
-        }
+        placeholderBox()
     } else {
         LazyRow(
             modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -198,5 +194,16 @@ fun CosplayPhotoList(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun placeholderBox() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp), contentAlignment = Alignment.Center
+    ) {
+        Text("No images added yet.")
     }
 }
