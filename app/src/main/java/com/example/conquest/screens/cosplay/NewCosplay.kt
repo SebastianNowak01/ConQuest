@@ -9,9 +9,6 @@ import kotlinx.serialization.Serializable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -40,8 +37,6 @@ fun NewCosplay(
 ) {
     val cosplayViewModel: CosplayViewModel = viewModel()
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
-    var inProgress by remember { mutableStateOf(true) }
     var form by remember { mutableStateOf(NewCosplayFormState()) }
 
     MyBox {
@@ -79,12 +74,12 @@ fun NewCosplay(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        text = if (inProgress) "In Progress" else "Planned",
+                        text = if (form.inProgress) "In Progress" else "Planned",
                     )
 
                     Switch(
-                        checked = inProgress,
-                        onCheckedChange = { inProgress = it },
+                        checked = form.inProgress,
+                        onCheckedChange = { form = form.copy(inProgress = it) },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = MaterialTheme.colorScheme.primary,
                             checkedTrackColor = MaterialTheme.colorScheme.secondary,
@@ -139,9 +134,6 @@ fun NewCosplay(
         }
 
         MySaveCancelRow(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp),
             snackbarHostState = snackbarHostState,
             isValid = form.isValid,
             onCancel = { navController.popBackStack() },

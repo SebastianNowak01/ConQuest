@@ -1,9 +1,10 @@
 package com.example.conquest.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -12,6 +13,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
@@ -21,8 +23,9 @@ import kotlinx.coroutines.launch
  * Prefer the callback-only overload for maximum reuse.
  */
 @Composable
-fun MySaveCancelRow(
+fun BoxScope.MySaveCancelRow(
     modifier: Modifier = Modifier,
+    bottomPadding: Dp = 16.dp,
     onCancel: () -> Unit,
     onSave: () -> Unit,
     cancelContentDescription: String = "Cancel",
@@ -30,6 +33,8 @@ fun MySaveCancelRow(
 ) {
     Row(
         modifier = modifier
+            .align(androidx.compose.ui.Alignment.BottomCenter)
+            .padding(bottom = bottomPadding)
             .navigationBarsPadding(),
         horizontalArrangement = Arrangement.spacedBy(24.dp)
     ) {
@@ -55,8 +60,9 @@ fun MySaveCancelRow(
  * Convenience overload for the common "validate -> snackbar -> commit -> postCommit" flow.
  */
 @Composable
-fun MySaveCancelRow(
+fun BoxScope.MySaveCancelRow(
     modifier: Modifier = Modifier,
+    bottomPadding: Dp = 16.dp,
     snackbarHostState: SnackbarHostState,
     isValid: Boolean,
     invalidMessage: String = "Please fill out all required fields!",
@@ -70,6 +76,7 @@ fun MySaveCancelRow(
 
     MySaveCancelRow(
         modifier = modifier,
+        bottomPadding = bottomPadding,
         onCancel = onCancel,
         onSave = {
             if (!isValid) {
