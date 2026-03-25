@@ -17,11 +17,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
-/**
- * Reusable save/cancel FAB row.
- *
- * Prefer the callback-only overload for maximum reuse.
- */
 @Composable
 fun BoxScope.MySaveCancelRow(
     modifier: Modifier = Modifier,
@@ -56,9 +51,6 @@ fun BoxScope.MySaveCancelRow(
     }
 }
 
-/**
- * Convenience overload for the common "validate -> snackbar -> commit -> postCommit" flow.
- */
 @Composable
 fun BoxScope.MySaveCancelRow(
     modifier: Modifier = Modifier,

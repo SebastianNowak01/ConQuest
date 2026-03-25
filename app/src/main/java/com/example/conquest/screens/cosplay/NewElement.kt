@@ -11,8 +11,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -32,9 +30,9 @@ import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.MyBox
 import com.example.conquest.components.MyColumn
-import com.example.conquest.components.MyFab
+import com.example.conquest.components.MySaveCancelRow
 import com.example.conquest.components.MySnackbarHost
-import com.example.conquest.data.entity.CosplayElement
+import com.example.conquest.data.classes.NewElementFormState
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
@@ -48,15 +46,10 @@ fun NewElement(
 ) {
     val cosplayViewModel: CosplayViewModel = viewModel()
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
-    var name by remember { mutableStateOf("") }
-    var cost by remember { mutableStateOf("") }
-    var ready by remember { mutableStateOf(false) }
-    var highlight by remember { mutableStateOf(false) }
-    var bought by remember { mutableStateOf(false) }
-    var photoPath by remember { mutableStateOf("") }
+    var form by remember { mutableStateOf(NewElementFormState()) }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -65,9 +58,12 @@ fun NewElement(
             try {
                 val fileName = "cosplay_element_${System.currentTimeMillis()}.jpg"
                 val savedPath = copyUriToInternalStorage(context, it, fileName)
-                photoPath = savedPath
+                form = form.copy(photoPath = savedPath)
             } catch (e: Exception) {
-                coroutineScope.launch {
+                // Validation/snackbar is handled by MySaveCancelRow.
+                // For image failures we still show a snackbar immediately.
+                // (No need to pass down a scope; we'll launch locally.)
+                scope.launch {
                     snackbarHostState.showSnackbar("Failed to save image: ${e.localizedMessage}")
                 }
             }
@@ -89,8 +85,8 @@ fun NewElement(
             )
 
             OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
+                value = form.name,
+                onValueChange = { form = form.copy(name = it) },
                 label = { Text("Element Name*") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -98,8 +94,8 @@ fun NewElement(
             )
 
             OutlinedTextField(
-                value = cost,
-                onValueChange = { cost = it.filter { c -> c.isDigit() || c == '.' } },
+                value = form.cost,
+                onValueChange = { form = form.copy(cost = it.filter { c -> c.isDigit() || c == '.' }) },
                 label = { Text("Cost (Optional)") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -137,9 +133,9 @@ fun NewElement(
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .clickable { launcher.launch("image/*") }, contentAlignment = Alignment.Center
             ) {
-                if (photoPath.isNotBlank()) {
+                if (form.photoPath.isNotBlank()) {
                     AsyncImage(
-                        model = photoPath,
+                        model = form.photoPath,
                         contentDescription = "Selected image",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -184,8 +180,8 @@ fun NewElement(
                 ) {
                     Text(text = "Ready")
                     Switch(
-                        checked = ready,
-                        onCheckedChange = { ready = it },
+                        checked = form.ready,
+                        onCheckedChange = { form = form.copy(ready = it) },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = MaterialTheme.colorScheme.primary,
                             checkedTrackColor = MaterialTheme.colorScheme.secondary,
@@ -217,8 +213,8 @@ fun NewElement(
                 ) {
                     Text(text = "Bought")
                     Switch(
-                        checked = bought,
-                        onCheckedChange = { bought = it },
+                        checked = form.bought,
+                        onCheckedChange = { form = form.copy(bought = it) },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = MaterialTheme.colorScheme.primary,
                             checkedTrackColor = MaterialTheme.colorScheme.secondary,
@@ -230,50 +226,13 @@ fun NewElement(
             }
         }
 
-        Row(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp)
-                .navigationBarsPadding(), horizontalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            MyFab(
-                onClick = { navController.popBackStack() },
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.primary,
-                icon = Icons.Default.Close,
-                contentDescription = "Cancel"
-            )
-
-            MyFab(
-                onClick = {
-                    if (name.isNotBlank()) {
-                        val element = CosplayElement(
-                            id = 0,
-                            cosplayId = cosplayId,
-                            name = name.trim(),
-                            cost = cost.takeIf { it.isNotBlank() }?.toDoubleOrNull(),
-                            ready = ready,
-                            photoPath = photoPath,
-                            highlight = highlight,
-                            bought = bought,
-                            notes = null
-                        )
-                        cosplayViewModel.insertElement(element)
-                        navController.popBackStack()
-                    } else {
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = "Please fill out all required fields!"
-                            )
-                        }
-                    }
-                },
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.primary,
-                icon = Icons.Default.Add,
-                contentDescription = "Save"
-            )
-        }
+        MySaveCancelRow(
+            snackbarHostState = snackbarHostState,
+            isValid = form.isValid,
+            onCancel = { navController.popBackStack() },
+            onCommit = { cosplayViewModel.insertElement(form.toEntity(cosplayId = cosplayId, id = 0, notes = null)) },
+            postCommit = { navController.popBackStack() },
+        )
 
         MySnackbarHost(hostState = snackbarHostState)
     }
