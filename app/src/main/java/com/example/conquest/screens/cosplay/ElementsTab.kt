@@ -20,20 +20,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
 import androidx.compose.foundation.background
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Icon
+import com.example.conquest.components.MyDeleteFab
 import com.example.conquest.components.MyOuterBox
 
 @Composable
@@ -54,20 +53,12 @@ fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEnt
 
     MyOuterBox {
         if (selectionMode) {
-            MyFab(
+            MyDeleteFab(
                 onClick = {
                     cosplayViewModel.deleteElementsByIds(selectedIds)
                     selectionMode = false
                     selectedIds = emptySet()
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .zIndex(2f),
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.primary,
-                icon = Icons.Default.Close,
-                contentDescription = "Delete",
-            )
+                })
         }
 
         LazyColumn(

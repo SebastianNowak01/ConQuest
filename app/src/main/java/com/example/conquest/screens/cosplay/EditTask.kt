@@ -19,6 +19,7 @@ import com.example.conquest.components.DatePickerFieldToModal
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyFab
+import com.example.conquest.components.MyHeaderText
 import com.example.conquest.components.getCurrentDate
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -53,10 +54,8 @@ fun EditTask(
 
     MyOuterBox {
         MyColumn {
-            Text(
-                text = "Edit Task",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-            )
+            MyHeaderText(text = "Edit Task")
+
             OutlinedTextField(
                 value = taskName,
                 onValueChange = { taskName = it },

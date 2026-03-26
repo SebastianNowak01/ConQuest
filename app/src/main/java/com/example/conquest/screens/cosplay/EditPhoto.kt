@@ -43,6 +43,7 @@ import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyFab
+import com.example.conquest.components.MyHeaderText
 import kotlinx.serialization.Serializable
 import com.example.conquest.ui.theme.UIConsts
 
@@ -84,10 +85,8 @@ fun EditPhoto(
 
     MyOuterBox {
         MyColumn {
-            Text(
-                text = "Reference Image",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-            )
+            MyHeaderText(text = "Edit Photo")
+
             Box(
                 modifier = Modifier
                     .size(UIConsts.defaultHeight)

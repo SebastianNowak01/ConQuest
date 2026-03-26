@@ -22,15 +22,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.DatePickerFieldToModal
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
+import com.example.conquest.components.MyHeaderText
 import com.example.conquest.components.MySaveCancelRow
 import com.example.conquest.components.MySnackbarHost
 import com.example.conquest.data.classes.NewTaskFormState
@@ -51,17 +50,7 @@ fun NewTask(
 
     MyOuterBox {
         MyColumn {
-            Text(
-                text = "Add Task",
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp
-                ),
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .padding(bottom = 8.dp, top = 8.dp)
-                    .fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
+            MyHeaderText(text = "Add Task")
 
             OutlinedTextField(
                 value = form.taskName,

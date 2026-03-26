@@ -19,17 +19,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
+import com.example.conquest.components.MyHeaderText
 import com.example.conquest.components.MySaveCancelRow
 import com.example.conquest.components.MySnackbarHost
 import com.example.conquest.data.classes.NewElementFormState
@@ -72,17 +70,7 @@ fun NewElement(
 
     MyOuterBox {
         MyColumn {
-            Text(
-                text = "Add Element",
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp
-                ),
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .padding(bottom = 8.dp, top = 8.dp)
-                    .fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
+            MyHeaderText(text = "Add Element")
 
             OutlinedTextField(
                 value = form.name,

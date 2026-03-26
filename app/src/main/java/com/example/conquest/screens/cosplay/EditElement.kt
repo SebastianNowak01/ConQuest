@@ -29,6 +29,7 @@ import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyFab
+import com.example.conquest.components.MyHeaderText
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -77,10 +78,8 @@ fun EditElement(
 
     MyOuterBox {
         MyColumn {
-            Text(
-                text = "Element Image",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-            )
+            MyHeaderText(text = "Edit Element")
+
             Box(
                 modifier = Modifier
                     .size(80.dp)

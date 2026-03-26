@@ -19,11 +19,9 @@ import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.DatePickerFieldToModal
 import com.example.conquest.components.MySaveCancelRow
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.sp
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
+import com.example.conquest.components.MyHeaderText
 import com.example.conquest.components.MySnackbarHost
 import com.example.conquest.data.classes.NewCosplayFormState
 
@@ -41,17 +39,7 @@ fun NewCosplay(
 
     MyOuterBox {
         MyColumn {
-            Text(
-                text = "New Project",
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp
-                ),
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .padding(bottom = 8.dp, top = 8.dp)
-                    .fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
+            MyHeaderText(text = "New Project")
 
             Card(
                 modifier = Modifier
