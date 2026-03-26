@@ -159,7 +159,7 @@ fun CosplayPhotoList(
     onItemLongClick: (CosplayPhoto) -> Unit
 ) {
     if (photos.isEmpty()) {
-        placeholderBox()
+        PlaceholderBox()
     } else {
         LazyRow(
             modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -196,7 +196,7 @@ fun CosplayPhotoList(
 }
 
 @Composable
-fun placeholderBox() {
+fun PlaceholderBox() {
     Box(
         modifier = Modifier
             .fillMaxWidth()

@@ -4,12 +4,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -22,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,13 +31,10 @@ import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.DatePickerFieldToModal
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
-import com.example.conquest.components.MyFab
+import com.example.conquest.components.MySaveCancelRow
 import com.example.conquest.components.MySnackbarHost
-import com.example.conquest.components.getCurrentDate
-import com.example.conquest.data.entity.CosplayTask
-import kotlinx.coroutines.launch
+import com.example.conquest.data.classes.NewTaskFormState
 import kotlinx.serialization.Serializable
-import java.util.Date
 
 @Serializable
 data class NewTask(val cosplayId: Int)
@@ -54,12 +46,8 @@ fun NewTask(
 ) {
     val cosplayViewModel: CosplayViewModel = viewModel()
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
 
-    var name by remember { mutableStateOf("") }
-    var done by remember { mutableStateOf(false) }
-    var alarm by remember { mutableStateOf(false) }
-    var date: Date? by remember { mutableStateOf(getCurrentDate()) }
+    var form by remember { mutableStateOf(NewTaskFormState()) }
 
     MyOuterBox {
         MyColumn {
@@ -76,8 +64,8 @@ fun NewTask(
             )
 
             OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
+                value = form.taskName,
+                onValueChange = { form = form.copy(taskName = it) },
                 label = { Text("Task Name*") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -114,8 +102,8 @@ fun NewTask(
                     ) {
                         Text(text = "Done")
                         Switch(
-                            checked = done,
-                            onCheckedChange = { done = it },
+                            checked = form.done,
+                            onCheckedChange = { form = form.copy(done = it) },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = MaterialTheme.colorScheme.primary,
                                 checkedTrackColor = MaterialTheme.colorScheme.secondary,
@@ -147,8 +135,8 @@ fun NewTask(
                     ) {
                         Text(text = "Alarm")
                         Switch(
-                            checked = alarm,
-                            onCheckedChange = { alarm = it },
+                            checked = form.alarm,
+                            onCheckedChange = { form = form.copy(alarm = it) },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = MaterialTheme.colorScheme.primary,
                                 checkedTrackColor = MaterialTheme.colorScheme.secondary,
@@ -161,57 +149,28 @@ fun NewTask(
             }
 
             DatePickerFieldToModal(
-                label = "Task date*", selectedDate = date, onDateSelected = { date = it })
+                label = "Task date*",
+                selectedDate = form.date,
+                onDateSelected = { form = form.copy(date = it) })
         }
 
-        Row(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp)
-                .navigationBarsPadding(), horizontalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            MyFab(
-                onClick = {
-                    navController.navigate(MainCosplayScreen(uid = cosplayId, initialTab = 1)) {
-                        popUpTo(MainCosplayScreen(uid = cosplayId)) { inclusive = true }
-                    }
-                },
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.primary,
-                icon = Icons.Default.Close,
-                contentDescription = "Cancel"
-            )
-
-            MyFab(
-                onClick = {
-                    if (name.isNotBlank()) {
-                        val task = CosplayTask(
-                            id = 0,
-                            cosplayId = cosplayId,
-                            done = done,
-                            taskName = name.trim(),
-                            alarm = alarm,
-                            notes = null,
-                            date = date,
-                        )
-                        cosplayViewModel.insertTask(task)
-                        navController.navigate(MainCosplayScreen(uid = cosplayId, initialTab = 1)) {
-                            popUpTo(MainCosplayScreen(uid = cosplayId)) { inclusive = true }
-                        }
-                    } else {
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = "Please fill out all required fields!"
-                            )
-                        }
-                    }
-                },
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.primary,
-                icon = Icons.Default.Add,
-                contentDescription = "Save"
-            )
-        }
+        MySaveCancelRow(
+            snackbarHostState = snackbarHostState,
+            isValid = form.isValid,
+            onCancel = {
+                navController.navigate(MainCosplayScreen(uid = cosplayId, initialTab = 1)) {
+                    popUpTo(MainCosplayScreen(uid = cosplayId)) { inclusive = true }
+                }
+            },
+            onCommit = {
+                cosplayViewModel.insertTask(form.toEntity(cosplayId = cosplayId))
+            },
+            postCommit = {
+                navController.navigate(MainCosplayScreen(uid = cosplayId, initialTab = 1)) {
+                    popUpTo(MainCosplayScreen(uid = cosplayId)) { inclusive = true }
+                }
+            },
+        )
 
         MySnackbarHost(hostState = snackbarHostState)
     }
