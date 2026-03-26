@@ -3,7 +3,6 @@ package com.example.conquest.screens.cosplay
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -43,14 +42,13 @@ import androidx.navigation.NavController
 import androidx.navigation.toRoute
 import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
-import com.example.conquest.components.MyBox
+import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyDeleteFab
 import com.example.conquest.components.MyFab
 import com.example.conquest.data.entity.CosplayPhoto
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
-import kotlin.math.log
 
 @Composable
 fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController) {
@@ -67,7 +65,7 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
     var selectionMode by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(setOf<Int>()) }
 
-    MyBox {
+    MyOuterBox {
         if (selectionMode) {
             MyDeleteFab(onClick = {
                 cosplayViewModel.deletePhotosByIds(selectedIds)

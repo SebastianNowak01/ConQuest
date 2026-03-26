@@ -27,7 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
-import com.example.conquest.components.MyBox
+import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyDeleteFab
 import com.example.conquest.components.MyFab
 import com.example.conquest.screens.cosplay.MainCosplayScreen
@@ -49,7 +49,7 @@ fun MainScreen(navController: NavController, searchQuery: String) {
     var selectionMode by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(setOf<Int>()) }
 
-    MyBox {
+    MyOuterBox {
         if (selectionMode) {
             MyDeleteFab(onClick = {
                 cosplayViewModel.deleteCosplaysByIds(selectedIds)

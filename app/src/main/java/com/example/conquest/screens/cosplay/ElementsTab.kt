@@ -34,7 +34,7 @@ import com.example.conquest.CosplayViewModel
 import androidx.compose.foundation.background
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Icon
-import com.example.conquest.components.MyBox
+import com.example.conquest.components.MyOuterBox
 
 @Composable
 fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEntry) {
@@ -52,7 +52,7 @@ fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEnt
     var selectionMode by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(setOf<Int>()) }
 
-    MyBox {
+    MyOuterBox {
         if (selectionMode) {
             MyFab(
                 onClick = {

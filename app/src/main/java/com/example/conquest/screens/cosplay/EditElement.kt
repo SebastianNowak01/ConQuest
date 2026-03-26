@@ -26,7 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
-import com.example.conquest.components.MyBox
+import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyFab
 import kotlinx.serialization.Serializable
@@ -75,7 +75,7 @@ fun EditElement(
         }
     }
 
-    MyBox {
+    MyOuterBox {
         MyColumn {
             Text(
                 text = "Element Image",

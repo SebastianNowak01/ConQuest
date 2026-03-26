@@ -22,7 +22,7 @@ import com.example.conquest.components.MySaveCancelRow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import com.example.conquest.components.MyBox
+import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MySnackbarHost
 import com.example.conquest.data.classes.NewCosplayFormState
@@ -39,7 +39,7 @@ fun NewCosplay(
     val snackbarHostState = remember { SnackbarHostState() }
     var form by remember { mutableStateOf(NewCosplayFormState()) }
 
-    MyBox {
+    MyOuterBox {
         MyColumn {
             Text(
                 text = "New Project",
