@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.components.saveImageUriToInternalStorage
 import com.example.conquest.components.MyImageBox
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
@@ -46,11 +47,13 @@ fun NewElement(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            try {
-                val fileName = "cosplay_element_${System.currentTimeMillis()}.jpg"
-                val savedPath = copyUriToInternalStorage(context, it, fileName)
+            saveImageUriToInternalStorage(
+                context = context,
+                uri = it,
+                fileNamePrefix = "cosplay_element",
+            ).onSuccess { savedPath ->
                 form = form.copy(photoPath = savedPath)
-            } catch (e: Exception) {
+            }.onFailure { e ->
                 scope.launch {
                     snackbarHostState.showSnackbar("Failed to save image: ${e.localizedMessage}")
                 }
@@ -73,7 +76,9 @@ fun NewElement(
 
             OutlinedTextField(
                 value = form.cost,
-                onValueChange = { form = form.copy(cost = it.filter { c -> c.isDigit() || c == '.' }) },
+                onValueChange = {
+                    form = form.copy(cost = it.filter { c -> c.isDigit() || c == '.' })
+                },
                 label = { Text("Cost (Optional)") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -159,7 +164,13 @@ fun NewElement(
             snackbarHostState = snackbarHostState,
             isValid = form.isValid,
             onCancel = { navController.popBackStack() },
-            onCommit = { cosplayViewModel.insertElement(form.toEntity(cosplayId = cosplayId, id = 0, notes = null)) },
+            onCommit = {
+                cosplayViewModel.insertElement(
+                    form.toEntity(
+                        cosplayId = cosplayId, id = 0, notes = null
+                    )
+                )
+            },
             postCommit = { navController.popBackStack() },
         )
 

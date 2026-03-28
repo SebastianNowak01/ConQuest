@@ -1,11 +1,6 @@
 package com.example.conquest.screens.cosplay
 
-import android.content.ContentResolver
 import android.content.Context
-import android.net.Uri
-import android.webkit.MimeTypeMap
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -42,13 +37,11 @@ import androidx.navigation.NavController
 import androidx.navigation.toRoute
 import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.components.pickAndSaveImageLauncher
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyDeleteFab
 import com.example.conquest.components.MyFab
 import com.example.conquest.data.entity.CosplayPhoto
-import java.io.File
-import java.io.InputStream
-import java.io.OutputStream
 
 @Composable
 fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController) {
@@ -74,9 +67,10 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
             })
         }
 
-        PickAndSaveImage(context, Modifier.align(Alignment.BottomCenter)) { savedPath ->
-            cosplayViewModel.addPhoto(args.uid, savedPath)
-        }
+        PickAndSaveImage(
+            context = context,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            onImageSaved = { savedPath -> cosplayViewModel.addPhoto(args.uid, savedPath) })
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -96,36 +90,20 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
     }
 }
 
-fun getFileExtension(context: Context, uri: Uri): String? {
-    val contentResolver: ContentResolver = context.contentResolver
-    val mimeTypeMap = MimeTypeMap.getSingleton()
-    val mimeType = contentResolver.getType(uri)
-    return mimeTypeMap.getExtensionFromMimeType(mimeType)
-}
-
 @Composable
 fun PickAndSaveImage(
     context: Context, modifier: Modifier, onImageSaved: (String) -> Unit,
 ) {
     var error by remember { mutableStateOf<String?>(null) }
 
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        if (uri != null) {
-            try {
-                val extension = getFileExtension(context, uri) ?: "jpg"
-                val fileName = "cosplay_photo_${System.currentTimeMillis()}.$extension"
-                val savedPath = copyUriToInternalStorage(context, uri, fileName)
-                onImageSaved(savedPath)
-            } catch (e: Exception) {
-                error = "Failed to save image: ${e.localizedMessage}"
-            }
-        }
-    }
+    val launcher = pickAndSaveImageLauncher(
+        context = context,
+        fileNamePrefix = "cosplay_photo",
+        onSaved = onImageSaved,
+        onError = { t -> error = "Failed to save image: ${t.localizedMessage}" })
 
     MyFab(
-        onClick = { launcher.launch("image/*") },
+        onClick = { launcher.launch() },
         modifier = modifier,
         containerColor = MaterialTheme.colorScheme.tertiary,
         contentColor = MaterialTheme.colorScheme.primary,
@@ -138,18 +116,6 @@ fun PickAndSaveImage(
     }
 }
 
-fun copyUriToInternalStorage(context: Context, uri: Uri, fileName: String): String {
-    val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
-    val file = File(context.filesDir, fileName)
-    val outputStream: OutputStream = file.outputStream()
-
-    inputStream?.use { input ->
-        outputStream.use { output ->
-            input.copyTo(output)
-        }
-    }
-    return file.absolutePath
-}
 
 @Composable
 fun CosplayPhotoList(

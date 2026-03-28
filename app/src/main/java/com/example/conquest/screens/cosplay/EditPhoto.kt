@@ -35,6 +35,7 @@ import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyFab
 import com.example.conquest.components.MyHeaderText
+import com.example.conquest.components.saveImageUriToInternalStorage
 import kotlinx.serialization.Serializable
 import com.example.conquest.ui.theme.UIConsts
 
@@ -56,12 +57,13 @@ fun EditPhoto(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
-            try {
-                val extension = getFileExtension(context, uri) ?: "jpg"
-                val fileName = "cosplay_photo_${System.currentTimeMillis()}.$extension"
-                val savedPath = copyUriToInternalStorage(context, uri, fileName)
+            saveImageUriToInternalStorage(
+                context = context,
+                uri = uri,
+                fileNamePrefix = "cosplay_photo",
+            ).onSuccess { savedPath ->
                 photoPath = savedPath
-            } catch (e: Exception) {
+            }.onFailure { e ->
                 error = "Failed to save image: ${e.localizedMessage}"
             }
         }

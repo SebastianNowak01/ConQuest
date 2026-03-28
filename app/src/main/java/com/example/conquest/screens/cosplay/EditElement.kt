@@ -22,6 +22,7 @@ import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyHeaderText
 import com.example.conquest.components.MySaveCancelRow
 import com.example.conquest.components.MySnackbarHost
+import com.example.conquest.components.saveImageUriToInternalStorage
 import com.example.conquest.data.classes.ElementFormState
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -45,11 +46,13 @@ fun EditElement(
         contract = GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
-            try {
-                val fileName = "cosplay_element_${System.currentTimeMillis()}.jpg"
-                val savedPath = copyUriToInternalStorage(context, uri, fileName)
+            saveImageUriToInternalStorage(
+                context = context,
+                uri = uri,
+                fileNamePrefix = "cosplay_element",
+            ).onSuccess { savedPath ->
                 form = form.copy(photoPath = savedPath)
-            } catch (e: Exception) {
+            }.onFailure { e ->
                 scope.launch {
                     snackbarHostState.showSnackbar("Failed to save image: ${e.localizedMessage}")
                 }
