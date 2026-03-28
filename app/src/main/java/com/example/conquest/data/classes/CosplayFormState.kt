@@ -4,7 +4,7 @@ import com.example.conquest.components.getCurrentDate
 import com.example.conquest.data.entity.Cosplay
 import java.util.Date
 
-data class NewCosplayFormState(
+data class CosplayFormState(
     val characterName: String = "",
     val series: String = "",
     val initialDate: Date? = getCurrentDate(),
@@ -29,7 +29,7 @@ data class NewCosplayFormState(
             series = series,
             initialDate = requireNotNull(initialDate) { "Initial date required" },
             dueDate = dueDate,
-            budget = budget.toDoubleOrNull()
+            budget = budgetAmount
         )
     }
 }

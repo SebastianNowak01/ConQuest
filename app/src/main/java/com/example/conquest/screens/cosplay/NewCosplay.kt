@@ -23,7 +23,7 @@ import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyHeaderText
 import com.example.conquest.components.MySnackbarHost
-import com.example.conquest.data.classes.NewCosplayFormState
+import com.example.conquest.data.classes.CosplayFormState
 
 @Serializable
 object NewCosplay
@@ -35,7 +35,7 @@ fun NewCosplay(
 ) {
     val cosplayViewModel: CosplayViewModel = viewModel()
     val snackbarHostState = remember { SnackbarHostState() }
-    var form by remember { mutableStateOf(NewCosplayFormState()) }
+    var form by remember { mutableStateOf(CosplayFormState()) }
 
     MyOuterBox {
         MyColumn {

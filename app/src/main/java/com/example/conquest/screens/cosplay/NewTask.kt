@@ -32,7 +32,7 @@ import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyHeaderText
 import com.example.conquest.components.MySaveCancelRow
 import com.example.conquest.components.MySnackbarHost
-import com.example.conquest.data.classes.NewTaskFormState
+import com.example.conquest.data.classes.TaskFormState
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -46,7 +46,7 @@ fun NewTask(
     val cosplayViewModel: CosplayViewModel = viewModel()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    var form by remember { mutableStateOf(NewTaskFormState()) }
+    var form by remember { mutableStateOf(TaskFormState()) }
 
     MyOuterBox {
         MyColumn {

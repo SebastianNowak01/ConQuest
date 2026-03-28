@@ -3,9 +3,6 @@ package com.example.conquest.screens.cosplay
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,12 +15,12 @@ import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.DatePickerFieldToModal
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
-import com.example.conquest.components.MyFab
 import com.example.conquest.components.MyHeaderText
+import com.example.conquest.components.MySaveCancelRow
+import com.example.conquest.components.MySnackbarHost
 import com.example.conquest.components.getCurrentDate
-import kotlinx.coroutines.launch
+import com.example.conquest.data.classes.TaskFormState
 import kotlinx.serialization.Serializable
-import java.util.Date
 
 @Serializable
 data class EditTask(val taskId: Int)
@@ -34,21 +31,19 @@ fun EditTask(
 ) {
     val task by cosplayViewModel.getTaskById(taskId).collectAsState(initial = null)
 
-    var taskName by remember { mutableStateOf("") }
-    var done by remember { mutableStateOf(false) }
-    var alarm by remember { mutableStateOf(false) }
+    var form by remember { mutableStateOf(TaskFormState()) }
     var notes by remember { mutableStateOf("") }
-    var date: Date? by remember { mutableStateOf(null) }
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(task) {
         task?.let {
-            taskName = it.taskName
-            done = it.done
-            alarm = it.alarm
+            form = TaskFormState(
+                taskName = it.taskName,
+                done = it.done,
+                alarm = it.alarm,
+                date = it.date ?: getCurrentDate(),
+            )
             notes = it.notes ?: ""
-            date = it.date ?: getCurrentDate()
         }
     }
 
@@ -57,8 +52,8 @@ fun EditTask(
             MyHeaderText(text = "Edit Task")
 
             OutlinedTextField(
-                value = taskName,
-                onValueChange = { taskName = it },
+                value = form.taskName,
+                onValueChange = { form = form.copy(taskName = it) },
                 label = { Text("Task Name") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
@@ -94,8 +89,8 @@ fun EditTask(
                     ) {
                         Text(text = "Done")
                         Switch(
-                            checked = done,
-                            onCheckedChange = { done = it },
+                            checked = form.done,
+                            onCheckedChange = { form = form.copy(done = it) },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = MaterialTheme.colorScheme.primary,
                                 checkedTrackColor = MaterialTheme.colorScheme.secondary,
@@ -127,8 +122,8 @@ fun EditTask(
                     ) {
                         Text(text = "Alarm")
                         Switch(
-                            checked = alarm,
-                            onCheckedChange = { alarm = it },
+                            checked = form.alarm,
+                            onCheckedChange = { form = form.copy(alarm = it) },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = MaterialTheme.colorScheme.primary,
                                 checkedTrackColor = MaterialTheme.colorScheme.secondary,
@@ -140,7 +135,10 @@ fun EditTask(
                 }
             }
             DatePickerFieldToModal(
-                label = "Task date*", selectedDate = date, onDateSelected = { date = it })
+                label = "Task date*",
+                selectedDate = form.date,
+                onDateSelected = { form = form.copy(date = it) }
+            )
             OutlinedTextField(
                 value = notes,
                 onValueChange = { notes = it },
@@ -152,57 +150,24 @@ fun EditTask(
                 maxLines = 6
             )
         }
-        Row(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            MyFab(
-                onClick = { navController.popBackStack() },
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.primary,
-                icon = Icons.Default.Close,
-                contentDescription = "Discard"
-            )
-            MyFab(
-                onClick = {
-                    if (taskName.isBlank()) {
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar("Task name cannot be empty!")
-                        }
-                        return@MyFab
-                    }
-                    task?.let {
-                        val updatedTask = it.copy(
-                            taskName = taskName,
-                            done = done,
-                            alarm = alarm,
-                            notes = notes,
-                            date = date
-                        )
-                        cosplayViewModel.updateTask(updatedTask)
-                    }
-                    navController.popBackStack()
-                },
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.primary,
-                icon = Icons.Default.Check,
-                contentDescription = "Save"
-            )
-        }
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(horizontal = 16.dp, vertical = 140.dp),
-            snackbar = { data ->
-                Snackbar(
-                    snackbarData = data,
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(32.dp),
+
+        MySaveCancelRow(
+            snackbarHostState = snackbarHostState,
+            isValid = form.isValid,
+            invalidMessage = "Please fill out all required fields!",
+            onCancel = { navController.popBackStack() },
+            onCommit = {
+                val current = task ?: return@MySaveCancelRow
+                val updatedTask = form.toEntity(
+                    cosplayId = current.cosplayId,
+                    id = current.id,
+                    notes = notes.ifBlank { null },
                 )
-            })
+                cosplayViewModel.updateTask(updatedTask)
+            },
+            postCommit = { navController.popBackStack() },
+        )
+
+        MySnackbarHost(hostState = snackbarHostState)
     }
 }

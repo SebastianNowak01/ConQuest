@@ -4,7 +4,7 @@ import com.example.conquest.components.getCurrentDate
 import com.example.conquest.data.entity.CosplayTask
 import java.util.Date
 
-data class NewTaskFormState(
+data class TaskFormState(
 	val taskName: String = "",
 	val done: Boolean = false,
 	val alarm: Boolean = false,
