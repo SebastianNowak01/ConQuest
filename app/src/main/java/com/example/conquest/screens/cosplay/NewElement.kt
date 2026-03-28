@@ -51,9 +51,6 @@ fun NewElement(
                 val savedPath = copyUriToInternalStorage(context, it, fileName)
                 form = form.copy(photoPath = savedPath)
             } catch (e: Exception) {
-                // Validation/snackbar is handled by MySaveCancelRow.
-                // For image failures we still show a snackbar immediately.
-                // (No need to pass down a scope; we'll launch locally.)
                 scope.launch {
                     snackbarHostState.showSnackbar("Failed to save image: ${e.localizedMessage}")
                 }
@@ -93,7 +90,6 @@ fun NewElement(
                 onClick = { launcher.launch("image/*") },
             )
 
-            // Ready switch
             Card(
                 modifier = Modifier
                     .fillMaxWidth()

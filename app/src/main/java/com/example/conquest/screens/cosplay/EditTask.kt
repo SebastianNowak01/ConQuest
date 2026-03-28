@@ -67,7 +67,6 @@ fun EditTask(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Done switch
                 Card(
                     modifier = Modifier
                         .weight(1f)
@@ -100,7 +99,6 @@ fun EditTask(
                         )
                     }
                 }
-                // Alarm switch
                 Card(
                     modifier = Modifier
                         .weight(1f)

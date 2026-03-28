@@ -106,7 +106,7 @@ fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEnt
                             clickable = false,
                             onClick = {},
                         )
-                        // Text content
+
                         Column(
                             modifier = Modifier.weight(1f),
                             verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -125,7 +125,6 @@ fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEnt
                             }
                         }
 
-                        // Status labels in one line
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
                             verticalAlignment = Alignment.CenterVertically
