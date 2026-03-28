@@ -30,7 +30,7 @@ import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyHeaderText
 import com.example.conquest.components.MySaveCancelRow
 import com.example.conquest.components.MySnackbarHost
-import com.example.conquest.data.classes.NewElementFormState
+import com.example.conquest.data.classes.ElementFormState
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
@@ -47,7 +47,7 @@ fun NewElement(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    var form by remember { mutableStateOf(NewElementFormState()) }
+    var form by remember { mutableStateOf(ElementFormState()) }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()

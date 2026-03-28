@@ -2,13 +2,14 @@ package com.example.conquest.data.classes
 
 import com.example.conquest.data.entity.CosplayElement
 
-data class NewElementFormState(
+data class ElementFormState(
     val name: String = "",
     val cost: String = "",
     val ready: Boolean = false,
     val highlight: Boolean = false,
     val bought: Boolean = false,
     val photoPath: String = "",
+    val notes: String = "",
 ) {
     val costAmount: Double?
         get() = cost.takeIf { it.isNotBlank() }?.toDoubleOrNull()
@@ -19,7 +20,7 @@ data class NewElementFormState(
     fun toEntity(
         cosplayId: Int,
         id: Int = 0,
-        notes: String? = null,
+        notes: String? = this.notes.ifBlank { null },
     ): CosplayElement {
         return CosplayElement(
             id = id,

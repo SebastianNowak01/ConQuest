@@ -11,8 +11,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,8 +26,11 @@ import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
-import com.example.conquest.components.MyFab
 import com.example.conquest.components.MyHeaderText
+import com.example.conquest.components.MySaveCancelRow
+import com.example.conquest.components.MySnackbarHost
+import com.example.conquest.data.classes.ElementFormState
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -42,13 +43,9 @@ fun EditElement(
     val context = LocalContext.current
     val element by cosplayViewModel.getElementById(elementId).collectAsState(initial = null)
 
-    var name by remember { mutableStateOf("") }
-    var cost by remember { mutableStateOf("") }
-    var ready by remember { mutableStateOf(false) }
-    var bought by remember { mutableStateOf(false) }
-    var photoPath by remember { mutableStateOf("") }
-    var notes by remember { mutableStateOf("") }
-    var error by remember { mutableStateOf("") }
+    var form by remember { mutableStateOf(ElementFormState()) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     // Image picker launcher
     val imagePickerLauncher = rememberLauncherForActivityResult(
@@ -58,21 +55,26 @@ fun EditElement(
             try {
                 val fileName = "cosplay_element_${System.currentTimeMillis()}.jpg"
                 val savedPath = copyUriToInternalStorage(context, uri, fileName)
-                photoPath = savedPath
+                form = form.copy(photoPath = savedPath)
             } catch (e: Exception) {
-                error = "Failed to save image: ${e.localizedMessage}"
+                scope.launch {
+                    snackbarHostState.showSnackbar("Failed to save image: ${e.localizedMessage}")
+                }
             }
         }
     }
 
     LaunchedEffect(element) {
         element?.let {
-            name = it.name
-            cost = it.cost?.toString() ?: ""
-            ready = it.ready
-            bought = it.bought
-            photoPath = it.photoPath ?: ""
-            notes = it.notes ?: ""
+            form = ElementFormState(
+                name = it.name,
+                cost = it.cost?.toString() ?: "",
+                ready = it.ready,
+                bought = it.bought,
+                photoPath = it.photoPath ?: "",
+                highlight = it.highlight,
+                notes = it.notes ?: "",
+            )
         }
     }
 
@@ -88,9 +90,9 @@ fun EditElement(
                     .clickable { imagePickerLauncher.launch("image/*") },
                 contentAlignment = Alignment.Center
             ) {
-                if (photoPath.isNotEmpty()) {
+                if (form.photoPath.isNotEmpty()) {
                     AsyncImage(
-                        model = photoPath,
+                        model = form.photoPath,
                         contentDescription = "Element image",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -106,17 +108,13 @@ fun EditElement(
                 }
             }
 
-            if (error.isNotEmpty()) {
-                Text(error, color = MaterialTheme.colorScheme.error)
-            }
-
             Text(
                 text = "Basic Information",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
             OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
+                value = form.name,
+                onValueChange = { form = form.copy(name = it) },
                 label = { Text("Name") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
@@ -124,8 +122,10 @@ fun EditElement(
             )
 
             OutlinedTextField(
-                value = cost,
-                onValueChange = { cost = it },
+                value = form.cost,
+                onValueChange = {
+                    form = form.copy(cost = it.filter { c -> c.isDigit() || c == '.' })
+                },
                 label = { Text("Cost") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
@@ -162,8 +162,8 @@ fun EditElement(
                     ) {
                         Text(text = "Ready")
                         Switch(
-                            checked = ready,
-                            onCheckedChange = { ready = it },
+                            checked = form.ready,
+                            onCheckedChange = { form = form.copy(ready = it) },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = MaterialTheme.colorScheme.primary,
                                 checkedTrackColor = MaterialTheme.colorScheme.secondary,
@@ -194,8 +194,8 @@ fun EditElement(
                     ) {
                         Text(text = "Bought")
                         Switch(
-                            checked = bought,
-                            onCheckedChange = { bought = it },
+                            checked = form.bought,
+                            onCheckedChange = { form = form.copy(bought = it) },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = MaterialTheme.colorScheme.primary,
                                 checkedTrackColor = MaterialTheme.colorScheme.secondary,
@@ -212,8 +212,8 @@ fun EditElement(
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
             OutlinedTextField(
-                value = notes,
-                onValueChange = { notes = it },
+                value = form.notes,
+                onValueChange = { form = form.copy(notes = it) },
                 label = { Text("Notes") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -223,40 +223,24 @@ fun EditElement(
             )
         }
 
-        Row(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            MyFab(
-                onClick = { navController.popBackStack() },
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.primary,
-                icon = Icons.Default.Close,
-                contentDescription = "Discard"
-            )
+        MySaveCancelRow(
+            snackbarHostState = snackbarHostState,
+            isValid = form.isValid,
+            onCancel = { navController.popBackStack() },
+            onCommit = {
+                val current = element ?: return@MySaveCancelRow
+                val updatedElement = form.toEntity(
+                    cosplayId = current.cosplayId,
+                    id = current.id,
+                ).copy(
+                    // Preserve any fields that are NOT part of the element form.
+                    highlight = current.highlight,
+                )
+                cosplayViewModel.updateElement(updatedElement)
+            },
+            postCommit = { navController.popBackStack() },
+        )
 
-            MyFab(
-                onClick = {
-                    element?.let {
-                        val updatedElement = it.copy(
-                            name = name,
-                            cost = cost.toDoubleOrNull(),
-                            ready = ready,
-                            bought = bought,
-                            photoPath = photoPath,
-                            notes = notes
-                        )
-                        cosplayViewModel.updateElement(updatedElement)
-                    }
-                    navController.popBackStack()
-                },
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.primary,
-                icon = Icons.Default.Check,
-                contentDescription = "Save"
-            )
-        }
+        MySnackbarHost(hostState = snackbarHostState)
     }
 }
