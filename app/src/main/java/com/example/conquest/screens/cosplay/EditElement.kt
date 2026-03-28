@@ -211,7 +211,6 @@ fun EditElement(
                     cosplayId = current.cosplayId,
                     id = current.id,
                 ).copy(
-                    // Preserve any fields that are NOT part of the element form.
                     highlight = current.highlight,
                 )
                 cosplayViewModel.updateElement(updatedElement)

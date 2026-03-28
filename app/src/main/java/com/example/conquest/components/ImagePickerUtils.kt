@@ -86,9 +86,6 @@ fun pickAndSaveImageLauncher(
     }
 }
 
-// Intentionally no UpperCamelCase wrapper: Compose lint requires lowerCamelCase for
-// composable functions that return a value.
-
 fun interface ImagePickAndSaveLauncher {
     fun launch()
 }
