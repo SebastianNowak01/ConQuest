@@ -10,6 +10,17 @@ data class TaskFormState(
 	val alarm: Boolean = false,
 	val date: Date? = getCurrentDate(),
 ) {
+	companion object {
+		fun fromEntity(task: CosplayTask): TaskFormState {
+			return TaskFormState(
+				taskName = task.taskName,
+				done = task.done,
+				alarm = task.alarm,
+				date = task.date ?: getCurrentDate(),
+			)
+		}
+	}
+
 	val isValid: Boolean
 		get() = taskName.isNotBlank() && date != null
 
@@ -23,6 +34,19 @@ data class TaskFormState(
 			cosplayId = cosplayId,
 			done = done,
 			taskName = taskName.trim(),
+			alarm = alarm,
+			notes = notes,
+			date = requireNotNull(date) { "Task date required" },
+		)
+	}
+
+	/**
+	 * For edit screens: apply form fields onto an existing entity without re-listing ids/foreign keys.
+	 */
+	fun toUpdatedEntity(current: CosplayTask, notes: String? = current.notes): CosplayTask {
+		return current.copy(
+			taskName = taskName.trim(),
+			done = done,
 			alarm = alarm,
 			notes = notes,
 			date = requireNotNull(date) { "Task date required" },

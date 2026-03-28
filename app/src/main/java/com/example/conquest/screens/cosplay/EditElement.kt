@@ -60,17 +60,9 @@ fun EditElement(
         }
     }
 
-    LaunchedEffect(element) {
-        element?.let {
-            form = ElementFormState(
-                name = it.name,
-                cost = it.cost?.toString() ?: "",
-                ready = it.ready,
-                bought = it.bought,
-                photoPath = it.photoPath ?: "",
-                highlight = it.highlight,
-                notes = it.notes ?: "",
-            )
+    LaunchedEffect(element?.id) {
+        element?.let { loaded ->
+            form = ElementFormState.fromEntity(loaded)
         }
     }
 
@@ -118,7 +110,6 @@ fun EditElement(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Ready switch
                 Card(
                     modifier = Modifier
                         .weight(1f)
@@ -207,13 +198,7 @@ fun EditElement(
             onCancel = { navController.popBackStack() },
             onCommit = {
                 val current = element ?: return@MySaveCancelRow
-                val updatedElement = form.toEntity(
-                    cosplayId = current.cosplayId,
-                    id = current.id,
-                ).copy(
-                    highlight = current.highlight,
-                )
-                cosplayViewModel.updateElement(updatedElement)
+                cosplayViewModel.updateElement(form.toUpdatedEntity(current))
             },
             postCommit = { navController.popBackStack() },
         )

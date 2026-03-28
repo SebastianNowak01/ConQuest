@@ -11,6 +11,20 @@ data class ElementFormState(
     val photoPath: String = "",
     val notes: String = "",
 ) {
+    companion object {
+        fun fromEntity(element: CosplayElement): ElementFormState {
+            return ElementFormState(
+                name = element.name,
+                cost = element.cost?.toString() ?: "",
+                ready = element.ready,
+                highlight = element.highlight,
+                bought = element.bought,
+                photoPath = element.photoPath ?: "",
+                notes = element.notes ?: "",
+            )
+        }
+    }
+
     val costAmount: Double?
         get() = cost.takeIf { it.isNotBlank() }?.toDoubleOrNull()
 
@@ -32,6 +46,21 @@ data class ElementFormState(
             highlight = highlight,
             bought = bought,
             notes = notes
+        )
+    }
+
+    /**
+     * For edit screens: apply form fields onto an existing entity without re-listing ids/foreign keys.
+     */
+    fun toUpdatedEntity(current: CosplayElement): CosplayElement {
+        return current.copy(
+            name = name.trim(),
+            cost = costAmount,
+            ready = ready,
+            highlight = highlight,
+            bought = bought,
+            photoPath = photoPath,
+            notes = this.notes.ifBlank { null },
         )
     }
 }

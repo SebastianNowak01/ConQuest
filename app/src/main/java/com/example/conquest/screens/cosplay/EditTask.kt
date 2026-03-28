@@ -18,7 +18,6 @@ import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyHeaderText
 import com.example.conquest.components.MySaveCancelRow
 import com.example.conquest.components.MySnackbarHost
-import com.example.conquest.components.getCurrentDate
 import com.example.conquest.data.classes.TaskFormState
 import kotlinx.serialization.Serializable
 
@@ -35,15 +34,10 @@ fun EditTask(
     var notes by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(task) {
-        task?.let {
-            form = TaskFormState(
-                taskName = it.taskName,
-                done = it.done,
-                alarm = it.alarm,
-                date = it.date ?: getCurrentDate(),
-            )
-            notes = it.notes ?: ""
+    LaunchedEffect(task?.id) {
+        task?.let { loaded ->
+            form = TaskFormState.fromEntity(loaded)
+            notes = loaded.notes.orEmpty()
         }
     }
 
@@ -156,12 +150,12 @@ fun EditTask(
             onCancel = { navController.popBackStack() },
             onCommit = {
                 val current = task ?: return@MySaveCancelRow
-                val updatedTask = form.toEntity(
-                    cosplayId = current.cosplayId,
-                    id = current.id,
-                    notes = notes.ifBlank { null },
+                cosplayViewModel.updateTask(
+                    form.toUpdatedEntity(
+                        current = current,
+                        notes = notes.ifBlank { null },
+                    )
                 )
-                cosplayViewModel.updateTask(updatedTask)
             },
             postCommit = { navController.popBackStack() },
         )
