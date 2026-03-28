@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -35,9 +33,9 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.toRoute
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.components.MyAddFab
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyDeleteFab
-import com.example.conquest.components.MyFab
 
 @Composable
 fun TasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry) {
@@ -183,14 +181,6 @@ fun TasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry)
                 }
             }
         }
-
-        MyFab(
-            onClick = { navController.navigate(NewTask(cosplayId)) },
-            modifier = Modifier.align(Alignment.BottomCenter),
-            containerColor = MaterialTheme.colorScheme.tertiary,
-            contentColor = MaterialTheme.colorScheme.primary,
-            icon = Icons.Default.Add,
-            contentDescription = "Add"
-        )
+        MyAddFab(navController, route = NewTask(cosplayId))
     }
 }

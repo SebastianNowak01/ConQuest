@@ -1,8 +1,6 @@
 package com.example.conquest.screens.cosplay
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -11,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.toRoute
-import com.example.conquest.components.MyFab
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -25,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.components.MyAddFab
 import com.example.conquest.components.MyDeleteFab
 import com.example.conquest.components.MyImageBox
 import com.example.conquest.components.MyOuterBox
@@ -148,14 +146,6 @@ fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEnt
                 }
             }
         }
-
-        MyFab(
-            onClick = { navController.navigate(NewElement(cosplayId)) },
-            modifier = Modifier.align(Alignment.BottomCenter),
-            containerColor = MaterialTheme.colorScheme.tertiary,
-            contentColor = MaterialTheme.colorScheme.primary,
-            icon = Icons.Default.Add,
-            contentDescription = "Add"
-        )
+        MyAddFab(navController, route = NewElement(cosplayId))
     }
 }

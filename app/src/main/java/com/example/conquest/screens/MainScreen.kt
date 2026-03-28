@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -18,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
@@ -27,9 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
+import com.example.conquest.components.MyAddFab
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyDeleteFab
-import com.example.conquest.components.MyFab
 import com.example.conquest.screens.cosplay.MainCosplayScreen
 import com.example.conquest.screens.cosplay.NewCosplay
 
@@ -107,13 +104,6 @@ fun MainScreen(navController: NavController, searchQuery: String) {
                 }
             }
         }
-        MyFab(
-            onClick = { navController.navigate(NewCosplay) },
-            modifier = Modifier.align(Alignment.BottomCenter),
-            containerColor = MaterialTheme.colorScheme.tertiary,
-            contentColor = MaterialTheme.colorScheme.primary,
-            icon = Icons.Default.Add,
-            contentDescription = "Add"
-        )
+        MyAddFab(navController, route = NewCosplay)
     }
 }

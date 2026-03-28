@@ -75,14 +75,14 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
         Spacer(modifier = Modifier.height(24.dp))
 
         CosplayPhotoList(photos = photos, selectedIds = selectedIds, onItemClick = { photo ->
-            if (selectionMode) {
-                val id = photo.id
-                val newSet = if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
-                selectedIds = newSet
-                if (newSet.isEmpty()) selectionMode = false
-            } else {
+            if (!selectionMode) {
                 navController.navigate(EditPhoto(photo.id))
+                return@CosplayPhotoList
             }
+            val id = photo.id
+            val newSet = if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
+            selectedIds = newSet
+            if (newSet.isEmpty()) selectionMode = false
         }, onItemLongClick = { photo ->
             selectionMode = true
             selectedIds = selectedIds + photo.id
