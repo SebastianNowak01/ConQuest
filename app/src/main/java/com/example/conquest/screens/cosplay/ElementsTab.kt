@@ -1,6 +1,5 @@
 package com.example.conquest.screens.cosplay
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -18,21 +17,16 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
-import androidx.compose.foundation.background
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material3.Icon
 import com.example.conquest.components.MyDeleteFab
+import com.example.conquest.components.MyImageBox
 import com.example.conquest.components.MyOuterBox
 
 @Composable
@@ -104,32 +98,14 @@ fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEnt
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        // Image or placeholder
-                        if (!element.photoPath.isNullOrEmpty()) {
-                            AsyncImage(
-                                model = element.photoPath,
-                                contentDescription = "Element image",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .clip(CircleShape)
-                            )
-                        } else {
-                            Box(
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .clip(CircleShape)
-                                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Image,
-                                    contentDescription = "Placeholder image",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
 
+                        MyImageBox(
+                            photoPath = element.photoPath.orEmpty(),
+                            contentDescription = "Element image",
+                            size = 48.dp,
+                            clickable = false,
+                            onClick = {},
+                        )
                         // Text content
                         Column(
                             modifier = Modifier.weight(1f),
