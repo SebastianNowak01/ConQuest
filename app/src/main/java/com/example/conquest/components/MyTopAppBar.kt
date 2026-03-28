@@ -108,9 +108,7 @@ fun MyTopAppBar(
     onMenuClick: () -> Unit
 ) {
     when (config) {
-        MyTopAppBar.None -> { /* No TopAppBar */
-        }
-
+        MyTopAppBar.None -> {}
         MyTopAppBar.Settings -> SettingsTopAppBar(onMenuClick)
         is MyTopAppBar.Cosplay -> CosplayTopAppBar(onMenuClick)
         MyTopAppBar.Default -> DefaultTopAppBar(searchQuery, onSearchQueryChange, onMenuClick)

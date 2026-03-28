@@ -49,18 +49,16 @@ fun MyImageBox(
                 contentDescription = "Pick image",
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            return
         }
-
-        if (photoPath.isNotEmpty()) {
-            AsyncImage(
-                model = photoPath,
-                contentDescription = contentDescription,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(shape),
-            )
-        }
+        AsyncImage(
+            model = photoPath,
+            contentDescription = contentDescription,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(shape),
+        )
     }
 }
 
