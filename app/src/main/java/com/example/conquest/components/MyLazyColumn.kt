@@ -18,7 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import com.example.conquest.ui.theme.UIConsts
 
 /**
  * A common pattern in this app is a padded, spaced LazyColumn that shows Cards which:
@@ -34,14 +34,14 @@ fun <T> MyLazyColumn(
     modifier: Modifier = Modifier,
     items: List<T>,
     key: ((T) -> Any)? = null,
-    contentPadding: PaddingValues = PaddingValues(16.dp),
-    spacedBy: Dp = 18.dp,
-    cardCornerRadius: Dp = 32.dp,
-    cardElevation: Dp = 4.dp,
+    contentPadding: PaddingValues = PaddingValues(UIConsts.paddingM),
+    spacedBy: Dp = UIConsts.spacingM,
+    cardCornerRadius: Dp = UIConsts.cornerRadiusL,
+    cardElevation: Dp = UIConsts.elevationS,
     isSelected: (T) -> Boolean,
     onClick: (T) -> Unit,
     onLongClick: (T) -> Unit,
-    cardContentPadding: Dp = 16.dp,
+    cardContentPadding: Dp = UIConsts.paddingM,
     content: @Composable ColumnScope.(T) -> Unit,
 ) {
     LazyColumn(
@@ -83,7 +83,7 @@ private fun MySelectableCardItem(
         modifier = Modifier
             .fillMaxWidth()
             .clip(shape)
-            .border(1.dp, MaterialTheme.colorScheme.outline, shape)
+            .border(UIConsts.strokeThin, MaterialTheme.colorScheme.outline, shape)
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick,

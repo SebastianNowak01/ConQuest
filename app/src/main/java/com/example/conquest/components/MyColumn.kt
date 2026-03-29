@@ -8,16 +8,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.example.conquest.ui.theme.UIConsts
 
 @Composable
 fun BoxScope.MyColumn(content: @Composable () -> Unit) {
     Column(
         modifier = Modifier
             .align(Alignment.TopCenter)
-            .fillMaxWidth(0.9f)
-            .padding(start = 16.dp, end = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp),
+            .fillMaxWidth(UIConsts.columnWidthFraction)
+            .padding(start = UIConsts.paddingM, end = UIConsts.paddingM),
+        verticalArrangement = Arrangement.spacedBy(UIConsts.columnVerticalSpacing),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         content()

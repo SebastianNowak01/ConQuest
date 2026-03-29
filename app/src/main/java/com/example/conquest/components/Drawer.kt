@@ -26,10 +26,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.conquest.screens.MainScreen
 import com.example.conquest.screens.SettingsScreenParams
+import com.example.conquest.ui.theme.UIConsts
 import kotlinx.coroutines.launch
 
 val routes = listOf(
@@ -57,17 +57,20 @@ fun Drawer(
             ModalDrawerSheet(
                 drawerContainerColor = MaterialTheme.colorScheme.background
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(UIConsts.paddingM))
                 Text(
                     text = "ConQuest",
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+                    modifier = Modifier.padding(
+                        horizontal = UIConsts.paddingL,
+                        vertical = UIConsts.paddingS,
+                    )
                 )
                 HorizontalDivider(
-                    thickness = 1.dp,
+                    thickness = UIConsts.strokeThin,
                     color = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(bottom = UIConsts.paddingS)
                 )
                 navigationItems.forEachIndexed { index, item ->
                     NavigationDrawerItem(

@@ -10,7 +10,6 @@ import androidx.navigation.NavController
 import androidx.navigation.toRoute
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.MyAddFab
@@ -18,6 +17,7 @@ import com.example.conquest.components.MyDeleteFab
 import com.example.conquest.components.MyImageBox
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyLazyColumn
+import com.example.conquest.ui.theme.UIConsts
 
 @Composable
 fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEntry) {
@@ -62,24 +62,24 @@ fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEnt
                 selectionMode = true
                 selectedIds = selectedIds + element.id
             },
-            cardContentPadding = 12.dp,
+            cardContentPadding = UIConsts.spacingS,
         ) { element ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingS)
             ) {
                 MyImageBox(
                     photoPath = element.photoPath.orEmpty(),
                     contentDescription = "Element image",
-                    size = 48.dp,
+                    size = UIConsts.imageSizeS,
                     clickable = false,
                     onClick = {},
                 )
 
                 Column(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    verticalArrangement = Arrangement.spacedBy(UIConsts.paddingXS)
                 ) {
                     Text(
                         text = element.name,
@@ -96,7 +96,7 @@ fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEnt
                 }
 
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(UIConsts.paddingXS),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     if (element.ready) {

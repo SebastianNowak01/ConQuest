@@ -13,7 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
@@ -24,6 +23,7 @@ import com.example.conquest.components.MyDeleteFab
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyLazyColumn
 import com.example.conquest.components.MySwitchCard
+import com.example.conquest.ui.theme.UIConsts
 
 @Composable
 fun TasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry) {
@@ -75,7 +75,7 @@ fun TasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry)
                 color = MaterialTheme.colorScheme.primary
             )
             Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingS),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 MySwitchCard(

@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
+import com.example.conquest.ui.theme.UIConsts
 
 @Composable
 fun MyFab(
@@ -24,9 +24,9 @@ fun MyFab(
         onClick = onClick,
         containerColor = containerColor,
         contentColor = contentColor,
-        shape = RoundedCornerShape(50),
+        shape = RoundedCornerShape(UIConsts.fabCornerRadius),
         modifier = modifier
-            .padding(bottom = 16.dp)
+            .padding(bottom = UIConsts.paddingM)
             .statusBarsPadding()
     ) {
         Icon(icon, contentDescription = contentDescription)

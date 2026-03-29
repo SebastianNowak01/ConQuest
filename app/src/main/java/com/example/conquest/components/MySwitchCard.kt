@@ -15,7 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.example.conquest.ui.theme.UIConsts
 
 @Composable
 fun MySwitchCard(
@@ -28,17 +28,20 @@ fun MySwitchCard(
         modifier = modifier
             .fillMaxWidth()
             .border(
-                width = 1.dp,
+                width = UIConsts.strokeThin,
                 color = MaterialTheme.colorScheme.outline,
-                shape = RoundedCornerShape(32.dp)
+                shape = RoundedCornerShape(UIConsts.cornerRadiusL)
             ),
-        shape = RoundedCornerShape(32.dp),
+        shape = RoundedCornerShape(UIConsts.cornerRadiusL),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 18.dp, vertical = 4.dp),
+                .padding(
+                    horizontal = UIConsts.spacingM,
+                    vertical = UIConsts.paddingXS,
+                ),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {

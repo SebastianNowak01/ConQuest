@@ -9,7 +9,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
@@ -23,6 +22,7 @@ import com.example.conquest.components.MySnackbarHost
 import com.example.conquest.components.MySwitchCard
 import com.example.conquest.components.saveImageUriToInternalStorage
 import com.example.conquest.data.classes.ElementFormState
+import com.example.conquest.ui.theme.UIConsts
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
@@ -71,7 +71,7 @@ fun EditElement(
             MyImageBox(
                 photoPath = form.photoPath,
                 contentDescription = "Element image",
-                size = 80.dp,
+                size = UIConsts.imageSizeM,
                 clickable = true,
                 onClick = { imagePickerLauncher.launch("image/*") },
             )
@@ -92,7 +92,7 @@ fun EditElement(
             )
 
             Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingS),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 MySwitchCard(
@@ -116,7 +116,7 @@ fun EditElement(
                 label = "Notes",
                 singleLine = false,
                 maxLines = 6,
-                height = 120.dp,
+                height = UIConsts.heightM,
             )
         }
 

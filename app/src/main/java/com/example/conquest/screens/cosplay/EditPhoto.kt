@@ -22,7 +22,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
@@ -80,8 +79,8 @@ fun EditPhoto(
             MyImageBox(
                 photoPath = photoPath,
                 contentDescription = "Reference image",
-                size = UIConsts.defaultHeight,
-                shape = RoundedCornerShape(UIConsts.editScreenMiscellaneousSize),
+                size = UIConsts.heightM,
+                shape = RoundedCornerShape(UIConsts.cornerRadiusM),
                 clickable = true,
                 onClick = { imagePickerLauncher.launch("image/*") },
             )
@@ -96,16 +95,16 @@ fun EditPhoto(
                 label = "Notes",
                 singleLine = false,
                 maxLines = 6,
-                height = UIConsts.defaultHeight,
-                shape = RoundedCornerShape(UIConsts.editScreenMiscellaneousSize),
+                height = UIConsts.heightM,
+                shape = RoundedCornerShape(UIConsts.cornerRadiusM),
             )
         }
 
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = UIConsts.paddingSize),
-            horizontalArrangement = Arrangement.spacedBy(24.dp)
+                .padding(bottom = UIConsts.paddingM),
+            horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingL)
         ) {
             MyFab(
                 onClick = { navController.popBackStack() },

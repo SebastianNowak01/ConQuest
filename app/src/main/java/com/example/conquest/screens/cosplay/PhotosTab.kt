@@ -30,7 +30,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
@@ -42,6 +41,7 @@ import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyDeleteFab
 import com.example.conquest.components.MyFab
 import com.example.conquest.data.entity.CosplayPhoto
+import com.example.conquest.ui.theme.UIConsts
 
 @Composable
 fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController) {
@@ -72,7 +72,7 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
             modifier = Modifier.align(Alignment.BottomCenter),
             onImageSaved = { savedPath -> cosplayViewModel.addPhoto(args.uid, savedPath) })
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(UIConsts.spacingL))
 
         CosplayPhotoList(photos = photos, selectedIds = selectedIds, onItemClick = { photo ->
             if (!selectionMode) {
@@ -128,17 +128,18 @@ fun CosplayPhotoList(
         PlaceholderBox()
     } else {
         LazyRow(
-            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(UIConsts.paddingS)
         ) {
             items(items = photos, key = { it.id }) { photo ->
                 Card(
                     modifier = Modifier
-                        .size(120.dp)
-                        .clip(RoundedCornerShape(16.dp))
+                        .size(UIConsts.photoThumbSize)
+                        .clip(RoundedCornerShape(UIConsts.cornerRadiusM))
                         .border(
-                            width = 1.dp,
+                            width = UIConsts.strokeThin,
                             color = MaterialTheme.colorScheme.outline,
-                            shape = RoundedCornerShape(16.dp)
+                            shape = RoundedCornerShape(UIConsts.cornerRadiusM)
                         )
                         .combinedClickable(
                             onClick = { onItemClick(photo) },
@@ -147,8 +148,8 @@ fun CosplayPhotoList(
                         containerColor = if (selectedIds.contains(photo.id)) MaterialTheme.colorScheme.secondaryContainer
                         else MaterialTheme.colorScheme.background
                     ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                    shape = RoundedCornerShape(16.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = UIConsts.elevationS),
+                    shape = RoundedCornerShape(UIConsts.cornerRadiusM)
                 ) {
                     AsyncImage(
                         model = photo.path,
@@ -166,7 +167,8 @@ fun PlaceholderBox() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp), contentAlignment = Alignment.Center
+            .height(UIConsts.placeholderHeightL),
+        contentAlignment = Alignment.Center
     ) {
         Text("No images added yet.")
     }

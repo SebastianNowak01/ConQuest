@@ -8,19 +8,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.example.conquest.ui.theme.UIConsts
 
 @Composable
 fun MyHeaderText(text: String) {
     Text(
         text = text,
         style = MaterialTheme.typography.headlineMedium.copy(
-            fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp
+            fontWeight = FontWeight.Bold,
+            letterSpacing = UIConsts.letterSpacingS,
         ),
         color = MaterialTheme.colorScheme.primary,
         modifier = Modifier
-            .padding(bottom = 8.dp, top = 8.dp)
+            .padding(top = UIConsts.paddingS, bottom = UIConsts.paddingS)
             .fillMaxWidth(),
         textAlign = TextAlign.Center
     )

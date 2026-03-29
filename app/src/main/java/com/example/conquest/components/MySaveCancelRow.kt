@@ -14,13 +14,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import com.example.conquest.ui.theme.UIConsts
 import kotlinx.coroutines.launch
 
 @Composable
 fun BoxScope.MySaveCancelRow(
     modifier: Modifier = Modifier,
-    bottomPadding: Dp = 16.dp,
+    bottomPadding: Dp = UIConsts.paddingM,
     onCancel: () -> Unit,
     onSave: () -> Unit,
     cancelContentDescription: String = "Cancel",
@@ -31,7 +31,7 @@ fun BoxScope.MySaveCancelRow(
             .align(androidx.compose.ui.Alignment.BottomCenter)
             .padding(bottom = bottomPadding)
             .navigationBarsPadding(),
-        horizontalArrangement = Arrangement.spacedBy(24.dp)
+        horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingL)
     ) {
         MyFab(
             onClick = onCancel,
@@ -54,7 +54,7 @@ fun BoxScope.MySaveCancelRow(
 @Composable
 fun BoxScope.MySaveCancelRow(
     modifier: Modifier = Modifier,
-    bottomPadding: Dp = 16.dp,
+    bottomPadding: Dp = UIConsts.paddingM,
     snackbarHostState: SnackbarHostState,
     isValid: Boolean,
     invalidMessage: String = "Please fill out all required fields!",

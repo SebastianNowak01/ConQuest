@@ -10,7 +10,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.example.conquest.ui.theme.UIConsts
 
 @Composable
 fun BoxScope.MySnackbarHost(hostState: SnackbarHostState) {
@@ -18,13 +18,16 @@ fun BoxScope.MySnackbarHost(hostState: SnackbarHostState) {
         hostState = hostState,
         modifier = Modifier
             .align(Alignment.BottomCenter)
-            .padding(horizontal = 16.dp, vertical = 140.dp),
+            .padding(
+                horizontal = UIConsts.paddingM,
+                vertical = UIConsts.snackbarHostVerticalOffset,
+            ),
         snackbar = { data ->
             Snackbar(
                 snackbarData = data,
                 containerColor = MaterialTheme.colorScheme.tertiary,
                 contentColor = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(32.dp),
+                shape = RoundedCornerShape(UIConsts.cornerRadiusL),
             )
         })
 }

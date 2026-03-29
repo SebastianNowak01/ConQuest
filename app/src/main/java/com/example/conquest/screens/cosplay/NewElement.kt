@@ -7,7 +7,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
@@ -21,6 +20,7 @@ import com.example.conquest.components.MySaveCancelRow
 import com.example.conquest.components.MySnackbarHost
 import com.example.conquest.components.MySwitchCard
 import com.example.conquest.data.classes.ElementFormState
+import com.example.conquest.ui.theme.UIConsts
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
@@ -66,7 +66,7 @@ fun NewElement(
                 onValueChange = { form = form.copy(name = it) },
                 label = "Element Name*",
                 singleLine = true,
-                shape = RoundedCornerShape(32.dp),
+                shape = RoundedCornerShape(UIConsts.cornerRadiusL),
             )
 
             MyInputField(
@@ -75,13 +75,13 @@ fun NewElement(
                 label = "Cost (Optional)",
                 singleLine = true,
                 filterDecimal = true,
-                shape = RoundedCornerShape(32.dp),
+                shape = RoundedCornerShape(UIConsts.cornerRadiusL),
             )
 
             MyImageBox(
                 photoPath = form.photoPath,
                 contentDescription = "Selected image",
-                size = 64.dp,
+                size = UIConsts.imageSizeS,
                 clickable = true,
                 onClick = { launcher.launch("image/*") },
             )
