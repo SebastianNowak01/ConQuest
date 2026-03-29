@@ -14,8 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,6 +34,7 @@ import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.MyAddFab
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyDeleteFab
+import com.example.conquest.components.MySwitchCard
 
 @Composable
 fun TasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry) {
@@ -110,72 +109,18 @@ fun TasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry)
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Card(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxWidth()
-                                    .border(
-                                        width = 1.dp,
-                                        color = MaterialTheme.colorScheme.outline,
-                                        shape = RoundedCornerShape(32.dp)
-                                    ),
-                                shape = RoundedCornerShape(32.dp),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 18.dp, vertical = 4.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                ) {
-                                    Text(text = "Done")
-                                    Switch(
-                                        checked = task.done,
-                                        onCheckedChange = null,
-                                        enabled = false,
-                                        colors = SwitchDefaults.colors(
-                                            checkedThumbColor = MaterialTheme.colorScheme.primary,
-                                            checkedTrackColor = MaterialTheme.colorScheme.secondary,
-                                            uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            uncheckedTrackColor = MaterialTheme.colorScheme.secondary
-                                        )
-                                    )
-                                }
-                            }
-                            Card(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxWidth()
-                                    .border(
-                                        width = 1.dp,
-                                        color = MaterialTheme.colorScheme.outline,
-                                        shape = RoundedCornerShape(32.dp)
-                                    ),
-                                shape = RoundedCornerShape(32.dp),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 18.dp, vertical = 4.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                ) {
-                                    Text(text = "Alarm")
-                                    Switch(
-                                        checked = task.alarm,
-                                        onCheckedChange = null,
-                                        enabled = false,
-                                        colors = SwitchDefaults.colors(
-                                            checkedThumbColor = MaterialTheme.colorScheme.primary,
-                                            checkedTrackColor = MaterialTheme.colorScheme.secondary,
-                                            uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            uncheckedTrackColor = MaterialTheme.colorScheme.secondary
-                                        )
-                                    )
-                                }
-                            }
+                            MySwitchCard(
+                                label = "Done",
+                                checked = task.done,
+                                onCheckedChange = null,
+                                modifier = Modifier.weight(1f)
+                            )
+                            MySwitchCard(
+                                label = "Alarm",
+                                checked = task.alarm,
+                                onCheckedChange = null,
+                                modifier = Modifier.weight(1f)
+                            )
                         }
                     }
                 }

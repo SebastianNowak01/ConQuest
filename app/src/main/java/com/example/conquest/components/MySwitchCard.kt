@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 fun MySwitchCard(
     label: String,
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
+    onCheckedChange: ((Boolean) -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     Card(
