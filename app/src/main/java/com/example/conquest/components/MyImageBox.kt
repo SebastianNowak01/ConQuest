@@ -23,11 +23,12 @@ import coil.compose.AsyncImage
 fun MyImageBox(
     modifier: Modifier = Modifier,
     photoPath: String,
-    contentDescription: String,
+    contentDescription: String? = null,
     size: Dp,
     shape: Shape = CircleShape,
     clickable: Boolean,
     onClick: () -> Unit,
+    emptyContentDescription: String = "Pick image",
 ) {
     val clickModifier = if (clickable) {
         Modifier.clickable(onClick = onClick)
@@ -46,7 +47,7 @@ fun MyImageBox(
         if (photoPath.isEmpty()) {
             Icon(
                 imageVector = Icons.Default.Image,
-                contentDescription = "Pick image",
+                contentDescription = emptyContentDescription,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
             return

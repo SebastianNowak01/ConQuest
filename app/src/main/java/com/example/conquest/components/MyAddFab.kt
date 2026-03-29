@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 
 @Composable
-fun <T: Any>BoxScope.MyAddFab(navController: NavController, route: T) {
+fun <T : Any> BoxScope.MyAddFab(navController: NavController, route: T) {
     MyFab(
         onClick = { navController.navigate(route) },
         modifier = Modifier.align(Alignment.BottomCenter),

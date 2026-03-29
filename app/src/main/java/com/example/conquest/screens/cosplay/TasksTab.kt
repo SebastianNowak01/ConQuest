@@ -81,13 +81,13 @@ fun TasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry)
                 MySwitchCard(
                     label = "Done",
                     checked = task.done,
-                    onCheckedChange = {},
+                    onCheckedChange = null,
                     modifier = Modifier.weight(1f),
                 )
                 MySwitchCard(
                     label = "Alarm",
                     checked = task.alarm,
-                    onCheckedChange = {},
+                    onCheckedChange = null,
                     modifier = Modifier.weight(1f),
                 )
             }

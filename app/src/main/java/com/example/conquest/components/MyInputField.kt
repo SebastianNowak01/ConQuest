@@ -30,9 +30,11 @@ fun MyInputField(
     maxLines: Int = if (singleLine) 1 else 6,
     height: Dp? = null,
     shape: RoundedCornerShape = RoundedCornerShape(20.dp),
-    keyboardType: KeyboardType = KeyboardType.Text,
+    keyboardType: KeyboardType? = null,
     filterDecimal: Boolean = false,
 ) {
+    val resolvedKeyboardType = keyboardType ?: if (filterDecimal) KeyboardType.Decimal else KeyboardType.Text
+
     val appliedModifier = modifier
         .fillMaxWidth()
         .let { m -> if (height != null) m.height(height) else m }
@@ -52,7 +54,7 @@ fun MyInputField(
         shape = shape,
         singleLine = singleLine,
         maxLines = maxLines,
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        keyboardOptions = KeyboardOptions(keyboardType = resolvedKeyboardType),
     )
 }
 
