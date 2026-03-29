@@ -70,14 +70,15 @@ fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEnt
                             shape = RoundedCornerShape(32.dp)
                         )
                         .combinedClickable(onClick = {
-                            if (selectionMode) {
-                                val id = element.id
-                                selectedIds =
-                                    if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
-                                if (selectedIds.isEmpty()) selectionMode = false
-                            } else {
+                            if (!selectionMode) {
                                 navController.navigate(EditElement(element.id))
+                                return@combinedClickable
                             }
+                            val id = element.id
+                            selectedIds =
+                                if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
+                            if (selectedIds.isEmpty()) selectionMode = false
+
                         }, onLongClick = {
                             selectionMode = true
                             selectedIds = selectedIds + element.id

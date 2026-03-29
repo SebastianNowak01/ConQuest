@@ -1,18 +1,12 @@
 package com.example.conquest.screens.cosplay
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,6 +26,7 @@ import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyHeaderText
 import com.example.conquest.components.MySaveCancelRow
 import com.example.conquest.components.MySnackbarHost
+import com.example.conquest.components.MySwitchCard
 import com.example.conquest.data.classes.TaskFormState
 import kotlinx.serialization.Serializable
 
@@ -69,72 +64,18 @@ fun NewTask(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Done switch
-                Card(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            shape = RoundedCornerShape(32.dp)
-                        ),
-                    shape = RoundedCornerShape(32.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 18.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        Text(text = "Done")
-                        Switch(
-                            checked = form.done,
-                            onCheckedChange = { form = form.copy(done = it) },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.primary,
-                                checkedTrackColor = MaterialTheme.colorScheme.secondary,
-                                uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                uncheckedTrackColor = MaterialTheme.colorScheme.secondary
-                            )
-                        )
-                    }
-                }
-                // Alarm switch
-                Card(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            shape = RoundedCornerShape(32.dp)
-                        ),
-                    shape = RoundedCornerShape(32.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 18.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        Text(text = "Alarm")
-                        Switch(
-                            checked = form.alarm,
-                            onCheckedChange = { form = form.copy(alarm = it) },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.primary,
-                                checkedTrackColor = MaterialTheme.colorScheme.secondary,
-                                uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                uncheckedTrackColor = MaterialTheme.colorScheme.secondary
-                            )
-                        )
-                    }
-                }
+                MySwitchCard(
+                    label = "Done",
+                    checked = form.done,
+                    onCheckedChange = { form = form.copy(done = it) },
+                    modifier = Modifier.weight(1f),
+                )
+                MySwitchCard(
+                    label = "Alarm",
+                    checked = form.alarm,
+                    onCheckedChange = { form = form.copy(alarm = it) },
+                    modifier = Modifier.weight(1f),
+                )
             }
 
             DatePickerFieldToModal(

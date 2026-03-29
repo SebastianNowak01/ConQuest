@@ -1,7 +1,5 @@
 package com.example.conquest.screens.cosplay
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -11,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -23,6 +20,7 @@ import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyHeaderText
 import com.example.conquest.components.MySnackbarHost
+import com.example.conquest.components.MySwitchCard
 import com.example.conquest.data.classes.CosplayFormState
 
 @Serializable
@@ -41,42 +39,10 @@ fun NewCosplay(
         MyColumn {
             MyHeaderText(text = "New Project")
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.outline,
-                        shape = RoundedCornerShape(32.dp)
-                    ),
-                shape = RoundedCornerShape(32.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            horizontal = 18.dp, vertical = 4.dp
-                        ),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Text(
-                        text = if (form.inProgress) "In Progress" else "Planned",
-                    )
-
-                    Switch(
-                        checked = form.inProgress,
-                        onCheckedChange = { form = form.copy(inProgress = it) },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = MaterialTheme.colorScheme.primary,
-                            checkedTrackColor = MaterialTheme.colorScheme.secondary,
-                            uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            uncheckedTrackColor = MaterialTheme.colorScheme.secondary
-                        )
-                    )
-                }
-            }
+            MySwitchCard(
+                label = if (form.inProgress) "In Progress" else "Planned",
+                checked = form.inProgress,
+                onCheckedChange = { form = form.copy(inProgress = it) })
 
             OutlinedTextField(
                 value = form.characterName,

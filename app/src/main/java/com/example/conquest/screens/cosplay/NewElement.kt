@@ -3,13 +3,11 @@ package com.example.conquest.screens.cosplay
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
@@ -24,6 +22,7 @@ import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyHeaderText
 import com.example.conquest.components.MySaveCancelRow
 import com.example.conquest.components.MySnackbarHost
+import com.example.conquest.components.MySwitchCard
 import com.example.conquest.data.classes.ElementFormState
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -95,69 +94,17 @@ fun NewElement(
                 onClick = { launcher.launch("image/*") },
             )
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.outline,
-                        shape = RoundedCornerShape(32.dp)
-                    ),
-                shape = RoundedCornerShape(32.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 18.dp, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Text(text = "Ready")
-                    Switch(
-                        checked = form.ready,
-                        onCheckedChange = { form = form.copy(ready = it) },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = MaterialTheme.colorScheme.primary,
-                            checkedTrackColor = MaterialTheme.colorScheme.secondary,
-                            uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            uncheckedTrackColor = MaterialTheme.colorScheme.secondary
-                        )
-                    )
-                }
-            }
+            MySwitchCard(
+                label = "Ready",
+                checked = form.ready,
+                onCheckedChange = { form = form.copy(ready = it) },
+            )
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.outline,
-                        shape = RoundedCornerShape(32.dp)
-                    ),
-                shape = RoundedCornerShape(32.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 18.dp, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Text(text = "Bought")
-                    Switch(
-                        checked = form.bought,
-                        onCheckedChange = { form = form.copy(bought = it) },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = MaterialTheme.colorScheme.primary,
-                            checkedTrackColor = MaterialTheme.colorScheme.secondary,
-                            uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            uncheckedTrackColor = MaterialTheme.colorScheme.secondary
-                        )
-                    )
-                }
-            }
+            MySwitchCard(
+                label = "Bought",
+                checked = form.bought,
+                onCheckedChange = { form = form.copy(bought = it) },
+            )
         }
 
         MySaveCancelRow(
