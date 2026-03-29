@@ -66,10 +66,8 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    // New: reactive getter for a single photo
     fun getPhotoById(id: Int): Flow<CosplayPhoto?> = photoDao.getPhotoById(id)
 
-    // New: update a photo and optionally delete the old file if path changed
     fun updatePhoto(updated: CosplayPhoto, oldPathToDelete: String? = null) {
         viewModelScope.launch {
             photoDao.updatePhoto(updated)

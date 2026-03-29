@@ -69,8 +69,6 @@ fun NewElement(
                 shape = RoundedCornerShape(32.dp),
             )
 
-            // Note: MyInputField currently doesn't include a leading icon ("$").
-            // If you want that too, we can extend MyInputField with an optional leadingIcon slot.
             MyInputField(
                 value = form.cost,
                 onValueChange = { form = form.copy(cost = it) },

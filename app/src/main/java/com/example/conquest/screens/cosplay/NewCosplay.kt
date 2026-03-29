@@ -62,8 +62,6 @@ fun NewCosplay(
                 selectedDate = form.dueDate,
                 onDateSelected = { form = form.copy(dueDate = it) })
 
-            // Note: MyInputField currently doesn't include a leading icon ("$").
-            // If you want that too, we can extend MyInputField with an optional leadingIcon slot.
             MyInputField(
                 value = form.budget,
                 onValueChange = { form = form.copy(budget = it) },
