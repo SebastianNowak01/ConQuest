@@ -26,12 +26,12 @@ import kotlinx.serialization.Serializable
 import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.material3.MenuAnchorType
+import com.example.conquest.ui.theme.UIConsts
 
 @Serializable
 object SettingsScreenParams
@@ -49,7 +49,7 @@ fun SettingsScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 32.dp)
+            .padding(top = UIConsts.paddingL)
             .background(MaterialTheme.colorScheme.background),
 
         verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally
@@ -65,7 +65,7 @@ fun SettingsScreen() {
                 modifier = Modifier
                     .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true)
                     .fillMaxWidth(0.9f),
-                shape = RoundedCornerShape(32.dp),
+                shape = RoundedCornerShape(UIConsts.cornerRadiusL),
                 textStyle = MaterialTheme.typography.bodyLarge
             )
             DropdownMenu(
@@ -89,7 +89,7 @@ fun SettingsScreen() {
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 8.dp)
+                            .padding(horizontal = UIConsts.paddingS)
                     )
                 }
             }

@@ -1,11 +1,6 @@
 package com.example.conquest.screens.cosplay
 
-import android.content.ContentResolver
 import android.content.Context
-import android.net.Uri
-import android.webkit.MimeTypeMap
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,7 +15,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -36,19 +30,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.toRoute
 import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.components.pickAndSaveImageLauncher
+import com.example.conquest.components.MyOuterBox
+import com.example.conquest.components.MyDeleteFab
 import com.example.conquest.components.MyFab
 import com.example.conquest.data.entity.CosplayPhoto
-import java.io.File
-import java.io.InputStream
-import java.io.OutputStream
+import com.example.conquest.ui.theme.UIConsts
 
 @Composable
 fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController) {
@@ -65,53 +58,36 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
     var selectionMode by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(setOf<Int>()) }
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-    ) {
+    MyOuterBox {
         if (selectionMode) {
-            MyFab(
-                onClick = {
-                    cosplayViewModel.deletePhotosByIds(selectedIds)
-                    selectionMode = false
-                    selectedIds = emptySet()
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .zIndex(2f),
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.primary,
-                icon = Icons.Default.Close,
-                contentDescription = "Delete"
-            )
+            MyDeleteFab(onClick = {
+                cosplayViewModel.deletePhotosByIds(selectedIds)
+                selectionMode = false
+                selectedIds = emptySet()
+            })
         }
 
-        PickAndSaveImage(context, Modifier.align(Alignment.BottomCenter)) { savedPath ->
-            cosplayViewModel.addPhoto(args.uid, savedPath)
-        }
+        PickAndSaveImage(
+            context = context,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            onImageSaved = { savedPath -> cosplayViewModel.addPhoto(args.uid, savedPath) })
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(UIConsts.spacingL))
 
         CosplayPhotoList(photos = photos, selectedIds = selectedIds, onItemClick = { photo ->
-            if (selectionMode) {
-                val id = photo.id
-                val newSet = if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
-                selectedIds = newSet
-                if (newSet.isEmpty()) selectionMode = false
-            } else {
+            if (!selectionMode) {
                 navController.navigate(EditPhoto(photo.id))
+                return@CosplayPhotoList
             }
+            val id = photo.id
+            val newSet = if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
+            selectedIds = newSet
+            if (newSet.isEmpty()) selectionMode = false
         }, onItemLongClick = { photo ->
             selectionMode = true
             selectedIds = selectedIds + photo.id
         })
     }
-}
-
-fun getFileExtension(context: Context, uri: Uri): String? {
-    val contentResolver: ContentResolver = context.contentResolver
-    val mimeTypeMap = MimeTypeMap.getSingleton()
-    val mimeType = contentResolver.getType(uri)
-    return mimeTypeMap.getExtensionFromMimeType(mimeType)
 }
 
 @Composable
@@ -120,23 +96,14 @@ fun PickAndSaveImage(
 ) {
     var error by remember { mutableStateOf<String?>(null) }
 
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        if (uri != null) {
-            try {
-                val extension = getFileExtension(context, uri) ?: "jpg"
-                val fileName = "cosplay_photo_${System.currentTimeMillis()}.$extension"
-                val savedPath = copyUriToInternalStorage(context, uri, fileName)
-                onImageSaved(savedPath)
-            } catch (e: Exception) {
-                error = "Failed to save image: ${e.localizedMessage}"
-            }
-        }
-    }
+    val launcher = pickAndSaveImageLauncher(
+        context = context,
+        fileNamePrefix = "cosplay_photo",
+        onSaved = onImageSaved,
+        onError = { t -> error = "Failed to save image: ${t.localizedMessage}" })
 
     MyFab(
-        onClick = { launcher.launch("image/*") },
+        onClick = { launcher.launch() },
         modifier = modifier,
         containerColor = MaterialTheme.colorScheme.tertiary,
         contentColor = MaterialTheme.colorScheme.primary,
@@ -149,18 +116,6 @@ fun PickAndSaveImage(
     }
 }
 
-fun copyUriToInternalStorage(context: Context, uri: Uri, fileName: String): String {
-    val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
-    val file = File(context.filesDir, fileName)
-    val outputStream: OutputStream = file.outputStream()
-
-    inputStream?.use { input ->
-        outputStream.use { output ->
-            input.copyTo(output)
-        }
-    }
-    return file.absolutePath
-}
 
 @Composable
 fun CosplayPhotoList(
@@ -170,26 +125,21 @@ fun CosplayPhotoList(
     onItemLongClick: (CosplayPhoto) -> Unit
 ) {
     if (photos.isEmpty()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp), contentAlignment = Alignment.Center
-        ) {
-            Text("No images added yet.")
-        }
+        PlaceholderBox()
     } else {
         LazyRow(
-            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(UIConsts.paddingS)
         ) {
             items(items = photos, key = { it.id }) { photo ->
                 Card(
                     modifier = Modifier
-                        .size(120.dp)
-                        .clip(RoundedCornerShape(16.dp))
+                        .size(UIConsts.photoThumbSize)
+                        .clip(RoundedCornerShape(UIConsts.cornerRadiusM))
                         .border(
-                            width = 1.dp,
+                            width = UIConsts.strokeThin,
                             color = MaterialTheme.colorScheme.outline,
-                            shape = RoundedCornerShape(16.dp)
+                            shape = RoundedCornerShape(UIConsts.cornerRadiusM)
                         )
                         .combinedClickable(
                             onClick = { onItemClick(photo) },
@@ -198,8 +148,8 @@ fun CosplayPhotoList(
                         containerColor = if (selectedIds.contains(photo.id)) MaterialTheme.colorScheme.secondaryContainer
                         else MaterialTheme.colorScheme.background
                     ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                    shape = RoundedCornerShape(16.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = UIConsts.elevationS),
+                    shape = RoundedCornerShape(UIConsts.cornerRadiusM)
                 ) {
                     AsyncImage(
                         model = photo.path,
@@ -209,5 +159,17 @@ fun CosplayPhotoList(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun PlaceholderBox() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(UIConsts.placeholderHeightL),
+        contentAlignment = Alignment.Center
+    ) {
+        Text("No images added yet.")
     }
 }

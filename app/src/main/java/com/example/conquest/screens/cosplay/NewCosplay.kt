@@ -1,38 +1,21 @@
 package com.example.conquest.screens.cosplay
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import kotlinx.serialization.Serializable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
-import java.util.*
 import com.example.conquest.components.DatePickerFieldToModal
-import com.example.conquest.components.getCurrentDate
-import com.example.conquest.components.MyFab
-import com.example.conquest.data.entity.Cosplay
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.launch
+import com.example.conquest.components.MySaveCancelRow
+import com.example.conquest.components.MyOuterBox
+import com.example.conquest.components.MyColumn
+import com.example.conquest.components.MyHeaderText
+import com.example.conquest.components.MyInputField
+import com.example.conquest.components.MySnackbarHost
+import com.example.conquest.components.MySwitchCard
+import com.example.conquest.data.classes.CosplayFormState
 
 @Serializable
 object NewCosplay
@@ -44,171 +27,59 @@ fun NewCosplay(
 ) {
     val cosplayViewModel: CosplayViewModel = viewModel()
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
-    var characterName by remember { mutableStateOf("") }
-    var series by remember { mutableStateOf("") }
-    var initialDate by remember { mutableStateOf<Date?>(getCurrentDate()) }
-    var dueDate by remember { mutableStateOf<Date?>(getCurrentDate()) }
-    var budget by remember { mutableStateOf("") }
-    var inProgress by remember { mutableStateOf(true) }
+    var form by remember { mutableStateOf(CosplayFormState()) }
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        Column(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .fillMaxWidth(0.9f)
-                .padding(start = 16.dp, end = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "New Project",
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp
-                ),
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .padding(bottom = 8.dp, top = 8.dp)
-                    .fillMaxWidth(),
-                textAlign = TextAlign.Center
+    MyOuterBox {
+        MyColumn {
+            MyHeaderText(text = "New Project")
+
+            MySwitchCard(
+                label = if (form.inProgress) "In Progress" else "Planned",
+                checked = form.inProgress,
+                onCheckedChange = { form = form.copy(inProgress = it) })
+
+            MyInputField(
+                value = form.characterName,
+                onValueChange = { form = form.copy(characterName = it) },
+                label = "Character Name*",
+                singleLine = true,
             )
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.outline,
-                        shape = RoundedCornerShape(32.dp)
-                    ),
-                shape = RoundedCornerShape(32.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            horizontal = 18.dp, vertical = 4.dp
-                        ),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Text(
-                        text = if (inProgress) "In Progress" else "Planned",
-                    )
-
-                    Switch(
-                        checked = inProgress,
-                        onCheckedChange = { inProgress = it },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = MaterialTheme.colorScheme.primary,
-                            checkedTrackColor = MaterialTheme.colorScheme.secondary,
-                            uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            uncheckedTrackColor = MaterialTheme.colorScheme.secondary
-                        )
-                    )
-                }
-            }
-
-            OutlinedTextField(
-                value = characterName,
-                onValueChange = { characterName = it },
-                label = { Text("Character Name*") },
-                modifier = Modifier.fillMaxWidth(),
+            MyInputField(
+                value = form.series,
+                onValueChange = { form = form.copy(series = it) },
+                label = "Series*",
                 singleLine = true,
-                shape = RoundedCornerShape(32.dp)
-            )
-
-            OutlinedTextField(
-                value = series,
-                onValueChange = { series = it },
-                label = { Text("Series*") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                shape = RoundedCornerShape(32.dp)
             )
 
             DatePickerFieldToModal(
                 label = "Initial date*",
-                selectedDate = initialDate,
-                onDateSelected = { initialDate = it })
+                selectedDate = form.initialDate,
+                onDateSelected = { form = form.copy(initialDate = it) })
 
             DatePickerFieldToModal(
-                label = "Due date", selectedDate = dueDate, onDateSelected = { dueDate = it })
+                label = "Due date",
+                selectedDate = form.dueDate,
+                onDateSelected = { form = form.copy(dueDate = it) })
 
-            OutlinedTextField(
-                value = budget,
-                onValueChange = { budget = it.filter { it.isDigit() || it == '.' } },
-                label = { Text("Budget (Optional)") },
-                modifier = Modifier.fillMaxWidth(),
+            MyInputField(
+                value = form.budget,
+                onValueChange = { form = form.copy(budget = it) },
+                label = "Budget (Optional)",
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                leadingIcon = { Text("$") },
-                shape = RoundedCornerShape(32.dp)
+                filterDecimal = true,
             )
 
         }
 
-        // ✅ Row with two FABs centered at bottom
-        Row(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp)
-                .navigationBarsPadding(),
-            horizontalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            MyFab(
-                onClick = { navController.popBackStack() },
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.primary,
-                icon = Icons.Default.Close,
-                contentDescription = "Cancel"
-            )
+        MySaveCancelRow(
+            snackbarHostState = snackbarHostState,
+            isValid = form.isValid,
+            onCancel = { navController.popBackStack() },
+            onCommit = { cosplayViewModel.insertCosplay(form.toEntity(uid = 0, finished = false)) },
+            postCommit = { navController.popBackStack() },
+        )
 
-            MyFab(
-                onClick = {
-                    if (characterName.isNotBlank() && series.isNotBlank() && initialDate != null) {
-                        val newCosplay = Cosplay(
-                            name = characterName,
-                            series = series,
-                            initialDate = initialDate!!,
-                            dueDate = dueDate,
-                            budget = budget.takeIf { it.isNotBlank() }?.toDoubleOrNull(),
-                            inProgress = inProgress,
-                            uid = 0,
-                            finished = false
-                        )
-                        cosplayViewModel.insertCosplay(newCosplay)
-                        navController.popBackStack()
-                    } else {
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = "Please fill out all required fields!"
-                            )
-                        }
-                    }
-                },
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.primary,
-                icon = Icons.Default.Add,
-                contentDescription = "Save"
-            )
-        }
-
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(horizontal = 16.dp, vertical = 140.dp),
-            snackbar = { data ->
-                Snackbar(
-                    snackbarData = data,
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(32.dp),
-                )
-            })
+        MySnackbarHost(hostState = snackbarHostState)
     }
 }

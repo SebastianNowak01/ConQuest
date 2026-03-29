@@ -3,25 +3,14 @@ package com.example.conquest.screens.cosplay
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,17 +21,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.components.MyImageBox
+import com.example.conquest.components.MyOuterBox
+import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyFab
+import com.example.conquest.components.MyHeaderText
+import com.example.conquest.components.MyInputField
+import com.example.conquest.components.saveImageUriToInternalStorage
 import kotlinx.serialization.Serializable
+import com.example.conquest.ui.theme.UIConsts
 
 @Serializable
 data class EditPhoto(val photoId: Int)
@@ -62,12 +53,13 @@ fun EditPhoto(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
-            try {
-                val extension = getFileExtension(context, uri) ?: "jpg"
-                val fileName = "cosplay_photo_${System.currentTimeMillis()}.$extension"
-                val savedPath = copyUriToInternalStorage(context, uri, fileName)
+            saveImageUriToInternalStorage(
+                context = context,
+                uri = uri,
+                fileNamePrefix = "cosplay_photo",
+            ).onSuccess { savedPath ->
                 photoPath = savedPath
-            } catch (e: Exception) {
+            }.onFailure { e ->
                 error = "Failed to save image: ${e.localizedMessage}"
             }
         }
@@ -80,70 +72,39 @@ fun EditPhoto(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .fillMaxWidth(0.9f)
-                .padding(start = 16.dp, end = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Reference Image",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+    MyOuterBox {
+        MyColumn {
+            MyHeaderText(text = "Edit Photo")
+
+            MyImageBox(
+                photoPath = photoPath,
+                contentDescription = "Reference image",
+                size = UIConsts.heightM,
+                shape = RoundedCornerShape(UIConsts.cornerRadiusM),
+                clickable = true,
+                onClick = { imagePickerLauncher.launch("image/*") },
             )
-            Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .clickable { imagePickerLauncher.launch("image/*") },
-                contentAlignment = Alignment.Center
-            ) {
-                if (photoPath.isNotEmpty()) {
-                    AsyncImage(
-                        model = photoPath,
-                        contentDescription = "Reference image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(16.dp))
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Image,
-                        contentDescription = "Pick image",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
 
             if (error.isNotEmpty()) {
                 Text(error, color = MaterialTheme.colorScheme.error)
             }
 
-            Text(
-                text = "Notes",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-            )
-            OutlinedTextField(
+            MyInputField(
                 value = notes,
                 onValueChange = { notes = it },
-                label = { Text("Notes") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp),
-                shape = RoundedCornerShape(20.dp),
-                maxLines = 6
+                label = "Notes",
+                singleLine = false,
+                maxLines = 6,
+                height = UIConsts.heightM,
+                shape = RoundedCornerShape(UIConsts.cornerRadiusM),
             )
         }
 
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(24.dp)
+                .padding(bottom = UIConsts.paddingM),
+            horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingL)
         ) {
             MyFab(
                 onClick = { navController.popBackStack() },
@@ -157,7 +118,7 @@ fun EditPhoto(
                 onClick = {
                     photo?.let { current ->
                         val oldPath = current.path
-                        val newPath = if (photoPath.isNotEmpty()) photoPath else oldPath
+                        val newPath = photoPath.ifEmpty { oldPath }
                         val updated = current.copy(path = newPath, notes = notes.ifBlank { null })
                         val deleteOld = if (newPath != oldPath) oldPath else null
                         cosplayViewModel.updatePhoto(updated, oldPathToDelete = deleteOld)

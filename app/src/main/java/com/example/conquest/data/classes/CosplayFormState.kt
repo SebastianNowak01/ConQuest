@@ -1,0 +1,63 @@
+package com.example.conquest.data.classes
+
+import com.example.conquest.components.getCurrentDate
+import com.example.conquest.data.entity.Cosplay
+import java.util.Date
+
+data class CosplayFormState(
+    val characterName: String = "",
+    val series: String = "",
+    val initialDate: Date? = getCurrentDate(),
+    val dueDate: Date? = getCurrentDate(),
+    val budget: String = "",
+    val inProgress: Boolean = true,
+) {
+    companion object {
+        fun fromEntity(cosplay: Cosplay): CosplayFormState {
+            return CosplayFormState(
+                characterName = cosplay.name,
+                series = cosplay.series,
+                initialDate = cosplay.initialDate,
+                dueDate = cosplay.dueDate,
+                budget = cosplay.budget?.toString() ?: "",
+                inProgress = cosplay.inProgress,
+            )
+        }
+    }
+
+    val budgetAmount: Double?
+        get() = budget.takeIf { it.isNotBlank() }?.toDoubleOrNull()
+
+    val isValid: Boolean
+        get() = characterName.isNotBlank() && series.isNotBlank() && initialDate != null
+
+    fun toEntity(
+        uid: Int = 0, finished: Boolean = !inProgress
+    ): Cosplay {
+        return Cosplay(
+            uid = uid,
+            inProgress = inProgress,
+            finished = finished,
+            name = characterName,
+            series = series,
+            initialDate = requireNotNull(initialDate) { "Initial date required" },
+            dueDate = dueDate,
+            budget = budgetAmount
+        )
+    }
+
+    /**
+     * For edit screens: apply form fields onto an existing entity without re-listing ids.
+     */
+    fun toUpdatedEntity(current: Cosplay): Cosplay {
+        return current.copy(
+            inProgress = inProgress,
+            finished = !inProgress,
+            name = characterName,
+            series = series,
+            initialDate = requireNotNull(initialDate) { "Initial date required" },
+            dueDate = dueDate,
+            budget = budgetAmount,
+        )
+    }
+}
