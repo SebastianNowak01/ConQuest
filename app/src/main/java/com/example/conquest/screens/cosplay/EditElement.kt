@@ -4,13 +4,11 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -19,6 +17,7 @@ import com.example.conquest.components.MyImageBox
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyHeaderText
+import com.example.conquest.components.MyInputField
 import com.example.conquest.components.MySaveCancelRow
 import com.example.conquest.components.MySnackbarHost
 import com.example.conquest.components.MySwitchCard
@@ -41,7 +40,6 @@ fun EditElement(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    // Image picker launcher
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = GetContent()
     ) { uri: Uri? ->
@@ -78,34 +76,21 @@ fun EditElement(
                 onClick = { imagePickerLauncher.launch("image/*") },
             )
 
-            Text(
-                text = "Basic Information",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-            )
-            OutlinedTextField(
+            MyInputField(
                 value = form.name,
                 onValueChange = { form = form.copy(name = it) },
-                label = { Text("Name") },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                singleLine = true
+                label = "Name",
+                singleLine = true,
             )
 
-            OutlinedTextField(
+            MyInputField(
                 value = form.cost,
-                onValueChange = {
-                    form = form.copy(cost = it.filter { c -> c.isDigit() || c == '.' })
-                },
-                label = { Text("Cost") },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                singleLine = true
+                onValueChange = { form = form.copy(cost = it) },
+                label = "Cost",
+                singleLine = true,
+                filterDecimal = true,
             )
 
-            Text(
-                text = "Status",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-            )
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -125,19 +110,13 @@ fun EditElement(
                 )
             }
 
-            Text(
-                text = "Notes",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-            )
-            OutlinedTextField(
+            MyInputField(
                 value = form.notes,
                 onValueChange = { form = form.copy(notes = it) },
-                label = { Text("Notes") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp),
-                shape = RoundedCornerShape(20.dp),
-                maxLines = 6
+                label = "Notes",
+                singleLine = false,
+                maxLines = 6,
+                height = 120.dp,
             )
         }
 

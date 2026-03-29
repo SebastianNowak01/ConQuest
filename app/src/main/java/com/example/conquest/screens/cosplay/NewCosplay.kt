@@ -1,16 +1,9 @@
 package com.example.conquest.screens.cosplay
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import kotlinx.serialization.Serializable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
@@ -19,6 +12,7 @@ import com.example.conquest.components.MySaveCancelRow
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyHeaderText
+import com.example.conquest.components.MyInputField
 import com.example.conquest.components.MySnackbarHost
 import com.example.conquest.components.MySwitchCard
 import com.example.conquest.data.classes.CosplayFormState
@@ -44,22 +38,18 @@ fun NewCosplay(
                 checked = form.inProgress,
                 onCheckedChange = { form = form.copy(inProgress = it) })
 
-            OutlinedTextField(
+            MyInputField(
                 value = form.characterName,
                 onValueChange = { form = form.copy(characterName = it) },
-                label = { Text("Character Name*") },
-                modifier = Modifier.fillMaxWidth(),
+                label = "Character Name*",
                 singleLine = true,
-                shape = RoundedCornerShape(32.dp)
             )
 
-            OutlinedTextField(
+            MyInputField(
                 value = form.series,
                 onValueChange = { form = form.copy(series = it) },
-                label = { Text("Series*") },
-                modifier = Modifier.fillMaxWidth(),
+                label = "Series*",
                 singleLine = true,
-                shape = RoundedCornerShape(32.dp)
             )
 
             DatePickerFieldToModal(
@@ -72,17 +62,14 @@ fun NewCosplay(
                 selectedDate = form.dueDate,
                 onDateSelected = { form = form.copy(dueDate = it) })
 
-            OutlinedTextField(
+            // Note: MyInputField currently doesn't include a leading icon ("$").
+            // If you want that too, we can extend MyInputField with an optional leadingIcon slot.
+            MyInputField(
                 value = form.budget,
-                onValueChange = {
-                    form = form.copy(budget = it.filter { it.isDigit() || it == '.' })
-                },
-                label = { Text("Budget (Optional)") },
-                modifier = Modifier.fillMaxWidth(),
+                onValueChange = { form = form.copy(budget = it) },
+                label = "Budget (Optional)",
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                leadingIcon = { Text("$") },
-                shape = RoundedCornerShape(32.dp)
+                filterDecimal = true,
             )
 
         }

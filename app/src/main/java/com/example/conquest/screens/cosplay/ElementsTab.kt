@@ -62,7 +62,6 @@ fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEnt
                 selectionMode = true
                 selectedIds = selectedIds + element.id
             },
-            // Elements used 12.dp padding inside the card; keep that.
             cardContentPadding = 12.dp,
         ) { element ->
             Row(

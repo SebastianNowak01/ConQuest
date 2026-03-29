@@ -1,7 +1,6 @@
 package com.example.conquest.screens.cosplay
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,6 +14,7 @@ import com.example.conquest.components.DatePickerFieldToModal
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyHeaderText
+import com.example.conquest.components.MyInputField
 import com.example.conquest.components.MySaveCancelRow
 import com.example.conquest.components.MySnackbarHost
 import com.example.conquest.components.MySwitchCard
@@ -45,13 +45,11 @@ fun EditTask(
         MyColumn {
             MyHeaderText(text = "Edit Task")
 
-            OutlinedTextField(
+            MyInputField(
                 value = form.taskName,
                 onValueChange = { form = form.copy(taskName = it) },
-                label = { Text("Task Name") },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                singleLine = true
+                label = "Task Name",
+                singleLine = true,
             )
             Text(
                 text = "Status",
@@ -80,15 +78,13 @@ fun EditTask(
                 selectedDate = form.date,
                 onDateSelected = { form = form.copy(date = it) })
 
-            OutlinedTextField(
+            MyInputField(
                 value = notes,
                 onValueChange = { notes = it },
-                label = { Text("Notes") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp),
-                shape = RoundedCornerShape(20.dp),
-                maxLines = 6
+                label = "Notes",
+                singleLine = false,
+                maxLines = 6,
+                height = 120.dp,
             )
         }
 
