@@ -43,6 +43,7 @@ val noDrawerRoutes = listOf(
     "com.example.conquest.screens.cosplay.EditElement/{elementId}",
     "com.example.conquest.screens.cosplay.EditTask/{taskId}",
     "com.example.conquest.screens.cosplay.EditPhoto/{photoId}",
+    "com.example.conquest.screens.cosplay.EditCosplay/{cosplayId}",
 )
 
 @Composable

@@ -1,5 +1,6 @@
 package com.example.conquest.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,8 +26,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavHostController
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.data.entity.Cosplay
+import com.example.conquest.screens.cosplay.EditCosplay
 import com.example.conquest.ui.theme.UIConsts
 import kotlinx.coroutines.flow.flowOf
 
@@ -67,6 +70,7 @@ private fun SettingsTopAppBar(onMenuClick: () -> Unit) {
 @Composable
 private fun CosplayTopAppBar(
     navBackStackEntry: NavBackStackEntry?,
+    navController: NavHostController,
     onMenuClick: () -> Unit
 ) {
     val cosplayViewModel: CosplayViewModel = viewModel()
@@ -86,7 +90,9 @@ private fun CosplayTopAppBar(
             val loadedCosplay = cosplay
             if (loadedCosplay != null) {
                 Row(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable { navController.navigate(EditCosplay(loadedCosplay.uid)) },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     MyImageBox(
@@ -162,6 +168,7 @@ private fun DefaultTopAppBar(
 fun MyTopAppBar(
     config: MyTopAppBar,
     searchQuery: String,
+    navController: NavHostController,
     navBackStackEntry: NavBackStackEntry?,
     onSearchQueryChange: (String) -> Unit,
     onMenuClick: () -> Unit,
@@ -171,6 +178,7 @@ fun MyTopAppBar(
         MyTopAppBar.Settings -> SettingsTopAppBar(onMenuClick)
         is MyTopAppBar.Cosplay -> CosplayTopAppBar(
             navBackStackEntry = navBackStackEntry,
+            navController = navController,
             onMenuClick = onMenuClick,
         )
         MyTopAppBar.Default -> DefaultTopAppBar(searchQuery, onSearchQueryChange, onMenuClick)

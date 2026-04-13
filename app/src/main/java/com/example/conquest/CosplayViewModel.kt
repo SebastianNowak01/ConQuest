@@ -36,6 +36,12 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
         return dao.getCosplayById(cosplayId)
     }
 
+    fun updateCosplay(cosplay: Cosplay) {
+        viewModelScope.launch {
+            dao.updateCosplay(cosplay)
+        }
+    }
+
     fun deleteCosplaysByIds(cosplayIds: Set<Int>) {
         viewModelScope.launch {
             val photos = photoDao.getPhotosForCosplayOnce(cosplayIds)

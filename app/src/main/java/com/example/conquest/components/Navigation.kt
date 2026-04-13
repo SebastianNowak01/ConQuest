@@ -15,6 +15,7 @@ import com.example.conquest.screens.SettingsScreenParams
 import com.example.conquest.screens.cosplay.EditElement
 import com.example.conquest.screens.cosplay.EditTask
 import com.example.conquest.screens.cosplay.EditPhoto
+import com.example.conquest.screens.cosplay.EditCosplay
 
 @Composable
 fun MainNavigation(navController: NavHostController, searchQuery: String) {
@@ -58,6 +59,13 @@ fun MainNavigation(navController: NavHostController, searchQuery: String) {
             val args = backStackEntry.toRoute<EditPhoto>()
             EditPhoto(
                 photoId = args.photoId, navController = navController
+            )
+        }
+        composable<EditCosplay> { backStackEntry ->
+            val args = backStackEntry.toRoute<EditCosplay>()
+            EditCosplay(
+                cosplayId = args.cosplayId,
+                navController = navController,
             )
         }
     }
