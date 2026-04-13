@@ -19,25 +19,28 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.conquest.screens.MainScreen
 import com.example.conquest.screens.SettingsScreenParams
+import com.example.conquest.screens.cosplay.Events
 import com.example.conquest.ui.theme.UIConsts
 import kotlinx.coroutines.launch
 
 val routes = listOf(
-    MainScreen, SettingsScreenParams
+    MainScreen,
+    SettingsScreenParams,
+    Events,
 )
 
 val noDrawerRoutes = listOf(
     "com.example.conquest.screens.cosplay.NewCosplay",
+    "com.example.conquest.screens.cosplay.NewEvent",
+    "com.example.conquest.screens.cosplay.EditEvent/{eventId}",
     "com.example.conquest.screens.cosplay.NewElement/{cosplayId}",
     "com.example.conquest.screens.cosplay.NewTask/{cosplayId}",
     "com.example.conquest.screens.cosplay.EditElement/{elementId}",
@@ -51,7 +54,11 @@ fun Drawer(
     navController: NavHostController, drawerState: DrawerState, content: @Composable () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    val selectedItemIndex = routes.indexOfFirst { route ->
+        route::class.qualifiedName == currentRoute
+    }.takeIf { it >= 0 } ?: 0
 
     ModalNavigationDrawer(
         drawerState = drawerState, drawerContent = {
@@ -79,7 +86,6 @@ fun Drawer(
                         selected = index == selectedItemIndex,
                         onClick = {
                             navController.navigate(routes[index])
-                            selectedItemIndex = index
                             scope.launch { drawerState.close() }
                         },
                         icon = {

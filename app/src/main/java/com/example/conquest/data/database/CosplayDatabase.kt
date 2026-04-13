@@ -8,14 +8,16 @@ import com.example.conquest.data.dao.CosplayDao
 import com.example.conquest.data.dao.CosplayElementDao
 import com.example.conquest.data.dao.CosplayPhotoDao
 import com.example.conquest.data.dao.CosplayTaskDao
+import com.example.conquest.data.dao.EventDao
 import com.example.conquest.data.entity.Cosplay
 import com.example.conquest.data.entity.CosplayElement
 import com.example.conquest.data.entity.CosplayPhoto
 import com.example.conquest.data.entity.CosplayTask
+import com.example.conquest.data.entity.Event
 
 @Database(
-    entities = [Cosplay::class, CosplayPhoto::class, CosplayElement::class, CosplayTask::class],
-    version = 8,
+    entities = [Cosplay::class, CosplayPhoto::class, CosplayElement::class, CosplayTask::class, Event::class],
+    version = 9,
 )
 @TypeConverters(DateConverter::class)
 abstract class CosplayDatabase : RoomDatabase() {
@@ -23,5 +25,6 @@ abstract class CosplayDatabase : RoomDatabase() {
     abstract fun cosplayPhotoDao(): CosplayPhotoDao
     abstract fun cosplayElementDao(): CosplayElementDao
     abstract fun cosplayTaskDao(): CosplayTaskDao
+    abstract fun eventDao(): EventDao
 }
 
