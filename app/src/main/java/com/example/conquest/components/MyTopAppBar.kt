@@ -79,39 +79,39 @@ private fun CosplayTopAppBar(
         }
     }
     val cosplay by cosplayFlow.collectAsState(initial = null)
-    val cosplayName = cosplay?.name ?: "Unknown cosplay"
-    val cosplaySeries = cosplay?.series ?: "Unknown series"
-    val cosplayPhotoPath = cosplay?.cosplayPhotoPath ?: ""
 
     TopAppBar(
         colors = topAppBarColorsObject(),
         title = {
-            Row(
-                modifier = Modifier.fillMaxSize(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                MyImageBox(
-                    photoPath = cosplayPhotoPath,
-                    size = UIConsts.imageSizeS,
-                    clickable = false,
-                    onClick = {},
-                    contentDescription = cosplayName,
-                    emptyContentDescription = "Cosplay photo",
-                )
-                Spacer(modifier = Modifier.width(UIConsts.paddingS))
-                Column {
-                    Text(
-                        text = cosplayName,
-                        style = MaterialTheme.typography.titleMedium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
+            val loadedCosplay = cosplay
+            if (loadedCosplay != null) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    MyImageBox(
+                        photoPath = loadedCosplay.cosplayPhotoPath ?: "",
+                        size = UIConsts.imageSizeS,
+                        clickable = false,
+                        onClick = {},
+                        contentDescription = loadedCosplay.name,
+                        emptyContentDescription = "Cosplay photo",
                     )
-                    Text(
-                        text = cosplaySeries,
-                        style = MaterialTheme.typography.bodySmall,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
+                    Spacer(modifier = Modifier.width(UIConsts.paddingS))
+                    Column {
+                        Text(
+                            text = loadedCosplay.name,
+                            style = MaterialTheme.typography.titleMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Text(
+                            text = loadedCosplay.series,
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                 }
             }
         },
