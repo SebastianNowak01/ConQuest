@@ -2,10 +2,6 @@ package com.example.conquest.screens.cosplay
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -14,20 +10,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
-import com.example.conquest.components.DatePickerFieldToModal
-import com.example.conquest.components.EventTypeDropdown
+import com.example.conquest.components.EventListItem
+import com.example.conquest.components.EventsFilters
 import com.example.conquest.components.MyAddFab
 import com.example.conquest.components.MyDeleteFab
 import com.example.conquest.components.MyLazyColumn
 import com.example.conquest.components.MyOuterBox
-import com.example.conquest.components.convertDateToString
-import com.example.conquest.components.displayName
 import com.example.conquest.data.entity.EventType
-import com.example.conquest.ui.theme.UIConsts
 import java.util.Calendar
 import java.util.Date
 import kotlinx.serialization.Serializable
@@ -74,35 +66,19 @@ fun EventsScreen(
             )
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = UIConsts.paddingM),
-        ) {
-            EventTypeDropdown(
+        Column(modifier = Modifier.fillMaxSize()) {
+            EventsFilters(
                 selectedType = selectedType,
-                onTypeSelected = { selectedType = it },
-                label = "Filter by Type",
-                allowAllOption = true,
-            )
-
-            DatePickerFieldToModal(
-                label = "Filter by Date",
                 selectedDate = selectedDate,
+                onTypeSelected = { selectedType = it },
                 onDateSelected = { selectedDate = it },
-            )
-
-            if (selectedType != null || selectedDate != null) {
-                TextButton(onClick = {
+                onClearFilters = {
                     selectedType = null
                     selectedDate = null
-                }) {
-                    Text(text = "Clear Filters")
-                }
-            }
+                },
+            )
 
             MyLazyColumn(
-                modifier = Modifier.weight(1f),
                 items = filteredEvents,
                 key = { it.id },
                 isSelected = { selectedIds.contains(it.id) },
@@ -122,29 +98,7 @@ fun EventsScreen(
                     selectedIds = selectedIds + event.id
                 },
             ) { event ->
-                Text(
-                    text = event.eventName,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                Text(
-                    text = event.eventLocation,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondary,
-                )
-                Text(
-                    text = "${event.eventType.displayName} - ${convertDateToString(event.eventDate)}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.secondary,
-                )
-                if (!event.description.isNullOrBlank()) {
-                    Text(
-                        text = event.description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                }
+                EventListItem(event = event)
             }
         }
 
