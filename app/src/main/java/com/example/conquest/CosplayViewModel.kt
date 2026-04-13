@@ -9,6 +9,7 @@ import com.example.conquest.data.entity.Cosplay
 import com.example.conquest.data.entity.CosplayElement
 import com.example.conquest.data.entity.CosplayPhoto
 import com.example.conquest.data.entity.CosplayTask
+import com.example.conquest.data.entity.Event
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +23,7 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     internal val photoDao = (application as ConQuestApplication).database.cosplayPhotoDao()
     internal val elementDao = (application as ConQuestApplication).database.cosplayElementDao()
     internal val taskDao = (application as ConQuestApplication).database.cosplayTaskDao()
+    internal val eventDao = (application as ConQuestApplication).database.eventDao()
 
     val allCosplays =
         dao.getAllCosplays().stateIn(viewModelScope, SharingStarted.Lazily, emptyList<Cosplay>())
@@ -152,6 +154,31 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch {
             taskDao.updateTask(task)
         }
+    }
+
+    val events: StateFlow<List<Event>> =
+        eventDao.getAllEvents().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    fun insertEvent(event: Event) {
+        viewModelScope.launch {
+            eventDao.insertEvent(event)
+        }
+    }
+
+    fun updateEvent(event: Event) {
+        viewModelScope.launch {
+            eventDao.updateEvent(event)
+        }
+    }
+
+    fun deleteEventsByIds(ids: Set<Int>) {
+        viewModelScope.launch {
+            eventDao.deleteEventsByIds(ids)
+        }
+    }
+
+    fun getEventById(id: Int): Flow<Event?> {
+        return eventDao.getEventById(id)
     }
 }
 
