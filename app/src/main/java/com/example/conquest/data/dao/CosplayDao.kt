@@ -16,4 +16,7 @@ interface CosplayDao {
 
     @Query("SELECT * FROM cosplays")
     fun getAllCosplays(): Flow<List<Cosplay>>
+
+    @Query("SELECT * FROM cosplays WHERE uid = :cosplayId LIMIT 1")
+    fun getCosplayById(cosplayId: Int): Flow<Cosplay?>
 }

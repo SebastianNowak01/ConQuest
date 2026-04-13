@@ -32,6 +32,10 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    fun getCosplayById(cosplayId: Int): Flow<Cosplay?> {
+        return dao.getCosplayById(cosplayId)
+    }
+
     fun deleteCosplaysByIds(cosplayIds: Set<Int>) {
         viewModelScope.launch {
             val photos = photoDao.getPhotosForCosplayOnce(cosplayIds)

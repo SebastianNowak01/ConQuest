@@ -1,9 +1,10 @@
 package com.example.conquest.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -16,11 +17,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
+import com.example.conquest.CosplayViewModel
+import com.example.conquest.data.entity.Cosplay
 import com.example.conquest.ui.theme.UIConsts
-import androidx.compose.foundation.layout.Column
+import kotlinx.coroutines.flow.flowOf
 
 sealed class MyTopAppBar {
     data object Default : MyTopAppBar()
@@ -58,11 +66,23 @@ private fun SettingsTopAppBar(onMenuClick: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CosplayTopAppBar(
-    cosplayName: String,
-    cosplaySeries: String,
-    cosplayPhotoPath: String,
+    navBackStackEntry: NavBackStackEntry?,
     onMenuClick: () -> Unit
 ) {
+    val cosplayViewModel: CosplayViewModel = viewModel()
+    val cosplayId = navBackStackEntry?.arguments?.getInt("uid")
+    val cosplayFlow = remember(cosplayId) {
+        if (cosplayId == null) {
+            flowOf<Cosplay?>(null)
+        } else {
+            cosplayViewModel.getCosplayById(cosplayId)
+        }
+    }
+    val cosplay by cosplayFlow.collectAsState(initial = null)
+    val cosplayName = cosplay?.name ?: "Unknown cosplay"
+    val cosplaySeries = cosplay?.series ?: "Unknown series"
+    val cosplayPhotoPath = cosplay?.cosplayPhotoPath ?: ""
+
     TopAppBar(
         colors = topAppBarColorsObject(),
         title = {
@@ -142,19 +162,15 @@ private fun DefaultTopAppBar(
 fun MyTopAppBar(
     config: MyTopAppBar,
     searchQuery: String,
-    cosplayName: String,
-    cosplaySeries: String,
-    cosplayPhotoPath: String,
+    navBackStackEntry: NavBackStackEntry?,
     onSearchQueryChange: (String) -> Unit,
-    onMenuClick: () -> Unit
+    onMenuClick: () -> Unit,
 ) {
     when (config) {
         MyTopAppBar.None -> {/* No Top App bar*/}
         MyTopAppBar.Settings -> SettingsTopAppBar(onMenuClick)
         is MyTopAppBar.Cosplay -> CosplayTopAppBar(
-            cosplayName = cosplayName,
-            cosplaySeries = cosplaySeries,
-            cosplayPhotoPath = cosplayPhotoPath,
+            navBackStackEntry = navBackStackEntry,
             onMenuClick = onMenuClick,
         )
         MyTopAppBar.Default -> DefaultTopAppBar(searchQuery, onSearchQueryChange, onMenuClick)
