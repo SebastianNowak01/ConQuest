@@ -15,7 +15,7 @@ import com.example.conquest.data.entity.CosplayTask
 
 @Database(
     entities = [Cosplay::class, CosplayPhoto::class, CosplayElement::class, CosplayTask::class],
-    version = 7
+    version = 8,
 )
 @TypeConverters(DateConverter::class)
 abstract class CosplayDatabase : RoomDatabase() {
@@ -24,3 +24,4 @@ abstract class CosplayDatabase : RoomDatabase() {
     abstract fun cosplayElementDao(): CosplayElementDao
     abstract fun cosplayTaskDao(): CosplayTaskDao
 }
+

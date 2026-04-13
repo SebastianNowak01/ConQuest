@@ -3,9 +3,11 @@ package com.example.conquest.screens.cosplay
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.Composable
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,18 +33,26 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 @Serializable
-object NewCosplay
+data class EditCosplay(val cosplayId: Int)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewCosplay(
+fun EditCosplay(
+    cosplayId: Int,
     navController: NavController,
+    cosplayViewModel: CosplayViewModel = viewModel(),
 ) {
-    val cosplayViewModel: CosplayViewModel = viewModel()
+    val cosplay by cosplayViewModel.getCosplayById(cosplayId).collectAsState(initial = null)
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var form by remember { mutableStateOf(CosplayFormState()) }
+
+    LaunchedEffect(cosplay?.uid) {
+        cosplay?.let { loaded ->
+            form = CosplayFormState.fromEntity(loaded)
+        }
+    }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -66,12 +76,13 @@ fun NewCosplay(
 
     MyOuterBox {
         MyColumn {
-            MyHeaderText(text = "New Project")
+            MyHeaderText(text = "Edit Cosplay")
 
             MySwitchCard(
                 label = if (form.inProgress) "In Progress" else "Planned",
                 checked = form.inProgress,
-                onCheckedChange = { form = form.copy(inProgress = it) })
+                onCheckedChange = { form = form.copy(inProgress = it) },
+            )
 
             MyInputField(
                 value = form.characterName,
@@ -99,12 +110,14 @@ fun NewCosplay(
             DatePickerFieldToModal(
                 label = "Initial date*",
                 selectedDate = form.initialDate,
-                onDateSelected = { form = form.copy(initialDate = it) })
+                onDateSelected = { form = form.copy(initialDate = it) },
+            )
 
             DatePickerFieldToModal(
                 label = "Due date",
                 selectedDate = form.dueDate,
-                onDateSelected = { form = form.copy(dueDate = it) })
+                onDateSelected = { form = form.copy(dueDate = it) },
+            )
 
             MyInputField(
                 value = form.budget,
@@ -113,17 +126,20 @@ fun NewCosplay(
                 singleLine = true,
                 filterDecimal = true,
             )
-
         }
 
         MySaveCancelRow(
             snackbarHostState = snackbarHostState,
             isValid = form.isValid,
             onCancel = { navController.popBackStack() },
-            onCommit = { cosplayViewModel.insertCosplay(form.toEntity(uid = 0, finished = false)) },
+            onCommit = {
+                val current = cosplay ?: return@MySaveCancelRow
+                cosplayViewModel.updateCosplay(form.toUpdatedEntity(current))
+            },
             postCommit = { navController.popBackStack() },
         )
 
         MySnackbarHost(hostState = snackbarHostState)
     }
 }
+

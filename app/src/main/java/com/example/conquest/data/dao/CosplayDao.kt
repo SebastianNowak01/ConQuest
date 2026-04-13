@@ -3,6 +3,7 @@ package com.example.conquest.data.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.example.conquest.data.entity.Cosplay
 import kotlinx.coroutines.flow.Flow
 
@@ -16,4 +17,10 @@ interface CosplayDao {
 
     @Query("SELECT * FROM cosplays")
     fun getAllCosplays(): Flow<List<Cosplay>>
+
+    @Query("SELECT * FROM cosplays WHERE uid = :cosplayId LIMIT 1")
+    fun getCosplayById(cosplayId: Int): Flow<Cosplay?>
+
+    @Update
+    suspend fun updateCosplay(cosplay: Cosplay)
 }

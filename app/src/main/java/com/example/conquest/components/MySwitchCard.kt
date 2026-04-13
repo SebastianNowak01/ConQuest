@@ -1,6 +1,5 @@
 package com.example.conquest.components
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.example.conquest.ui.theme.UIConsts
 
 @Composable
@@ -26,12 +26,7 @@ fun MySwitchCard(
 ) {
     Card(
         modifier = modifier
-            .fillMaxWidth()
-            .border(
-                width = UIConsts.strokeThin,
-                color = MaterialTheme.colorScheme.outline,
-                shape = RoundedCornerShape(UIConsts.cornerRadiusL)
-            ),
+            .fillMaxWidth(),
         shape = RoundedCornerShape(UIConsts.cornerRadiusL),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
     ) {
@@ -52,8 +47,10 @@ fun MySwitchCard(
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.primary,
                     checkedTrackColor = MaterialTheme.colorScheme.secondary,
+                    checkedBorderColor = Color.Transparent,
                     uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    uncheckedTrackColor = MaterialTheme.colorScheme.secondary
+                    uncheckedTrackColor = MaterialTheme.colorScheme.secondary,
+                    uncheckedBorderColor = Color.Transparent,
                 )
             )
         }

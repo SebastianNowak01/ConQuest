@@ -7,6 +7,7 @@ import java.util.Date
 data class CosplayFormState(
     val characterName: String = "",
     val series: String = "",
+    val cosplayPhotoPath: String = "",
     val initialDate: Date? = getCurrentDate(),
     val dueDate: Date? = getCurrentDate(),
     val budget: String = "",
@@ -17,6 +18,7 @@ data class CosplayFormState(
             return CosplayFormState(
                 characterName = cosplay.name,
                 series = cosplay.series,
+                cosplayPhotoPath = cosplay.cosplayPhotoPath ?: "",
                 initialDate = cosplay.initialDate,
                 dueDate = cosplay.dueDate,
                 budget = cosplay.budget?.toString() ?: "",
@@ -42,7 +44,8 @@ data class CosplayFormState(
             series = series,
             initialDate = requireNotNull(initialDate) { "Initial date required" },
             dueDate = dueDate,
-            budget = budgetAmount
+            budget = budgetAmount,
+            cosplayPhotoPath = cosplayPhotoPath.ifBlank { null },
         )
     }
 
@@ -58,6 +61,7 @@ data class CosplayFormState(
             initialDate = requireNotNull(initialDate) { "Initial date required" },
             dueDate = dueDate,
             budget = budgetAmount,
+            cosplayPhotoPath = cosplayPhotoPath.ifBlank { null },
         )
     }
 }
