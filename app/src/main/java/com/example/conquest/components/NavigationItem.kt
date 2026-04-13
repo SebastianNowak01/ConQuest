@@ -34,9 +34,10 @@ val navigationItems = listOf(
         selectedIcon = Icons.Filled.Event,
         unselectedIcon = Icons.Outlined.Event,
     ),
-    NavigationItem(
-        title = "Progress",
-        selectedIcon = Icons.Filled.PhotoLibrary,
-        unselectedIcon = Icons.Outlined.PhotoLibrary,
-    ),
+)
+
+val progressNavigationItem = NavigationItem(
+    title = "Progress",
+    selectedIcon = Icons.Filled.PhotoLibrary,
+    unselectedIcon = Icons.Outlined.PhotoLibrary,
 )

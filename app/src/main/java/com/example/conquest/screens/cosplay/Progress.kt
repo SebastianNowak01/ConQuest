@@ -24,6 +24,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,11 +47,12 @@ import com.example.conquest.ui.theme.UIConsts
 import kotlinx.serialization.Serializable
 
 @Serializable
-object Progress
+data class Progress(val cosplayId: Int)
 
 @Composable
 fun ProgressScreen(
     navController: NavController,
+    cosplayId: Int,
     cosplayViewModel: CosplayViewModel = viewModel(),
 ) {
     val context = LocalContext.current
@@ -59,10 +61,14 @@ fun ProgressScreen(
     var selectedIds by remember { mutableStateOf(setOf<Int>()) }
     var error by remember { mutableStateOf("") }
 
+    LaunchedEffect(cosplayId) {
+        cosplayViewModel.setProgressCosplayId(cosplayId)
+    }
+
     val galleryLauncher = pickAndSaveImageLauncher(
         context = context,
         fileNamePrefix = "progress_photo",
-        onSaved = { path -> cosplayViewModel.addProgressPhoto(path) },
+        onSaved = { path -> cosplayViewModel.addProgressPhoto(cosplayId, path) },
         onError = { throwable -> error = "Failed to save image: ${throwable.localizedMessage}" },
     )
 
@@ -77,7 +83,7 @@ fun ProgressScreen(
             bitmap = bitmap,
             fileNamePrefix = "progress_photo",
         ).onSuccess { path ->
-            cosplayViewModel.addProgressPhoto(path)
+            cosplayViewModel.addProgressPhoto(cosplayId, path)
         }.onFailure { throwable ->
             error = "Failed to save image: ${throwable.localizedMessage}"
         }
@@ -131,7 +137,7 @@ fun ProgressScreen(
                             isSelected = selectedIds.contains(photo.id),
                             onClick = {
                                 if (!selectionMode) {
-                                    navController.navigate(EditProgressPhoto(photo.id))
+                                    navController.navigate(EditProgressPhoto(photo.id, cosplayId))
                                     return@ProgressPhotoItem
                                 }
                                 val id = photo.id

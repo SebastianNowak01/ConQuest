@@ -24,15 +24,19 @@ import com.example.conquest.ui.theme.UIConsts
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class EditProgressPhoto(val photoId: Int)
+data class EditProgressPhoto(
+    val photoId: Int,
+    val cosplayId: Int,
+)
 
 @Composable
 fun EditProgressPhoto(
     photoId: Int,
+    cosplayId: Int,
     navController: NavController,
     cosplayViewModel: CosplayViewModel = viewModel(),
 ) {
-    val photo by cosplayViewModel.getProgressPhotoById(photoId).collectAsState(initial = null)
+    val photo by cosplayViewModel.getProgressPhotoById(photoId, cosplayId).collectAsState(initial = null)
     val snackbarHostState = remember { SnackbarHostState() }
     var notes by remember { mutableStateOf("") }
 

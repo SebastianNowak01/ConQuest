@@ -49,7 +49,7 @@ fun getTopAppBarConfig(route: String?, noDrawerRoutes: List<String>): MyTopAppBa
         route in noDrawerRoutes -> MyTopAppBar.None
         route == "com.example.conquest.screens.SettingsScreenParams" -> MyTopAppBar.Settings
         route == "com.example.conquest.screens.cosplay.Events" -> MyTopAppBar.Events
-        route == "com.example.conquest.screens.cosplay.Progress" -> MyTopAppBar.Progress
+        route.startsWith("com.example.conquest.screens.cosplay.Progress") -> MyTopAppBar.Progress
         route.startsWith("com.example.conquest.screens.cosplay.") -> MyTopAppBar.Cosplay
         else -> MyTopAppBar.Default
     }

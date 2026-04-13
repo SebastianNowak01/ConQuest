@@ -36,14 +36,13 @@ val routes = listOf(
     MainScreen,
     SettingsScreenParams,
     Events,
-    Progress,
 )
 
 val noDrawerRoutes = listOf(
     "com.example.conquest.screens.cosplay.NewCosplay",
     "com.example.conquest.screens.cosplay.NewEvent",
     "com.example.conquest.screens.cosplay.EditEvent/{eventId}",
-    "com.example.conquest.screens.cosplay.EditProgressPhoto/{photoId}",
+    "com.example.conquest.screens.cosplay.EditProgressPhoto/{photoId}/{cosplayId}",
     "com.example.conquest.screens.cosplay.NewElement/{cosplayId}",
     "com.example.conquest.screens.cosplay.NewTask/{cosplayId}",
     "com.example.conquest.screens.cosplay.EditElement/{elementId}",
@@ -59,7 +58,21 @@ fun Drawer(
     val scope = rememberCoroutineScope()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    val selectedItemIndex = routes.indexOfFirst { route ->
+    val currentCosplayId = navBackStackEntry?.arguments?.getInt("uid")
+    val isInCosplayTabs = currentRoute?.startsWith("com.example.conquest.screens.cosplay.MainCosplayScreen") == true
+
+    val drawerItems = if (isInCosplayTabs && currentCosplayId != null) {
+        navigationItems + progressNavigationItem
+    } else {
+        navigationItems
+    }
+    val drawerRoutes = if (isInCosplayTabs && currentCosplayId != null) {
+        routes + Progress(currentCosplayId)
+    } else {
+        routes
+    }
+
+    val selectedItemIndex = drawerRoutes.indexOfFirst { route ->
         route::class.qualifiedName == currentRoute
     }.takeIf { it >= 0 } ?: 0
 
@@ -83,12 +96,12 @@ fun Drawer(
                     color = MaterialTheme.colorScheme.outline,
                     modifier = Modifier.padding(bottom = UIConsts.paddingS)
                 )
-                navigationItems.forEachIndexed { index, item ->
+                drawerItems.forEachIndexed { index, item ->
                     NavigationDrawerItem(
                         label = { Text(text = item.title) },
                         selected = index == selectedItemIndex,
                         onClick = {
-                            navController.navigate(routes[index])
+                            navController.navigate(drawerRoutes[index])
                             scope.launch { drawerState.close() }
                         },
                         icon = {

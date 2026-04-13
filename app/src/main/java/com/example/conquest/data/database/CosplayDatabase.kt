@@ -26,7 +26,7 @@ import com.example.conquest.data.entity.ProgressPhoto
         Event::class,
         ProgressPhoto::class,
     ],
-    version = 10,
+    version = 11,
 )
 @TypeConverters(DateConverter::class)
 abstract class CosplayDatabase : RoomDatabase() {

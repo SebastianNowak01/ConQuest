@@ -51,6 +51,9 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
             val photos = photoDao.getPhotosForCosplayOnce(cosplayIds)
             photoDao.deletePhotos(photos)
             photos.forEach { deleteFileByPath(it.path) }
+            val progressPhotos = progressPhotoDao.getPhotosForCosplayOnce(cosplayIds)
+            progressPhotoDao.deletePhotos(progressPhotos)
+            progressPhotos.forEach { deleteFileByPath(it.path) }
             dao.deleteCosplaysByIds(cosplayIds)
         }
     }
@@ -183,12 +186,20 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
         return eventDao.getEventById(id)
     }
 
-    val progressPhotos: StateFlow<List<ProgressPhoto>> =
-        progressPhotoDao.getAllPhotos().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+    private val _progressCosplayId = MutableStateFlow<Int?>(0)
 
-    fun addProgressPhoto(path: String) {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val progressPhotos: StateFlow<List<ProgressPhoto>> =
+        _progressCosplayId.filterNotNull().flatMapLatest { id -> progressPhotoDao.getPhotosForCosplay(id) }
+            .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    fun setProgressCosplayId(id: Int) {
+        _progressCosplayId.value = id
+    }
+
+    fun addProgressPhoto(cosplayId: Int, path: String) {
         viewModelScope.launch {
-            progressPhotoDao.insertPhoto(ProgressPhoto(path = path))
+            progressPhotoDao.insertPhoto(ProgressPhoto(cosplayId = cosplayId, path = path))
         }
     }
 
@@ -200,8 +211,8 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun getProgressPhotoById(id: Int): Flow<ProgressPhoto?> {
-        return progressPhotoDao.getPhotoById(id)
+    fun getProgressPhotoById(id: Int, cosplayId: Int): Flow<ProgressPhoto?> {
+        return progressPhotoDao.getPhotoById(id, cosplayId)
     }
 
     fun updateProgressPhoto(photo: ProgressPhoto) {
