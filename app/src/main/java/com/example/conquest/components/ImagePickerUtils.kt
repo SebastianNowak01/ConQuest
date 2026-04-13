@@ -2,6 +2,7 @@ package com.example.conquest.components
 
 import android.content.ContentResolver
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import android.webkit.MimeTypeMap
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -61,6 +62,24 @@ fun saveImageUriToInternalStorage(
         copyUriToInternalStorage(context, uri, fileName)
     }
 }
+fun saveBitmapToInternalStorage(
+    context: Context,
+    bitmap: Bitmap,
+    fileNamePrefix: String,
+): Result<String> {
+    return runCatching {
+        val fileName = "${fileNamePrefix}_${System.currentTimeMillis()}.jpg"
+        val file = File(context.filesDir, fileName)
+        file.outputStream().use { output ->
+            val compressed = bitmap.compress(Bitmap.CompressFormat.JPEG, 95, output)
+            if (!compressed) {
+                error("Failed to compress bitmap")
+            }
+        }
+        file.absolutePath
+    }
+}
+
 
 @Composable
 fun pickAndSaveImageLauncher(

@@ -28,6 +28,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.conquest.screens.MainScreen
 import com.example.conquest.screens.SettingsScreenParams
 import com.example.conquest.screens.cosplay.Events
+import com.example.conquest.screens.cosplay.Progress
 import com.example.conquest.ui.theme.UIConsts
 import kotlinx.coroutines.launch
 
@@ -35,12 +36,14 @@ val routes = listOf(
     MainScreen,
     SettingsScreenParams,
     Events,
+    Progress,
 )
 
 val noDrawerRoutes = listOf(
     "com.example.conquest.screens.cosplay.NewCosplay",
     "com.example.conquest.screens.cosplay.NewEvent",
     "com.example.conquest.screens.cosplay.EditEvent/{eventId}",
+    "com.example.conquest.screens.cosplay.EditProgressPhoto/{photoId}",
     "com.example.conquest.screens.cosplay.NewElement/{cosplayId}",
     "com.example.conquest.screens.cosplay.NewTask/{cosplayId}",
     "com.example.conquest.screens.cosplay.EditElement/{elementId}",
