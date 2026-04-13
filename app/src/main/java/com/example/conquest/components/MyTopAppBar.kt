@@ -1,6 +1,8 @@
 package com.example.conquest.components
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -10,11 +12,15 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
+import com.example.conquest.ui.theme.UIConsts
+import androidx.compose.foundation.layout.Column
 
 sealed class MyTopAppBar {
     data object Default : MyTopAppBar()
@@ -52,11 +58,43 @@ private fun SettingsTopAppBar(onMenuClick: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CosplayTopAppBar(
+    cosplayName: String,
+    cosplaySeries: String,
+    cosplayPhotoPath: String,
     onMenuClick: () -> Unit
 ) {
     TopAppBar(
         colors = topAppBarColorsObject(),
-        title = { Text("Cosplay screen") },
+        title = {
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                MyImageBox(
+                    photoPath = cosplayPhotoPath,
+                    size = UIConsts.imageSizeS,
+                    clickable = false,
+                    onClick = {},
+                    contentDescription = cosplayName,
+                    emptyContentDescription = "Cosplay photo",
+                )
+                Spacer(modifier = Modifier.width(UIConsts.paddingS))
+                Column {
+                    Text(
+                        text = cosplayName,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        text = cosplaySeries,
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+        },
         navigationIcon = {
             IconButton(onClick = onMenuClick) {
                 Icon(
@@ -104,13 +142,21 @@ private fun DefaultTopAppBar(
 fun MyTopAppBar(
     config: MyTopAppBar,
     searchQuery: String,
+    cosplayName: String,
+    cosplaySeries: String,
+    cosplayPhotoPath: String,
     onSearchQueryChange: (String) -> Unit,
     onMenuClick: () -> Unit
 ) {
     when (config) {
         MyTopAppBar.None -> {/* No Top App bar*/}
         MyTopAppBar.Settings -> SettingsTopAppBar(onMenuClick)
-        is MyTopAppBar.Cosplay -> CosplayTopAppBar(onMenuClick)
+        is MyTopAppBar.Cosplay -> CosplayTopAppBar(
+            cosplayName = cosplayName,
+            cosplaySeries = cosplaySeries,
+            cosplayPhotoPath = cosplayPhotoPath,
+            onMenuClick = onMenuClick,
+        )
         MyTopAppBar.Default -> DefaultTopAppBar(searchQuery, onSearchQueryChange, onMenuClick)
     }
 }

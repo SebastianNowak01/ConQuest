@@ -16,6 +16,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -24,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.conquest.components.MyTopAppBar
@@ -50,6 +52,8 @@ class MainActivity : ComponentActivity() {
             }
 
             val navController = rememberNavController()
+            val cosplayViewModel: CosplayViewModel = viewModel()
+            val cosplays by cosplayViewModel.allCosplays.collectAsState()
             val drawerState = rememberDrawerState(DrawerValue.Closed)
             val scope = rememberCoroutineScope()
 
@@ -57,6 +61,8 @@ class MainActivity : ComponentActivity() {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
             val isNoDrawerRoute = currentRoute in noDrawerRoutes
+            val currentCosplayId = navBackStackEntry?.arguments?.getInt("uid")
+            val currentCosplay = cosplays.firstOrNull { it.uid == currentCosplayId }
 
             val topBarConfig = getTopAppBarConfig(currentRoute, noDrawerRoutes)
 
@@ -72,6 +78,9 @@ class MainActivity : ComponentActivity() {
                             MyTopAppBar(
                                 config = topBarConfig,
                                 searchQuery = searchQuery,
+                                cosplayName = currentCosplay?.name ?: "",
+                                cosplaySeries = currentCosplay?.series ?: "",
+                                cosplayPhotoPath = currentCosplay?.cosplayPhotoPath ?: "",
                                 onSearchQueryChange = { searchQuery = it },
                                 onMenuClick = { scope.launch { drawerState.open() } })
                         }) { padding ->

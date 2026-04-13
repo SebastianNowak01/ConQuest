@@ -68,6 +68,7 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
 
     fun getPhotoById(id: Int): Flow<CosplayPhoto?> = photoDao.getPhotoById(id)
 
+
     fun updatePhoto(updated: CosplayPhoto, oldPathToDelete: String? = null) {
         viewModelScope.launch {
             photoDao.updatePhoto(updated)

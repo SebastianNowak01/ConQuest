@@ -17,5 +17,6 @@ data class Cosplay(
     @ColumnInfo(name = "series") val series: String,
     @ColumnInfo(name = "initial_date") val initialDate: Date,
     @ColumnInfo(name = "due_date") val dueDate: Date?,
-    @ColumnInfo(name = "budget") val budget: Double?
+    @ColumnInfo(name = "budget") val budget: Double?,
+    @ColumnInfo(name = "cosplay_photo_path") val cosplayPhotoPath: String? = null,
 )
