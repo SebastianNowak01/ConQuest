@@ -1,9 +1,11 @@
 package com.example.conquest.screens.cosplay
 
 import android.content.Context
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.MaterialTheme
@@ -22,7 +24,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.toRoute
-import androidx.compose.foundation.lazy.grid.GridCells
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.MyDeleteFab
 import com.example.conquest.components.MyFab
@@ -67,31 +68,40 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
             onImageSaved = { savedPath -> cosplayViewModel.addPhoto(args.uid, savedPath) },
         )
 
-        MyPhotoGrid(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxSize(),
-            photos = gridPhotos,
-            selectedIds = selectedIds,
-            columns = GridCells.Fixed(3),
-            contentPadding = PaddingValues(bottom = UIConsts.paddingL * 4),
-            emptyText = "No images added yet.",
-            contentDescription = "Cosplay photo",
-            onItemClick = { photo ->
-                if (!selectionMode) {
-                    navController.navigate(EditPhoto(photo.id))
-                    return@MyPhotoGrid
-                }
-                val id = photo.id
-                val newSet = if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
-                selectedIds = newSet
-                if (newSet.isEmpty()) selectionMode = false
-            },
-            onItemLongClick = { photo ->
-                selectionMode = true
-                selectedIds = selectedIds + photo.id
-            },
-        )
+                .fillMaxSize()
+                .padding(horizontal = UIConsts.paddingM)
+                .padding(bottom = UIConsts.paddingL * 4),
+        ) {
+            MyPhotoGrid(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxSize(),
+                photos = gridPhotos,
+                selectedIds = selectedIds,
+                columns = GridCells.Adaptive(minSize = UIConsts.photoThumbSize),
+                emptyText = "No images added yet.",
+                emptyModifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxSize(),
+                contentDescription = "Cosplay photo",
+                onItemClick = { photo ->
+                    if (!selectionMode) {
+                        navController.navigate(EditPhoto(photo.id))
+                        return@MyPhotoGrid
+                    }
+                    val id = photo.id
+                    val newSet = if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
+                    selectedIds = newSet
+                    if (newSet.isEmpty()) selectionMode = false
+                },
+                onItemLongClick = { photo ->
+                    selectionMode = true
+                    selectedIds = selectedIds + photo.id
+                },
+            )
+        }
     }
 }
 
