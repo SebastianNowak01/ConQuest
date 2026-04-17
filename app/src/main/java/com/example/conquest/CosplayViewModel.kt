@@ -2,9 +2,10 @@ package com.example.conquest
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.SharingStarted
 import androidx.lifecycle.viewModelScope
+import com.example.conquest.data.classes.CosplaySortOrder
+import com.example.conquest.data.classes.CosplaySortOption
+import com.example.conquest.data.classes.CosplayStatusFilter
 import com.example.conquest.data.entity.Cosplay
 import com.example.conquest.data.entity.CosplayElement
 import com.example.conquest.data.entity.CosplayPhoto
@@ -14,9 +15,11 @@ import com.example.conquest.data.entity.ProgressPhoto
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class CosplayViewModel(application: Application) : AndroidViewModel(application) {
@@ -29,6 +32,33 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
 
     val allCosplays =
         dao.getAllCosplays().stateIn(viewModelScope, SharingStarted.Lazily, emptyList<Cosplay>())
+
+    private val _mainScreenFilter = MutableStateFlow(CosplayStatusFilter.All)
+    val mainScreenFilter: StateFlow<CosplayStatusFilter> = _mainScreenFilter
+
+    private val _mainScreenSort = MutableStateFlow(CosplaySortOption.Character)
+    val mainScreenSort: StateFlow<CosplaySortOption> = _mainScreenSort
+
+    private val _mainScreenSortOrder = MutableStateFlow(CosplaySortOrder.LeastToMost)
+    val mainScreenSortOrder: StateFlow<CosplaySortOrder> = _mainScreenSortOrder
+
+    fun setMainScreenFilter(filter: CosplayStatusFilter) {
+        _mainScreenFilter.value = filter
+    }
+
+    fun setMainScreenSort(sort: CosplaySortOption) {
+        _mainScreenSort.value = sort
+    }
+
+    fun setMainScreenSortOrder(order: CosplaySortOrder) {
+        _mainScreenSortOrder.value = order
+    }
+
+    val allTasks: StateFlow<List<CosplayTask>> =
+        taskDao.getAllTasks().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    val allElements: StateFlow<List<CosplayElement>> =
+        elementDao.getAllElements().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     fun insertCosplay(cosplay: Cosplay) {
         viewModelScope.launch {

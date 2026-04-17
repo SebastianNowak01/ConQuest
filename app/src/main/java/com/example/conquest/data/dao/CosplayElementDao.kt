@@ -21,6 +21,9 @@ interface CosplayElementDao {
     @Query("SELECT * FROM cosplay_elements WHERE id = :id LIMIT 1")
     fun getElementById(id: Int): Flow<CosplayElement?>
 
+    @Query("SELECT * FROM cosplay_elements")
+    fun getAllElements(): Flow<List<CosplayElement>>
+
     @Update
     suspend fun updateElement(cosplayElement: CosplayElement)
 }

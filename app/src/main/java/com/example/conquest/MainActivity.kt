@@ -26,9 +26,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.conquest.components.MyTopAppBar
 import com.example.conquest.components.Drawer
 import com.example.conquest.components.MainNavigation
+import com.example.conquest.components.MyTopAppBar
 import com.example.conquest.components.getTopAppBarConfig
 import com.example.conquest.components.noDrawerRoutes
 import com.example.conquest.screens.rememberThemePreference
@@ -77,25 +77,26 @@ class MainActivity : ComponentActivity() {
                                 onSearchQueryChange = { searchQuery = it },
                                 onMenuClick = { scope.launch { drawerState.open() } },
                             )
-                        }) { padding ->
+                        },
+                    ) { padding ->
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(padding)
+                                .padding(padding),
                         ) {
                             if (!isNoDrawerRoute) {
                                 HorizontalDivider(thickness = 1.dp)
                             }
                             Box(
                                 modifier = Modifier.fillMaxSize(),
-                                contentAlignment = androidx.compose.ui.Alignment.TopCenter
+                                contentAlignment = androidx.compose.ui.Alignment.TopCenter,
                             ) {
                                 Box(
-                                    modifier = Modifier.widthIn(max = 600.dp)
+                                    modifier = Modifier.widthIn(max = 600.dp),
                                 ) {
                                     MainNavigation(
                                         navController = navController,
-                                        searchQuery = if (isNoDrawerRoute) "" else searchQuery
+                                        searchQuery = if (isNoDrawerRoute) "" else searchQuery,
                                     )
                                 }
                             }
@@ -103,7 +104,6 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
-
         }
     }
 }

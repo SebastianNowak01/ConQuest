@@ -7,10 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -168,40 +165,6 @@ private fun CosplayTopAppBar(
         })
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun DefaultTopAppBar(
-    searchQuery: String, onSearchQueryChange: (String) -> Unit, onMenuClick: () -> Unit
-) {
-    TopAppBar(colors = topAppBarColorsObject(), title = {
-        Row(
-            modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically
-        ) {
-            SearchBar(
-                value = searchQuery, onValueChange = onSearchQueryChange
-            )
-        }
-    }, navigationIcon = {
-        IconButton(onClick = onMenuClick) {
-            Icon(
-                imageVector = Icons.Default.Menu, contentDescription = "Menu"
-            )
-        }
-    }, actions = {
-        MyIcon(
-            onClick = {}, imageVector = Icons.Default.Search, contentDescription = "Filter"
-        )
-        MyIcon(
-            onClick = {}, imageVector = Icons.Default.AccountCircle, contentDescription = "Sort by"
-        )
-        MyIcon(
-            onClick = {},
-            imageVector = Icons.Default.KeyboardArrowDown,
-            contentDescription = "Order by"
-        )
-    })
-}
-
 @Composable
 fun MyTopAppBar(
     config: MyTopAppBar,
@@ -221,6 +184,11 @@ fun MyTopAppBar(
             navController = navController,
             onMenuClick = onMenuClick,
         )
-        MyTopAppBar.Default -> DefaultTopAppBar(searchQuery, onSearchQueryChange, onMenuClick)
+        MyTopAppBar.Default -> MainScreenTopAppBar(
+            searchQuery = searchQuery,
+            navBackStackEntry = navBackStackEntry,
+            onSearchQueryChange = onSearchQueryChange,
+            onMenuClick = onMenuClick,
+        )
     }
 }

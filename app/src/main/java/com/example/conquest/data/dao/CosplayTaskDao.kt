@@ -21,6 +21,9 @@ interface CosplayTaskDao {
     @Query("SELECT * FROM cosplay_tasks WHERE id = :id")
     fun getTaskById(id: Int): Flow<CosplayTask?>
 
+    @Query("SELECT * FROM cosplay_tasks")
+    fun getAllTasks(): Flow<List<CosplayTask>>
+
     @Update
     suspend fun updateTask(task: CosplayTask)
 }
