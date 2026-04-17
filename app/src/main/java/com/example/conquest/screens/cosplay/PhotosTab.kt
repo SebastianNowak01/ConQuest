@@ -77,6 +77,8 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
                     selectedIds = gridPhotos.map { it.id }.toSet()
                     selectionMode = selectedIds.isNotEmpty()
                 },
+                deleteDialogTitle = "Delete selected ${if (selectedIds.size == 1) "photo" else "photos"}?",
+                deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "photo" else "photos"}.",
             )
         }
 

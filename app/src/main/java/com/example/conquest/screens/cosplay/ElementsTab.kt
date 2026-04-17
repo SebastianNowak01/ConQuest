@@ -67,6 +67,8 @@ fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEnt
                     selectedIds = elements.map { it.id }.toSet()
                     selectionMode = selectedIds.isNotEmpty()
                 },
+                deleteDialogTitle = "Delete selected ${if (selectedIds.size == 1) "element" else "elements"}?",
+                deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "element" else "elements"}.",
             )
         }
 

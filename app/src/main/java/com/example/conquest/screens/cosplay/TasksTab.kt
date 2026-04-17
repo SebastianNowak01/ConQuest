@@ -57,6 +57,8 @@ fun TasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry)
                     selectedIds = tasks.map { it.id }.toSet()
                     selectionMode = selectedIds.isNotEmpty()
                 },
+                deleteDialogTitle = "Delete selected ${if (selectedIds.size == 1) "task" else "tasks"}?",
+                deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "task" else "tasks"}.",
             )
         }
 

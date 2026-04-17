@@ -9,6 +9,10 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
@@ -51,31 +55,21 @@ private fun MySelectAllFabButton(onClick: () -> Unit, modifier: Modifier = Modif
 }
 
 @Composable
-fun BoxScope.MyExitSelectionFab(onClick: () -> Unit) {
-    MyExitSelectionFabButton(
-        onClick = onClick,
-        modifier = Modifier
-            .align(Alignment.BottomCenter)
-            .zIndex(2f),
-    )
-}
-
-@Composable
-fun BoxScope.MySelectAllFab(onClick: () -> Unit) {
-    MySelectAllFabButton(
-        onClick = onClick,
-        modifier = Modifier
-            .align(Alignment.BottomCenter)
-            .zIndex(2f),
-    )
-}
-
-@Composable
 fun BoxScope.MySelectionModeFabs(
     onExitSelection: () -> Unit,
     onDeleteSelection: () -> Unit,
     onSelectAll: () -> Unit,
+    deleteDialogTitle: String = "Delete selected items?",
+    deleteDialogMessage: String = "This action is permanent.",
+    deleteDialogConfirmText: String = "Delete",
+    deleteDialogDismissText: String = "Cancel",
 ) {
+    var showDeleteConfirmation by remember { mutableStateOf(false) }
+
+    fun dismissDeleteDialog() {
+        showDeleteConfirmation = false
+    }
+
     Row(
         modifier = Modifier
             .align(Alignment.BottomCenter)
@@ -84,7 +78,23 @@ fun BoxScope.MySelectionModeFabs(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         MyExitSelectionFabButton(onClick = onExitSelection)
-        MyDeleteSelectionFabButton(onClick = onDeleteSelection)
+        MyDeleteSelectionFabButton(onClick = { showDeleteConfirmation = true })
         MySelectAllFabButton(onClick = onSelectAll)
+    }
+
+    if (showDeleteConfirmation) {
+        MyConfirmationDialog(
+            title = deleteDialogTitle,
+            message = deleteDialogMessage,
+            confirmText = deleteDialogConfirmText,
+            dismissText = deleteDialogDismissText,
+            onConfirm = {
+                dismissDeleteDialog()
+                onDeleteSelection()
+            },
+            onDismiss = {
+                dismissDeleteDialog()
+            },
+        )
     }
 }

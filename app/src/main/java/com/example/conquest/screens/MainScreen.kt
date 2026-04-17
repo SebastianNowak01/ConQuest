@@ -68,6 +68,8 @@ fun MainScreen(navController: NavController, searchQuery: String) {
                     selectedIds = filteredCosplays.map { it.uid }.toSet()
                     selectionMode = selectedIds.isNotEmpty()
                 },
+                deleteDialogTitle = "Delete selected ${if (selectedIds.size == 1) "cosplay" else "cosplays"}?",
+                deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "cosplay" else "cosplays"}.",
             )
         }
 
