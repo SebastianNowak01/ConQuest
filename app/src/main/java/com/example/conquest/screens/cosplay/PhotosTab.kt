@@ -1,22 +1,11 @@
 package com.example.conquest.screens.cosplay
 
 import android.content.Context
-import androidx.compose.foundation.border
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,19 +17,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.toRoute
-import coil.compose.AsyncImage
+import androidx.compose.foundation.lazy.grid.GridCells
 import com.example.conquest.CosplayViewModel
-import com.example.conquest.components.pickAndSaveImageLauncher
-import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyDeleteFab
 import com.example.conquest.components.MyFab
-import com.example.conquest.data.entity.CosplayPhoto
+import com.example.conquest.components.MyOuterBox
+import com.example.conquest.components.MyPhotoGrid
+import com.example.conquest.components.MyPhotoGridItem
+import com.example.conquest.components.pickAndSaveImageLauncher
 import com.example.conquest.ui.theme.UIConsts
 
 @Composable
@@ -54,6 +43,11 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
     }
 
     val photos by cosplayViewModel.photos.collectAsState()
+    val gridPhotos = remember(photos) {
+        photos.map { photo ->
+            MyPhotoGridItem(id = photo.id, path = photo.path)
+        }
+    }
 
     var selectionMode by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(setOf<Int>()) }
@@ -70,29 +64,42 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
         PickAndSaveImage(
             context = context,
             modifier = Modifier.align(Alignment.BottomCenter),
-            onImageSaved = { savedPath -> cosplayViewModel.addPhoto(args.uid, savedPath) })
+            onImageSaved = { savedPath -> cosplayViewModel.addPhoto(args.uid, savedPath) },
+        )
 
-        Spacer(modifier = Modifier.height(UIConsts.spacingL))
-
-        CosplayPhotoList(photos = photos, selectedIds = selectedIds, onItemClick = { photo ->
-            if (!selectionMode) {
-                navController.navigate(EditPhoto(photo.id))
-                return@CosplayPhotoList
-            }
-            val id = photo.id
-            val newSet = if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
-            selectedIds = newSet
-            if (newSet.isEmpty()) selectionMode = false
-        }, onItemLongClick = { photo ->
-            selectionMode = true
-            selectedIds = selectedIds + photo.id
-        })
+        MyPhotoGrid(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxSize(),
+            photos = gridPhotos,
+            selectedIds = selectedIds,
+            columns = GridCells.Fixed(3),
+            contentPadding = PaddingValues(bottom = UIConsts.paddingL * 4),
+            emptyText = "No images added yet.",
+            contentDescription = "Cosplay photo",
+            onItemClick = { photo ->
+                if (!selectionMode) {
+                    navController.navigate(EditPhoto(photo.id))
+                    return@MyPhotoGrid
+                }
+                val id = photo.id
+                val newSet = if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
+                selectedIds = newSet
+                if (newSet.isEmpty()) selectionMode = false
+            },
+            onItemLongClick = { photo ->
+                selectionMode = true
+                selectedIds = selectedIds + photo.id
+            },
+        )
     }
 }
 
 @Composable
 fun PickAndSaveImage(
-    context: Context, modifier: Modifier, onImageSaved: (String) -> Unit,
+    context: Context,
+    modifier: Modifier,
+    onImageSaved: (String) -> Unit,
 ) {
     var error by remember { mutableStateOf<String?>(null) }
 
@@ -100,7 +107,8 @@ fun PickAndSaveImage(
         context = context,
         fileNamePrefix = "cosplay_photo",
         onSaved = onImageSaved,
-        onError = { t -> error = "Failed to save image: ${t.localizedMessage}" })
+        onError = { throwable -> error = "Failed to save image: ${throwable.localizedMessage}" },
+    )
 
     MyFab(
         onClick = { launcher.launch() },
@@ -108,7 +116,7 @@ fun PickAndSaveImage(
         containerColor = MaterialTheme.colorScheme.tertiary,
         contentColor = MaterialTheme.colorScheme.primary,
         icon = Icons.Default.Add,
-        contentDescription = "Add"
+        contentDescription = "Add",
     )
 
     error?.let {
@@ -116,60 +124,3 @@ fun PickAndSaveImage(
     }
 }
 
-
-@Composable
-fun CosplayPhotoList(
-    photos: List<CosplayPhoto>,
-    selectedIds: Set<Int>,
-    onItemClick: (CosplayPhoto) -> Unit,
-    onItemLongClick: (CosplayPhoto) -> Unit
-) {
-    if (photos.isEmpty()) {
-        PlaceholderBox()
-    } else {
-        LazyRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(UIConsts.paddingS)
-        ) {
-            items(items = photos, key = { it.id }) { photo ->
-                Card(
-                    modifier = Modifier
-                        .size(UIConsts.photoThumbSize)
-                        .clip(RoundedCornerShape(UIConsts.cornerRadiusM))
-                        .border(
-                            width = UIConsts.strokeThin,
-                            color = MaterialTheme.colorScheme.outline,
-                            shape = RoundedCornerShape(UIConsts.cornerRadiusM)
-                        )
-                        .combinedClickable(
-                            onClick = { onItemClick(photo) },
-                            onLongClick = { onItemLongClick(photo) }),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (selectedIds.contains(photo.id)) MaterialTheme.colorScheme.secondaryContainer
-                        else MaterialTheme.colorScheme.background
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = UIConsts.elevationS),
-                    shape = RoundedCornerShape(UIConsts.cornerRadiusM)
-                ) {
-                    AsyncImage(
-                        model = photo.path,
-                        contentDescription = "Cosplay photo",
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun PlaceholderBox() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(UIConsts.placeholderHeightL),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("No images added yet.")
-    }
-}
