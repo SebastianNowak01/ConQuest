@@ -37,6 +37,7 @@ sealed class MyTopAppBar {
     data object Default : MyTopAppBar()
     data object Settings : MyTopAppBar()
     data object Events : MyTopAppBar()
+    data object Progress : MyTopAppBar()
     data object Cosplay : MyTopAppBar()
     data object None : MyTopAppBar()
 }
@@ -48,6 +49,7 @@ fun getTopAppBarConfig(route: String?, noDrawerRoutes: List<String>): MyTopAppBa
         route in noDrawerRoutes -> MyTopAppBar.None
         route == "com.example.conquest.screens.SettingsScreenParams" -> MyTopAppBar.Settings
         route == "com.example.conquest.screens.cosplay.Events" -> MyTopAppBar.Events
+        route.startsWith("com.example.conquest.screens.cosplay.Progress") -> MyTopAppBar.Progress
         route.startsWith("com.example.conquest.screens.cosplay.") -> MyTopAppBar.Cosplay
         else -> MyTopAppBar.Default
     }
@@ -74,6 +76,23 @@ private fun EventsTopAppBar(onMenuClick: () -> Unit) {
     TopAppBar(
         colors = topAppBarColorsObject(),
         title = { Text("Events") },
+        navigationIcon = {
+            IconButton(onClick = onMenuClick) {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Menu",
+                )
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ProgressTopAppBar(onMenuClick: () -> Unit) {
+    TopAppBar(
+        colors = topAppBarColorsObject(),
+        title = { Text("Progress") },
         navigationIcon = {
             IconButton(onClick = onMenuClick) {
                 Icon(
@@ -196,6 +215,7 @@ fun MyTopAppBar(
         MyTopAppBar.None -> {/* No Top App bar*/}
         MyTopAppBar.Settings -> SettingsTopAppBar(onMenuClick)
         MyTopAppBar.Events -> EventsTopAppBar(onMenuClick)
+        MyTopAppBar.Progress -> ProgressTopAppBar(onMenuClick)
         is MyTopAppBar.Cosplay -> CosplayTopAppBar(
             navBackStackEntry = navBackStackEntry,
             navController = navController,

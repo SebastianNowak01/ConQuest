@@ -11,11 +11,15 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import coil.compose.AsyncImage
 
@@ -29,11 +33,17 @@ fun MyImageBox(
     clickable: Boolean,
     onClick: () -> Unit,
     emptyContentDescription: String = "Pick image",
+    previewWhenPhotoExists: Boolean = false,
 ) {
-    val clickModifier = if (clickable) {
-        Modifier.clickable(onClick = onClick)
-    } else {
+    var showPreview by remember(photoPath) { mutableStateOf(false) }
+    val hasPhoto = photoPath.isNotEmpty()
+
+    val clickModifier = if (!clickable) {
         Modifier
+    } else if (previewWhenPhotoExists && hasPhoto) {
+        Modifier.clickable(onClick = { showPreview = true })
+    } else {
+        Modifier.clickable(onClick = onClick)
     }
 
     Box(
@@ -48,7 +58,7 @@ fun MyImageBox(
             Icon(
                 imageVector = Icons.Default.Image,
                 contentDescription = emptyContentDescription,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             return
         }
@@ -61,5 +71,12 @@ fun MyImageBox(
                 .clip(shape),
         )
     }
-}
 
+    if (showPreview) {
+        MyPhotoPreview(
+            photoPath = photoPath,
+            contentDescription = contentDescription,
+            onDismiss = { showPreview = false },
+        )
+    }
+}

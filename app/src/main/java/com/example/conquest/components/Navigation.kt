@@ -20,6 +20,9 @@ import com.example.conquest.screens.cosplay.Events
 import com.example.conquest.screens.cosplay.EventsScreen
 import com.example.conquest.screens.cosplay.NewEvent
 import com.example.conquest.screens.cosplay.EditEvent
+import com.example.conquest.screens.cosplay.EditProgressPhoto
+import com.example.conquest.screens.cosplay.Progress
+import com.example.conquest.screens.cosplay.ProgressScreen
 
 @Composable
 fun MainNavigation(navController: NavHostController, searchQuery: String) {
@@ -36,6 +39,13 @@ fun MainNavigation(navController: NavHostController, searchQuery: String) {
         composable<Events> {
             EventsScreen(navController = navController)
         }
+        composable<Progress> { backStackEntry ->
+            val args = backStackEntry.toRoute<Progress>()
+            ProgressScreen(
+                navController = navController,
+                cosplayId = args.cosplayId,
+            )
+        }
         composable<NewEvent> {
             NewEvent(navController = navController)
         }
@@ -43,6 +53,14 @@ fun MainNavigation(navController: NavHostController, searchQuery: String) {
             val args = backStackEntry.toRoute<EditEvent>()
             EditEvent(
                 eventId = args.eventId,
+                navController = navController,
+            )
+        }
+        composable<EditProgressPhoto> { backStackEntry ->
+            val args = backStackEntry.toRoute<EditProgressPhoto>()
+            EditProgressPhoto(
+                photoId = args.photoId,
+                cosplayId = args.cosplayId,
                 navController = navController,
             )
         }

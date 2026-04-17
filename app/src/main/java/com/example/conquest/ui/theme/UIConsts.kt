@@ -21,6 +21,9 @@ object UIConsts {
     val photoThumbSize = 120.dp
     val imageSizeS = 48.dp
     val imageSizeM = 80.dp
+    val previewBlurRadius = 24.dp
+    val previewImagePadding = 24.dp
+    val previewScrimAlpha = 0.35f
 
     val placeholderHeightL = 200.dp
 

@@ -10,6 +10,7 @@ import com.example.conquest.data.entity.CosplayElement
 import com.example.conquest.data.entity.CosplayPhoto
 import com.example.conquest.data.entity.CosplayTask
 import com.example.conquest.data.entity.Event
+import com.example.conquest.data.entity.ProgressPhoto
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +25,7 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     internal val elementDao = (application as ConQuestApplication).database.cosplayElementDao()
     internal val taskDao = (application as ConQuestApplication).database.cosplayTaskDao()
     internal val eventDao = (application as ConQuestApplication).database.eventDao()
+    internal val progressPhotoDao = (application as ConQuestApplication).database.progressPhotoDao()
 
     val allCosplays =
         dao.getAllCosplays().stateIn(viewModelScope, SharingStarted.Lazily, emptyList<Cosplay>())
@@ -49,6 +51,9 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
             val photos = photoDao.getPhotosForCosplayOnce(cosplayIds)
             photoDao.deletePhotos(photos)
             photos.forEach { deleteFileByPath(it.path) }
+            val progressPhotos = progressPhotoDao.getPhotosForCosplayOnce(cosplayIds)
+            progressPhotoDao.deletePhotos(progressPhotos)
+            progressPhotos.forEach { deleteFileByPath(it.path) }
             dao.deleteCosplaysByIds(cosplayIds)
         }
     }
@@ -179,6 +184,41 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
 
     fun getEventById(id: Int): Flow<Event?> {
         return eventDao.getEventById(id)
+    }
+
+    private val _progressCosplayId = MutableStateFlow<Int?>(0)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val progressPhotos: StateFlow<List<ProgressPhoto>> =
+        _progressCosplayId.filterNotNull().flatMapLatest { id -> progressPhotoDao.getPhotosForCosplay(id) }
+            .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    fun setProgressCosplayId(id: Int) {
+        _progressCosplayId.value = id
+    }
+
+    fun addProgressPhoto(cosplayId: Int, path: String) {
+        viewModelScope.launch {
+            progressPhotoDao.insertPhoto(ProgressPhoto(cosplayId = cosplayId, path = path))
+        }
+    }
+
+    fun deleteProgressPhotosByIds(ids: Set<Int>) {
+        viewModelScope.launch {
+            val toDelete = progressPhotoDao.getPhotosByIdsOnce(ids)
+            progressPhotoDao.deletePhotosByIds(ids)
+            toDelete.forEach { deleteFileByPath(it.path) }
+        }
+    }
+
+    fun getProgressPhotoById(id: Int, cosplayId: Int): Flow<ProgressPhoto?> {
+        return progressPhotoDao.getPhotoById(id, cosplayId)
+    }
+
+    fun updateProgressPhoto(photo: ProgressPhoto) {
+        viewModelScope.launch {
+            progressPhotoDao.updatePhoto(photo)
+        }
     }
 }
 

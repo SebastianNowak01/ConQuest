@@ -2,8 +2,12 @@ package com.example.conquest.screens.cosplay
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavBackStackEntry
 import kotlinx.serialization.Serializable
@@ -46,7 +50,7 @@ fun CosplayTabs(
     val tabIcons = listOf(
         TabIcon(Icons.Filled.TheaterComedy, "Cosplay Elements"),
         TabIcon(Icons.AutoMirrored.Filled.List, "Tasks"),
-        TabIcon(Icons.Filled.Image, "Reference Photos")
+        TabIcon(Icons.Filled.Image, "Reference Photos"),
     )
 
     val handle = navBackStackEntry.savedStateHandle
