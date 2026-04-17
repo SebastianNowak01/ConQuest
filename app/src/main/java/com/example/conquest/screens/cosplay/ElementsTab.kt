@@ -2,21 +2,29 @@ package com.example.conquest.screens.cosplay
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.toRoute
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.MyAddFab
-import com.example.conquest.components.MyDeleteFab
 import com.example.conquest.components.MyImageBox
-import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyLazyColumn
+import com.example.conquest.components.MyOuterBox
+import com.example.conquest.components.MySelectionModeFabs
 import com.example.conquest.ui.theme.UIConsts
 
 @Composable
@@ -35,14 +43,31 @@ fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEnt
     var selectionMode by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(setOf<Int>()) }
 
+    LaunchedEffect(elements) {
+        val visibleIds = elements.map { it.id }.toSet()
+        selectedIds = selectedIds.intersect(visibleIds)
+        if (selectedIds.isEmpty()) {
+            selectionMode = false
+        }
+    }
+
     MyOuterBox {
         if (selectionMode) {
-            MyDeleteFab(
-                onClick = {
+            MySelectionModeFabs(
+                onExitSelection = {
+                    selectionMode = false
+                    selectedIds = emptySet()
+                },
+                onDeleteSelection = {
                     cosplayViewModel.deleteElementsByIds(selectedIds)
                     selectionMode = false
                     selectedIds = emptySet()
-                })
+                },
+                onSelectAll = {
+                    selectedIds = elements.map { it.id }.toSet()
+                    selectionMode = selectedIds.isNotEmpty()
+                },
+            )
         }
 
         MyLazyColumn(

@@ -25,11 +25,11 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.toRoute
 import com.example.conquest.CosplayViewModel
-import com.example.conquest.components.MyDeleteFab
 import com.example.conquest.components.MyFab
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyPhotoGrid
 import com.example.conquest.components.MyPhotoGridItem
+import com.example.conquest.components.MySelectionModeFabs
 import com.example.conquest.components.pickAndSaveImageLauncher
 import com.example.conquest.ui.theme.UIConsts
 
@@ -53,20 +53,40 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
     var selectionMode by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(setOf<Int>()) }
 
+    LaunchedEffect(gridPhotos) {
+        val visibleIds = gridPhotos.map { it.id }.toSet()
+        selectedIds = selectedIds.intersect(visibleIds)
+        if (selectedIds.isEmpty()) {
+            selectionMode = false
+        }
+    }
+
     MyOuterBox {
         if (selectionMode) {
-            MyDeleteFab(onClick = {
-                cosplayViewModel.deletePhotosByIds(selectedIds)
-                selectionMode = false
-                selectedIds = emptySet()
-            })
+            MySelectionModeFabs(
+                onExitSelection = {
+                    selectionMode = false
+                    selectedIds = emptySet()
+                },
+                onDeleteSelection = {
+                    cosplayViewModel.deletePhotosByIds(selectedIds)
+                    selectionMode = false
+                    selectedIds = emptySet()
+                },
+                onSelectAll = {
+                    selectedIds = gridPhotos.map { it.id }.toSet()
+                    selectionMode = selectedIds.isNotEmpty()
+                },
+            )
         }
 
-        PickAndSaveImage(
-            context = context,
-            modifier = Modifier.align(Alignment.BottomCenter),
-            onImageSaved = { savedPath -> cosplayViewModel.addPhoto(args.uid, savedPath) },
-        )
+        if (!selectionMode) {
+            PickAndSaveImage(
+                context = context,
+                modifier = Modifier.align(Alignment.BottomCenter),
+                onImageSaved = { savedPath -> cosplayViewModel.addPhoto(args.uid, savedPath) },
+            )
+        }
 
         Column(
             modifier = Modifier

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,10 +20,10 @@ import com.example.conquest.CosplayViewModel
 import kotlinx.serialization.Serializable
 import androidx.compose.ui.text.font.FontWeight
 import com.example.conquest.components.MyAddFab
-import com.example.conquest.components.MyDeleteFab
 import com.example.conquest.components.MyImageBox
 import com.example.conquest.components.MyLazyColumn
 import com.example.conquest.components.MyOuterBox
+import com.example.conquest.components.MySelectionModeFabs
 import com.example.conquest.screens.cosplay.MainCosplayScreen
 import com.example.conquest.screens.cosplay.NewCosplay
 import com.example.conquest.ui.theme.UIConsts
@@ -43,13 +44,31 @@ fun MainScreen(navController: NavController, searchQuery: String) {
     var selectionMode by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(setOf<Int>()) }
 
+    LaunchedEffect(filteredCosplays) {
+        val visibleIds = filteredCosplays.map { it.uid }.toSet()
+        selectedIds = selectedIds.intersect(visibleIds)
+        if (selectedIds.isEmpty()) {
+            selectionMode = false
+        }
+    }
+
     MyOuterBox {
         if (selectionMode) {
-            MyDeleteFab(onClick = {
-                cosplayViewModel.deleteCosplaysByIds(selectedIds)
-                selectionMode = false
-                selectedIds = emptySet()
-            })
+            MySelectionModeFabs(
+                onExitSelection = {
+                    selectionMode = false
+                    selectedIds = emptySet()
+                },
+                onDeleteSelection = {
+                    cosplayViewModel.deleteCosplaysByIds(selectedIds)
+                    selectionMode = false
+                    selectedIds = emptySet()
+                },
+                onSelectAll = {
+                    selectedIds = filteredCosplays.map { it.uid }.toSet()
+                    selectionMode = selectedIds.isNotEmpty()
+                },
+            )
         }
 
         MyLazyColumn(

@@ -16,9 +16,9 @@ import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.EventListItem
 import com.example.conquest.components.EventsFilters
 import com.example.conquest.components.MyAddFab
-import com.example.conquest.components.MyDeleteFab
 import com.example.conquest.components.MyLazyColumn
 import com.example.conquest.components.MyOuterBox
+import com.example.conquest.components.MySelectionModeFabs
 import com.example.conquest.data.entity.EventType
 import java.util.Calendar
 import java.util.Date
@@ -57,11 +57,19 @@ fun EventsScreen(
 
     MyOuterBox {
         if (selectionMode) {
-            MyDeleteFab(
-                onClick = {
+            MySelectionModeFabs(
+                onExitSelection = {
+                    selectionMode = false
+                    selectedIds = emptySet()
+                },
+                onDeleteSelection = {
                     cosplayViewModel.deleteEventsByIds(selectedIds)
                     selectionMode = false
                     selectedIds = emptySet()
+                },
+                onSelectAll = {
+                    selectedIds = filteredEvents.map { it.id }.toSet()
+                    selectionMode = selectedIds.isNotEmpty()
                 },
             )
         }

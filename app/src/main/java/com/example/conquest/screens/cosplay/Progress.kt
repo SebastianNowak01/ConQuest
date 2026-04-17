@@ -29,11 +29,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
-import com.example.conquest.components.MyDeleteFab
 import com.example.conquest.components.MyFab
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyPhotoGrid
 import com.example.conquest.components.MyPhotoGridItem
+import com.example.conquest.components.MySelectionModeFabs
 import com.example.conquest.components.pickAndSaveImageLauncher
 import com.example.conquest.components.saveBitmapToInternalStorage
 import com.example.conquest.ui.theme.UIConsts
@@ -58,6 +58,14 @@ fun ProgressScreen(
     var selectionMode by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(setOf<Int>()) }
     var error by remember { mutableStateOf("") }
+
+    LaunchedEffect(gridPhotos) {
+        val visibleIds = gridPhotos.map { it.id }.toSet()
+        selectedIds = selectedIds.intersect(visibleIds)
+        if (selectedIds.isEmpty()) {
+            selectionMode = false
+        }
+    }
 
     LaunchedEffect(cosplayId) {
         cosplayViewModel.setProgressCosplayId(cosplayId)
@@ -89,11 +97,19 @@ fun ProgressScreen(
 
     MyOuterBox {
         if (selectionMode) {
-            MyDeleteFab(
-                onClick = {
+            MySelectionModeFabs(
+                onExitSelection = {
+                    selectionMode = false
+                    selectedIds = emptySet()
+                },
+                onDeleteSelection = {
                     cosplayViewModel.deleteProgressPhotosByIds(selectedIds)
                     selectionMode = false
                     selectedIds = emptySet()
+                },
+                onSelectAll = {
+                    selectedIds = gridPhotos.map { it.id }.toSet()
+                    selectionMode = selectedIds.isNotEmpty()
                 },
             )
         }
@@ -154,26 +170,27 @@ fun ProgressScreen(
             }
         }
 
-        Row(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = UIConsts.paddingM),
-            horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingL),
-        ) {
-            MyFab(
-                onClick = { galleryLauncher.launch() },
-                containerColor = MaterialTheme.colorScheme.tertiary,
-                contentColor = MaterialTheme.colorScheme.primary,
-                icon = Icons.Default.Add,
-                contentDescription = "Add from gallery",
-            )
-            MyFab(
-                onClick = { cameraLauncher.launch(null) },
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.primary,
-                icon = Icons.Default.PhotoCamera,
-                contentDescription = "Take photo",
-            )
+        if (!selectionMode) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter),
+                horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingL),
+            ) {
+                MyFab(
+                    onClick = { galleryLauncher.launch() },
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    icon = Icons.Default.Add,
+                    contentDescription = "Add from gallery",
+                )
+                MyFab(
+                    onClick = { cameraLauncher.launch(null) },
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    icon = Icons.Default.PhotoCamera,
+                    contentDescription = "Take photo",
+                )
+            }
         }
     }
 }

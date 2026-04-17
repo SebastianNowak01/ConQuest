@@ -19,9 +19,9 @@ import androidx.navigation.NavController
 import androidx.navigation.toRoute
 import com.example.conquest.CosplayViewModel
 import com.example.conquest.components.MyAddFab
-import com.example.conquest.components.MyDeleteFab
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyLazyColumn
+import com.example.conquest.components.MySelectionModeFabs
 import com.example.conquest.components.MySwitchCard
 import com.example.conquest.ui.theme.UIConsts
 
@@ -43,11 +43,21 @@ fun TasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry)
 
     MyOuterBox {
         if (selectionMode) {
-            MyDeleteFab(onClick = {
-                cosplayViewModel.deleteTasksByIds(selectedIds)
-                selectionMode = false
-                selectedIds = emptySet()
-            })
+            MySelectionModeFabs(
+                onExitSelection = {
+                    selectionMode = false
+                    selectedIds = emptySet()
+                },
+                onDeleteSelection = {
+                    cosplayViewModel.deleteTasksByIds(selectedIds)
+                    selectionMode = false
+                    selectedIds = emptySet()
+                },
+                onSelectAll = {
+                    selectedIds = tasks.map { it.id }.toSet()
+                    selectionMode = selectedIds.isNotEmpty()
+                },
+            )
         }
 
         MyLazyColumn(
