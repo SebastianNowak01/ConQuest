@@ -31,6 +31,7 @@ fun MainScreen(
     val cosplays by cosplayViewModel.allCosplays.collectAsState()
     val selectedFilter by cosplayViewModel.mainScreenFilter.collectAsState()
     val selectedSort by cosplayViewModel.mainScreenSort.collectAsState()
+    val selectedOrder by cosplayViewModel.mainScreenSortOrder.collectAsState()
     val allTasks by cosplayViewModel.allTasks.collectAsState()
     val allElements by cosplayViewModel.allElements.collectAsState()
     val events by cosplayViewModel.events.collectAsState()
@@ -65,6 +66,7 @@ fun MainScreen(
     val sortedCosplays = remember(
         filteredCosplays,
         selectedSort,
+        selectedOrder,
         taskCountByCosplay,
         endDateByCosplay,
         totalSpendByCosplay,
@@ -74,6 +76,7 @@ fun MainScreen(
         sortMainScreenCosplays(
             cosplays = filteredCosplays,
             sort = selectedSort,
+            order = selectedOrder,
             taskCountByCosplay = taskCountByCosplay,
             endDateByCosplay = endDateByCosplay,
             totalSpendByCosplay = totalSpendByCosplay,

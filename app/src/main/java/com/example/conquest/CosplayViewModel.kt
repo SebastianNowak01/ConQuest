@@ -3,6 +3,7 @@ package com.example.conquest
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.conquest.data.classes.CosplaySortOrder
 import com.example.conquest.data.classes.CosplaySortOption
 import com.example.conquest.data.classes.CosplayStatusFilter
 import com.example.conquest.data.entity.Cosplay
@@ -38,12 +39,19 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     private val _mainScreenSort = MutableStateFlow(CosplaySortOption.Character)
     val mainScreenSort: StateFlow<CosplaySortOption> = _mainScreenSort
 
+    private val _mainScreenSortOrder = MutableStateFlow(CosplaySortOrder.LeastToMost)
+    val mainScreenSortOrder: StateFlow<CosplaySortOrder> = _mainScreenSortOrder
+
     fun setMainScreenFilter(filter: CosplayStatusFilter) {
         _mainScreenFilter.value = filter
     }
 
     fun setMainScreenSort(sort: CosplaySortOption) {
         _mainScreenSort.value = sort
+    }
+
+    fun setMainScreenSortOrder(order: CosplaySortOrder) {
+        _mainScreenSortOrder.value = order
     }
 
     val allTasks: StateFlow<List<CosplayTask>> =

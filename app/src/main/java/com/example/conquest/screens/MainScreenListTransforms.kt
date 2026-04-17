@@ -1,5 +1,6 @@
 package com.example.conquest.screens
 
+import com.example.conquest.data.classes.CosplaySortOrder
 import com.example.conquest.data.classes.CosplaySortOption
 import com.example.conquest.data.classes.CosplayStatusFilter
 import com.example.conquest.data.entity.Cosplay
@@ -80,31 +81,36 @@ fun buildTotalTimeDaysByCosplay(
 fun sortMainScreenCosplays(
     cosplays: List<Cosplay>,
     sort: CosplaySortOption,
+    order: CosplaySortOrder,
     taskCountByCosplay: Map<Int, Int>,
     endDateByCosplay: Map<Int, Date?>,
     totalSpendByCosplay: Map<Int, Double>,
     totalTimeDaysByCosplay: Map<Int, Long>,
     eventsCount: Int,
 ): List<Cosplay> {
+    val direction = if (order == CosplaySortOrder.MostToLeast) -1 else 1
+
     return cosplays.sortedWith { left, right ->
-        val compare = when (sort) {
+        val baseCompare = when (sort) {
             CosplaySortOption.Character -> compareStringsAlphabetical(left.name, right.name)
             CosplaySortOption.Series -> compareStringsAlphabetical(left.series, right.series)
             CosplaySortOption.Tasks -> {
-                (taskCountByCosplay[right.uid] ?: 0).compareTo(taskCountByCosplay[left.uid] ?: 0)
+                (taskCountByCosplay[left.uid] ?: 0).compareTo(taskCountByCosplay[right.uid] ?: 0)
             }
             CosplaySortOption.InitialDate -> left.initialDate.compareTo(right.initialDate)
             CosplaySortOption.EndDate -> compareDates(endDateByCosplay[left.uid], endDateByCosplay[right.uid])
             CosplaySortOption.DueDate -> compareDates(left.dueDate, right.dueDate)
-            CosplaySortOption.Budget -> (right.budget ?: 0.0).compareTo(left.budget ?: 0.0)
+            CosplaySortOption.Budget -> (left.budget ?: 0.0).compareTo(right.budget ?: 0.0)
             CosplaySortOption.TotalSpend -> {
-                (totalSpendByCosplay[right.uid] ?: 0.0).compareTo(totalSpendByCosplay[left.uid] ?: 0.0)
+                (totalSpendByCosplay[left.uid] ?: 0.0).compareTo(totalSpendByCosplay[right.uid] ?: 0.0)
             }
             CosplaySortOption.TotalTime -> {
-                (totalTimeDaysByCosplay[right.uid] ?: 0L).compareTo(totalTimeDaysByCosplay[left.uid] ?: 0L)
+                (totalTimeDaysByCosplay[left.uid] ?: 0L).compareTo(totalTimeDaysByCosplay[right.uid] ?: 0L)
             }
             CosplaySortOption.Events -> eventsCount.compareTo(eventsCount)
         }
+
+        val compare = baseCompare * direction
 
         if (compare != 0) {
             compare

@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -21,10 +22,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.data.classes.CosplaySortOrder
 import com.example.conquest.data.classes.CosplaySortOption
 import com.example.conquest.data.classes.CosplayStatusFilter
 
@@ -71,6 +74,34 @@ private fun FilterButton(
                 },
             )
         }
+    }
+}
+
+@Composable
+private fun OrderButton(
+    selectedOrder: CosplaySortOrder,
+    onOrderChange: (CosplaySortOrder) -> Unit,
+) {
+    val currentOrderLabel = selectedOrder.label
+    val nextOrder = if (selectedOrder == CosplaySortOrder.MostToLeast) {
+        CosplaySortOrder.LeastToMost
+    } else {
+        CosplaySortOrder.MostToLeast
+    }
+    val nextOrderLabel = nextOrder.label
+
+    val rotation = if (selectedOrder == CosplaySortOrder.MostToLeast) {
+        180f
+    } else {
+        0f
+    }
+
+    IconButton(onClick = { onOrderChange(nextOrder) }) {
+        Icon(
+            imageVector = Icons.Default.KeyboardArrowDown,
+            contentDescription = "Order: $currentOrderLabel. Tap to switch to $nextOrderLabel",
+            modifier = Modifier.graphicsLayer(rotationZ = rotation),
+        )
     }
 }
 
@@ -132,6 +163,7 @@ fun MainScreenTopAppBar(
     val cosplayViewModel: CosplayViewModel = viewModel(viewModelStoreOwner = owner)
     val selectedFilter by cosplayViewModel.mainScreenFilter.collectAsState()
     val selectedSort by cosplayViewModel.mainScreenSort.collectAsState()
+    val selectedOrder by cosplayViewModel.mainScreenSortOrder.collectAsState()
 
     TopAppBar(
         colors = topAppBarColorsObject(),
@@ -162,6 +194,10 @@ fun MainScreenTopAppBar(
             SortButton(
                 selectedSort = selectedSort,
                 onSortChange = cosplayViewModel::setMainScreenSort,
+            )
+            OrderButton(
+                selectedOrder = selectedOrder,
+                onOrderChange = cosplayViewModel::setMainScreenSortOrder,
             )
         },
     )
