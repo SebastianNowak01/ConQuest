@@ -2,9 +2,8 @@ package com.example.conquest
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.SharingStarted
 import androidx.lifecycle.viewModelScope
+import com.example.conquest.data.classes.CosplayStatusFilter
 import com.example.conquest.data.entity.Cosplay
 import com.example.conquest.data.entity.CosplayElement
 import com.example.conquest.data.entity.CosplayPhoto
@@ -14,9 +13,11 @@ import com.example.conquest.data.entity.ProgressPhoto
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class CosplayViewModel(application: Application) : AndroidViewModel(application) {
@@ -29,6 +30,13 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
 
     val allCosplays =
         dao.getAllCosplays().stateIn(viewModelScope, SharingStarted.Lazily, emptyList<Cosplay>())
+
+    private val _mainScreenFilter = MutableStateFlow(CosplayStatusFilter.All)
+    val mainScreenFilter: StateFlow<CosplayStatusFilter> = _mainScreenFilter
+
+    fun setMainScreenFilter(filter: CosplayStatusFilter) {
+        _mainScreenFilter.value = filter
+    }
 
     fun insertCosplay(cosplay: Cosplay) {
         viewModelScope.launch {
