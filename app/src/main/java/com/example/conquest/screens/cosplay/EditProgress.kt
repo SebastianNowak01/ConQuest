@@ -52,8 +52,9 @@ fun EditProgressPhoto(
                 photoPath = photo?.path.orEmpty(),
                 contentDescription = "Progress photo",
                 size = UIConsts.heightM,
-                clickable = false,
+                clickable = true,
                 onClick = {},
+                previewWhenPhotoExists = true,
             )
 
             MyInputField(

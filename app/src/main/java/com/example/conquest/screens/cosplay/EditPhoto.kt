@@ -83,6 +83,7 @@ fun EditPhoto(
                 shape = RoundedCornerShape(UIConsts.cornerRadiusM),
                 clickable = true,
                 onClick = { imagePickerLauncher.launch("image/*") },
+                previewWhenPhotoExists = true,
             )
 
             if (error.isNotEmpty()) {
