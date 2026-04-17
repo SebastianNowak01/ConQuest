@@ -3,6 +3,7 @@ package com.example.conquest
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.conquest.data.classes.CosplaySortOption
 import com.example.conquest.data.classes.CosplayStatusFilter
 import com.example.conquest.data.entity.Cosplay
 import com.example.conquest.data.entity.CosplayElement
@@ -34,9 +35,22 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     private val _mainScreenFilter = MutableStateFlow(CosplayStatusFilter.All)
     val mainScreenFilter: StateFlow<CosplayStatusFilter> = _mainScreenFilter
 
+    private val _mainScreenSort = MutableStateFlow(CosplaySortOption.Character)
+    val mainScreenSort: StateFlow<CosplaySortOption> = _mainScreenSort
+
     fun setMainScreenFilter(filter: CosplayStatusFilter) {
         _mainScreenFilter.value = filter
     }
+
+    fun setMainScreenSort(sort: CosplaySortOption) {
+        _mainScreenSort.value = sort
+    }
+
+    val allTasks: StateFlow<List<CosplayTask>> =
+        taskDao.getAllTasks().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    val allElements: StateFlow<List<CosplayElement>> =
+        elementDao.getAllElements().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     fun insertCosplay(cosplay: Cosplay) {
         viewModelScope.launch {
