@@ -6,12 +6,14 @@ import androidx.lifecycle.viewModelScope
 import com.example.conquest.data.classes.CosplaySortOrder
 import com.example.conquest.data.classes.CosplaySortOption
 import com.example.conquest.data.classes.CosplayStatusFilter
+import com.example.conquest.data.classes.EventSortOption
 import com.example.conquest.data.entity.Cosplay
 import com.example.conquest.data.entity.CosplayElement
 import com.example.conquest.data.entity.CosplayPhoto
 import com.example.conquest.data.entity.CosplayTask
 import com.example.conquest.data.entity.Event
 import com.example.conquest.data.entity.EventCosplayCrossRef
+import com.example.conquest.data.entity.EventType
 import com.example.conquest.data.entity.ProgressPhoto
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -43,6 +45,15 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     private val _mainScreenSortOrder = MutableStateFlow(CosplaySortOrder.LeastToMost)
     val mainScreenSortOrder: StateFlow<CosplaySortOrder> = _mainScreenSortOrder
 
+    private val _eventsFilterType = MutableStateFlow<EventType?>(null)
+    val eventsFilterType: StateFlow<EventType?> = _eventsFilterType
+
+    private val _eventsSortOrder = MutableStateFlow(CosplaySortOrder.LeastToMost)
+    val eventsSortOrder: StateFlow<CosplaySortOrder> = _eventsSortOrder
+
+    private val _eventsSortOption = MutableStateFlow(EventSortOption.Date)
+    val eventsSortOption: StateFlow<EventSortOption> = _eventsSortOption
+
     fun setMainScreenFilter(filter: CosplayStatusFilter) {
         _mainScreenFilter.value = filter
     }
@@ -53,6 +64,18 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
 
     fun setMainScreenSortOrder(order: CosplaySortOrder) {
         _mainScreenSortOrder.value = order
+    }
+
+    fun setEventsFilterType(filterType: EventType?) {
+        _eventsFilterType.value = filterType
+    }
+
+    fun setEventsSortOrder(order: CosplaySortOrder) {
+        _eventsSortOrder.value = order
+    }
+
+    fun setEventsSortOption(sortOption: EventSortOption) {
+        _eventsSortOption.value = sortOption
     }
 
     val allTasks: StateFlow<List<CosplayTask>> =

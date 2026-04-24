@@ -44,7 +44,10 @@ fun MainNavigation(
             SettingsScreen()
         }
         composable<Events> {
-            EventsScreen(navController = navController)
+            EventsScreen(
+                navController = navController,
+                searchQuery = searchQuery,
+            )
         }
         composable<Progress> { backStackEntry ->
             val args = backStackEntry.toRoute<Progress>()

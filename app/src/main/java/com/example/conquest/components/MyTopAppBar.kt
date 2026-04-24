@@ -69,23 +69,6 @@ private fun SettingsTopAppBar(onMenuClick: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun EventsTopAppBar(onMenuClick: () -> Unit) {
-    TopAppBar(
-        colors = topAppBarColorsObject(),
-        title = { Text("Events") },
-        navigationIcon = {
-            IconButton(onClick = onMenuClick) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Menu",
-                )
-            }
-        }
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
 private fun ProgressTopAppBar(onMenuClick: () -> Unit) {
     TopAppBar(
         colors = topAppBarColorsObject(),
@@ -177,7 +160,12 @@ fun MyTopAppBar(
     when (config) {
         MyTopAppBar.None -> {/* No Top App bar*/}
         MyTopAppBar.Settings -> SettingsTopAppBar(onMenuClick)
-        MyTopAppBar.Events -> EventsTopAppBar(onMenuClick)
+        MyTopAppBar.Events -> EventsTopAppBar(
+            searchQuery = searchQuery,
+            navBackStackEntry = navBackStackEntry,
+            onSearchQueryChange = onSearchQueryChange,
+            onMenuClick = onMenuClick,
+        )
         MyTopAppBar.Progress -> ProgressTopAppBar(onMenuClick)
         is MyTopAppBar.Cosplay -> CosplayTopAppBar(
             navBackStackEntry = navBackStackEntry,
