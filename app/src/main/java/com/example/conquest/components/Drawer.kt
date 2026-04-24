@@ -28,6 +28,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.conquest.screens.MainScreen
 import com.example.conquest.screens.SettingsScreenParams
 import com.example.conquest.screens.cosplay.Events
+import com.example.conquest.screens.cosplay.MainCosplayScreen
 import com.example.conquest.screens.cosplay.Progress
 import com.example.conquest.screens.cosplay.Stats
 import com.example.conquest.ui.theme.UIConsts
@@ -59,8 +60,17 @@ fun Drawer(
     val scope = rememberCoroutineScope()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    val currentCosplayId = navBackStackEntry?.arguments?.getInt("uid")
-    val isInCosplayTabs = currentRoute?.startsWith("com.example.conquest.screens.cosplay.MainCosplayScreen") == true
+    val arguments = navBackStackEntry?.arguments
+    val currentCosplayId = if (arguments?.containsKey("uid") == true) {
+        arguments.getInt("uid")
+    } else if (arguments?.containsKey("cosplayId") == true) {
+        arguments.getInt("cosplayId")
+    } else {
+        null
+    }
+    val isInCosplayTabs = currentRoute?.startsWith("com.example.conquest.screens.cosplay.MainCosplayScreen") == true ||
+            currentRoute?.startsWith("com.example.conquest.screens.cosplay.Progress") == true ||
+            currentRoute?.startsWith("com.example.conquest.screens.cosplay.Stats") == true
 
     val drawerItems = if (isInCosplayTabs && currentCosplayId != null) {
         navigationItems + progressNavigationItem + statsNavigationItem
@@ -74,7 +84,7 @@ fun Drawer(
     }
 
     val selectedItemIndex = drawerRoutes.indexOfFirst { route ->
-        route::class.qualifiedName == currentRoute
+        currentRoute?.startsWith(route::class.qualifiedName ?: "") == true
     }.takeIf { it >= 0 } ?: 0
 
     ModalNavigationDrawer(

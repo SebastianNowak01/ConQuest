@@ -26,6 +26,7 @@ import com.example.conquest.screens.cosplay.ProgressScreen
 import com.example.conquest.screens.cosplay.Stats
 import com.example.conquest.screens.cosplay.StatsScreen
 
+
 @Composable
 fun MainNavigation(
     navController: NavHostController,
