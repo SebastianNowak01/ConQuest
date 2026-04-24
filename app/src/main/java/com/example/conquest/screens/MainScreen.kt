@@ -32,9 +32,6 @@ fun MainScreen(
     val selectedFilter by cosplayViewModel.mainScreenFilter.collectAsState()
     val selectedSort by cosplayViewModel.mainScreenSort.collectAsState()
     val selectedOrder by cosplayViewModel.mainScreenSortOrder.collectAsState()
-    val allTasks by cosplayViewModel.allTasks.collectAsState()
-    val allElements by cosplayViewModel.allElements.collectAsState()
-    val events by cosplayViewModel.events.collectAsState()
 
     val filteredCosplays = remember(cosplays, searchQuery, selectedFilter) {
         filterMainScreenCosplays(
@@ -44,44 +41,15 @@ fun MainScreen(
         )
     }
 
-    val taskCountByCosplay = remember(allTasks) {
-        buildTaskCountByCosplay(allTasks)
-    }
-
-    val endDateByCosplay = remember(allTasks) {
-        buildEndDateByCosplay(allTasks)
-    }
-
-    val totalSpendByCosplay = remember(allElements) {
-        buildTotalSpendByCosplay(allElements)
-    }
-
-    val totalTimeDaysByCosplay = remember(cosplays, endDateByCosplay) {
-        buildTotalTimeDaysByCosplay(
-            cosplays = cosplays,
-            endDateByCosplay = endDateByCosplay,
-        )
-    }
-
     val sortedCosplays = remember(
         filteredCosplays,
         selectedSort,
         selectedOrder,
-        taskCountByCosplay,
-        endDateByCosplay,
-        totalSpendByCosplay,
-        totalTimeDaysByCosplay,
-        events,
     ) {
         sortMainScreenCosplays(
             cosplays = filteredCosplays,
             sort = selectedSort,
             order = selectedOrder,
-            taskCountByCosplay = taskCountByCosplay,
-            endDateByCosplay = endDateByCosplay,
-            totalSpendByCosplay = totalSpendByCosplay,
-            totalTimeDaysByCosplay = totalTimeDaysByCosplay,
-            eventsCount = events.size,
         )
     }
 

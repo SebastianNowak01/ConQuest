@@ -24,6 +24,9 @@ interface CosplayElementDao {
     @Query("SELECT * FROM cosplay_elements")
     fun getAllElements(): Flow<List<CosplayElement>>
 
+    @Query("SELECT DISTINCT cosplay_id FROM cosplay_elements WHERE id IN (:ids)")
+    suspend fun getCosplayIdsForElementIdsOnce(ids: Set<Int>): List<Int>
+
     @Update
     suspend fun updateElement(cosplayElement: CosplayElement)
 }

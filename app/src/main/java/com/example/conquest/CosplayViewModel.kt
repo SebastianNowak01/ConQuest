@@ -11,6 +11,7 @@ import com.example.conquest.data.entity.CosplayElement
 import com.example.conquest.data.entity.CosplayPhoto
 import com.example.conquest.data.entity.CosplayTask
 import com.example.conquest.data.entity.Event
+import com.example.conquest.data.entity.EventCosplayCrossRef
 import com.example.conquest.data.entity.ProgressPhoto
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -60,9 +61,31 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     val allElements: StateFlow<List<CosplayElement>> =
         elementDao.getAllElements().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
+    private suspend fun refreshCosplayStats(cosplayId: Int) {
+        dao.recomputeStatsForCosplay(cosplayId)
+    }
+
+    private suspend fun refreshCosplayStats(cosplayIds: Set<Int>) {
+        if (cosplayIds.isNotEmpty()) {
+            dao.recomputeStatsForCosplays(cosplayIds)
+        }
+    }
+
+    private suspend fun replaceEventCosplayLinks(eventId: Int, cosplayIds: Set<Int>) {
+        eventDao.deleteEventCosplayCrossRefsForEvent(eventId)
+        if (cosplayIds.isNotEmpty()) {
+            eventDao.insertEventCosplayCrossRefs(
+                cosplayIds.map { cosplayId ->
+                    EventCosplayCrossRef(eventId = eventId, cosplayId = cosplayId)
+                }
+            )
+        }
+    }
+
     fun insertCosplay(cosplay: Cosplay) {
         viewModelScope.launch {
-            dao.insertCosplay(cosplay)
+            val cosplayId = dao.insertCosplay(cosplay).toInt()
+            refreshCosplayStats(cosplayId)
         }
     }
 
@@ -73,6 +96,7 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     fun updateCosplay(cosplay: Cosplay) {
         viewModelScope.launch {
             dao.updateCosplay(cosplay)
+            refreshCosplayStats(cosplay.uid)
         }
     }
 
@@ -126,6 +150,7 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     fun insertElement(element: CosplayElement) {
         viewModelScope.launch {
             elementDao.insertElement(element)
+            refreshCosplayStats(element.cosplayId)
         }
     }
 
@@ -142,7 +167,9 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
 
     fun deleteElementsByIds(ids: Set<Int>) {
         viewModelScope.launch {
+            val cosplayIds = elementDao.getCosplayIdsForElementIdsOnce(ids).toSet()
             elementDao.deleteElementsByIds(ids)
+            refreshCosplayStats(cosplayIds)
         }
     }
 
@@ -160,12 +187,15 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     fun insertTask(task: CosplayTask) {
         viewModelScope.launch {
             taskDao.insertTask(task)
+            refreshCosplayStats(task.cosplayId)
         }
     }
 
     fun deleteTasksByIds(ids: Set<Int>) {
         viewModelScope.launch {
+            val cosplayIds = taskDao.getCosplayIdsForTaskIdsOnce(ids).toSet()
             taskDao.deleteTasksByIds(ids)
+            refreshCosplayStats(cosplayIds)
         }
     }
 
@@ -178,6 +208,7 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     ) {
         viewModelScope.launch {
             elementDao.updateElement(cosplayElement)
+            refreshCosplayStats(cosplayElement.cosplayId)
         }
     }
 
@@ -188,27 +219,39 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     fun updateTask(task: CosplayTask) {
         viewModelScope.launch {
             taskDao.updateTask(task)
+            refreshCosplayStats(task.cosplayId)
         }
     }
 
     val events: StateFlow<List<Event>> =
         eventDao.getAllEvents().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    fun insertEvent(event: Event) {
+    fun insertEvent(event: Event, cosplayIds: Set<Int> = emptySet()) {
         viewModelScope.launch {
-            eventDao.insertEvent(event)
+            val eventId = eventDao.insertEvent(event).toInt()
+            replaceEventCosplayLinks(eventId = eventId, cosplayIds = cosplayIds)
+            refreshCosplayStats(cosplayIds)
         }
     }
 
-    fun updateEvent(event: Event) {
+    fun updateEvent(event: Event, cosplayIds: Set<Int>? = null) {
         viewModelScope.launch {
+            val existingCosplayIds = eventDao.getCosplayIdsForEventOnce(event.id).toSet()
             eventDao.updateEvent(event)
+            if (cosplayIds != null) {
+                replaceEventCosplayLinks(eventId = event.id, cosplayIds = cosplayIds)
+                refreshCosplayStats(existingCosplayIds + cosplayIds)
+            } else {
+                refreshCosplayStats(existingCosplayIds)
+            }
         }
     }
 
     fun deleteEventsByIds(ids: Set<Int>) {
         viewModelScope.launch {
+            val cosplayIds = eventDao.getCosplayIdsForEventIdsOnce(ids).toSet()
             eventDao.deleteEventsByIds(ids)
+            refreshCosplayStats(cosplayIds)
         }
     }
 

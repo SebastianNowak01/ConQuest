@@ -11,6 +11,7 @@ data class EventFormState(
     val eventType: EventType = EventType.EXPO,
     val eventDate: Date? = getCurrentDate(),
     val description: String = "",
+    val cosplayIds: Set<Int> = emptySet(),
 ) {
     companion object {
         fun fromEntity(event: Event): EventFormState {

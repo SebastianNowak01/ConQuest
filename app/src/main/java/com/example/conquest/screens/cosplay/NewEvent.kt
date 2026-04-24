@@ -70,7 +70,7 @@ fun NewEvent(navController: NavController) {
             snackbarHostState = snackbarHostState,
             isValid = form.isValid,
             onCancel = { navController.popBackStack() },
-            onCommit = { cosplayViewModel.insertEvent(form.toEntity()) },
+            onCommit = { cosplayViewModel.insertEvent(form.toEntity(), form.cosplayIds) },
             postCommit = { navController.popBackStack() },
         )
 

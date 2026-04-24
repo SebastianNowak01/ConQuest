@@ -15,6 +15,7 @@ import com.example.conquest.data.entity.CosplayElement
 import com.example.conquest.data.entity.CosplayPhoto
 import com.example.conquest.data.entity.CosplayTask
 import com.example.conquest.data.entity.Event
+import com.example.conquest.data.entity.EventCosplayCrossRef
 import com.example.conquest.data.entity.ProgressPhoto
 
 @Database(
@@ -24,9 +25,10 @@ import com.example.conquest.data.entity.ProgressPhoto
         CosplayElement::class,
         CosplayTask::class,
         Event::class,
+        EventCosplayCrossRef::class,
         ProgressPhoto::class,
     ],
-    version = 11,
+    version = 12,
 )
 @TypeConverters(DateConverter::class)
 abstract class CosplayDatabase : RoomDatabase() {
