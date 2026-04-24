@@ -52,15 +52,7 @@ interface CosplayDao {
                 END
             ),
             total_spend = (
-                SELECT COALESCE(
-                    SUM(
-                        CASE
-                            WHEN bought = 1 THEN COALESCE(cost, 0.0)
-                            ELSE 0.0
-                        END
-                    ),
-                    0.0
-                )
+                SELECT COALESCE(SUM(cost), 0.0)
                 FROM cosplay_elements
                 WHERE cosplay_id = uid
             ),
@@ -131,15 +123,7 @@ interface CosplayDao {
                 END
             ),
             total_spend = (
-                SELECT COALESCE(
-                    SUM(
-                        CASE
-                            WHEN bought = 1 THEN COALESCE(cost, 0.0)
-                            ELSE 0.0
-                        END
-                    ),
-                    0.0
-                )
+                SELECT COALESCE(SUM(cost), 0.0)
                 FROM cosplay_elements
                 WHERE cosplay_id = uid
             ),

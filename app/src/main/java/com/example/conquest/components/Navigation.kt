@@ -23,6 +23,8 @@ import com.example.conquest.screens.cosplay.NewEvent
 import com.example.conquest.screens.cosplay.NewTask
 import com.example.conquest.screens.cosplay.Progress
 import com.example.conquest.screens.cosplay.ProgressScreen
+import com.example.conquest.screens.cosplay.Stats
+import com.example.conquest.screens.cosplay.StatsScreen
 
 @Composable
 fun MainNavigation(
@@ -53,6 +55,12 @@ fun MainNavigation(
             val args = backStackEntry.toRoute<Progress>()
             ProgressScreen(
                 navController = navController,
+                cosplayId = args.cosplayId,
+            )
+        }
+        composable<Stats> { backStackEntry ->
+            val args = backStackEntry.toRoute<Stats>()
+            StatsScreen(
                 cosplayId = args.cosplayId,
             )
         }

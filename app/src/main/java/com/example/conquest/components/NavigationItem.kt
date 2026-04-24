@@ -9,6 +9,8 @@ import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.filled.Insights
+import androidx.compose.material.icons.outlined.Insights
 import androidx.compose.ui.graphics.vector.ImageVector
 
 data class NavigationItem(
@@ -40,4 +42,10 @@ val progressNavigationItem = NavigationItem(
     title = "Progress",
     selectedIcon = Icons.Filled.PhotoLibrary,
     unselectedIcon = Icons.Outlined.PhotoLibrary,
+)
+
+val statsNavigationItem = NavigationItem(
+    title = "Stats",
+    selectedIcon = Icons.Filled.Insights,
+    unselectedIcon = Icons.Outlined.Insights,
 )

@@ -29,6 +29,7 @@ import com.example.conquest.screens.MainScreen
 import com.example.conquest.screens.SettingsScreenParams
 import com.example.conquest.screens.cosplay.Events
 import com.example.conquest.screens.cosplay.Progress
+import com.example.conquest.screens.cosplay.Stats
 import com.example.conquest.ui.theme.UIConsts
 import kotlinx.coroutines.launch
 
@@ -62,12 +63,12 @@ fun Drawer(
     val isInCosplayTabs = currentRoute?.startsWith("com.example.conquest.screens.cosplay.MainCosplayScreen") == true
 
     val drawerItems = if (isInCosplayTabs && currentCosplayId != null) {
-        navigationItems + progressNavigationItem
+        navigationItems + progressNavigationItem + statsNavigationItem
     } else {
         navigationItems
     }
     val drawerRoutes = if (isInCosplayTabs && currentCosplayId != null) {
-        routes + Progress(currentCosplayId)
+        routes + Progress(currentCosplayId) + Stats(currentCosplayId)
     } else {
         routes
     }
