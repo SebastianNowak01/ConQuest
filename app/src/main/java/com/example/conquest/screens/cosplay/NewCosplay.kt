@@ -11,12 +11,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
-import com.example.conquest.deleteFileByPath
 import com.example.conquest.components.DatePickerFieldToModal
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyHeaderText
@@ -26,6 +26,7 @@ import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MySaveCancelRow
 import com.example.conquest.components.MySnackbarHost
 import com.example.conquest.components.MySwitchCard
+import com.example.conquest.components.deleteStoredImageByPath
 import com.example.conquest.components.saveImageUriToInternalStorage
 import com.example.conquest.data.classes.CosplayFormState
 import com.example.conquest.ui.theme.UIConsts
@@ -47,10 +48,13 @@ fun NewCosplay(
     var form by remember { mutableStateOf(CosplayFormState()) }
     var didCommit by remember { mutableStateOf(false) }
 
-    DisposableEffect(form.cosplayPhotoPath, didCommit) {
+    val latestPhotoPath by rememberUpdatedState(form.cosplayPhotoPath)
+    val latestDidCommit by rememberUpdatedState(didCommit)
+
+    DisposableEffect(Unit) {
         onDispose {
-            if (!didCommit) {
-                form.cosplayPhotoPath.takeIf { it.isNotBlank() }?.let(::deleteFileByPath)
+            if (!latestDidCommit) {
+                latestPhotoPath.takeIf { it.isNotBlank() }?.let { deleteStoredImageByPath(context, it) }
             }
         }
     }
@@ -67,7 +71,7 @@ fun NewCosplay(
                 val previousUnsavedPath = form.cosplayPhotoPath.takeIf {
                     it.isNotBlank() && it != savedPath
                 }
-                previousUnsavedPath?.let(::deleteFileByPath)
+                previousUnsavedPath?.let { deleteStoredImageByPath(context, it) }
                 form = form.copy(cosplayPhotoPath = savedPath)
             }.onFailure { error ->
                 scope.launch {

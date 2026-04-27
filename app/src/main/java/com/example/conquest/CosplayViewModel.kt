@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.conquest.components.deleteStoredImageByPath
 import com.example.conquest.data.classes.CosplaySortOrder
 import com.example.conquest.data.classes.CosplaySortOption
 import com.example.conquest.data.classes.CosplayStatusFilter
@@ -28,7 +29,6 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 class CosplayViewModel(application: Application) : AndroidViewModel(application) {
-    private val internalFilesRoot: String = application.filesDir.canonicalPath
     internal val dao = (application as ConQuestApplication).database.cosplayDao()
     internal val photoDao = (application as ConQuestApplication).database.cosplayPhotoDao()
     internal val elementDao = (application as ConQuestApplication).database.cosplayElementDao()
@@ -325,23 +325,7 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private fun deleteManagedImageFile(path: String?) {
-        val normalizedPath = path?.trim().orEmpty()
-        if (normalizedPath.isEmpty()) {
-            return
-        }
-
-        val filePath = runCatching { File(normalizedPath).canonicalPath }
-            .getOrElse {
-                Log.w("ConQuestFileCleanup", "Skipping non-canonical image path", it)
-                return
-            }
-
-        if (!filePath.startsWith(internalFilesRoot + File.separator)) {
-            Log.w("ConQuestFileCleanup", "Skipping non-internal image path: $filePath")
-            return
-        }
-
-        deleteFileByPath(filePath)
+        deleteStoredImageByPath(getApplication(), path.orEmpty())
     }
 }
 

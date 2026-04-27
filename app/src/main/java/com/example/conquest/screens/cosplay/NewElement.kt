@@ -11,12 +11,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
-import com.example.conquest.deleteFileByPath
+import com.example.conquest.components.deleteStoredImageByPath
 import com.example.conquest.components.saveImageUriToInternalStorage
 import com.example.conquest.components.MyImageBox
 import com.example.conquest.components.MyOuterBox
@@ -47,10 +48,13 @@ fun NewElement(
     var form by remember { mutableStateOf(ElementFormState()) }
     var didCommit by remember { mutableStateOf(false) }
 
-    DisposableEffect(form.photoPath, didCommit) {
+    val latestPhotoPath by rememberUpdatedState(form.photoPath)
+    val latestDidCommit by rememberUpdatedState(didCommit)
+
+    DisposableEffect(Unit) {
         onDispose {
-            if (!didCommit) {
-                form.photoPath.takeIf { it.isNotBlank() }?.let(::deleteFileByPath)
+            if (!latestDidCommit) {
+                latestPhotoPath.takeIf { it.isNotBlank() }?.let { deleteStoredImageByPath(context, it) }
             }
         }
     }
@@ -67,7 +71,7 @@ fun NewElement(
                 val previousUnsavedPath = form.photoPath.takeIf {
                     it.isNotBlank() && it != savedPath
                 }
-                previousUnsavedPath?.let(::deleteFileByPath)
+                previousUnsavedPath?.let { deleteStoredImageByPath(context, it) }
                 form = form.copy(photoPath = savedPath)
             }.onFailure { e ->
                 scope.launch {

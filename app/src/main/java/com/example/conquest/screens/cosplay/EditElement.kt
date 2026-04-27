@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,7 +22,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
-import com.example.conquest.deleteFileByPath
 import com.example.conquest.components.MyImageBox
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
@@ -30,6 +30,7 @@ import com.example.conquest.components.MyInputField
 import com.example.conquest.components.MySaveCancelRow
 import com.example.conquest.components.MySnackbarHost
 import com.example.conquest.components.MySwitchCard
+import com.example.conquest.components.deleteStoredImageByPath
 import com.example.conquest.components.saveImageUriToInternalStorage
 import com.example.conquest.data.classes.ElementFormState
 import com.example.conquest.ui.theme.UIConsts
@@ -52,13 +53,17 @@ fun EditElement(
     var originalPhotoPath by remember { mutableStateOf<String?>(null) }
     var didCommit by remember { mutableStateOf(false) }
 
-    DisposableEffect(form.photoPath, originalPhotoPath, didCommit) {
+    val latestPhotoPath by rememberUpdatedState(form.photoPath)
+    val latestOriginalPhotoPath by rememberUpdatedState(originalPhotoPath)
+    val latestDidCommit by rememberUpdatedState(didCommit)
+
+    DisposableEffect(Unit) {
         onDispose {
-            if (!didCommit) {
-                val pendingPath = form.photoPath.takeIf {
-                    it.isNotBlank() && it != originalPhotoPath
+            if (!latestDidCommit) {
+                val pendingPath = latestPhotoPath.takeIf {
+                    it.isNotBlank() && it != latestOriginalPhotoPath
                 }
-                pendingPath?.let(::deleteFileByPath)
+                pendingPath?.let { deleteStoredImageByPath(context, it) }
             }
         }
     }
@@ -75,7 +80,7 @@ fun EditElement(
                 val previousUnsavedPath = form.photoPath.takeIf {
                     it.isNotBlank() && it != originalPhotoPath && it != savedPath
                 }
-                previousUnsavedPath?.let(::deleteFileByPath)
+                previousUnsavedPath?.let { deleteStoredImageByPath(context, it) }
                 form = form.copy(photoPath = savedPath)
             }.onFailure { e ->
                 scope.launch {

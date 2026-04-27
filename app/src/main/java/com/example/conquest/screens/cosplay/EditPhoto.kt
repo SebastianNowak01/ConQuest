@@ -19,6 +19,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,13 +27,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
-import com.example.conquest.deleteFileByPath
 import com.example.conquest.components.MyImageBox
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyFab
 import com.example.conquest.components.MyHeaderText
 import com.example.conquest.components.MyInputField
+import com.example.conquest.components.deleteStoredImageByPath
 import com.example.conquest.components.saveImageUriToInternalStorage
 import kotlinx.serialization.Serializable
 import com.example.conquest.ui.theme.UIConsts
@@ -53,10 +54,16 @@ fun EditPhoto(
     var originalPhotoPath by remember { mutableStateOf("") }
     var didCommit by remember { mutableStateOf(false) }
 
-    DisposableEffect(photoPath, originalPhotoPath, didCommit) {
+    val latestPhotoPath by rememberUpdatedState(photoPath)
+    val latestOriginalPhotoPath by rememberUpdatedState(originalPhotoPath)
+    val latestDidCommit by rememberUpdatedState(didCommit)
+
+    DisposableEffect(Unit) {
         onDispose {
-            if (!didCommit) {
-                photoPath.takeIf { it.isNotBlank() && it != originalPhotoPath }?.let(::deleteFileByPath)
+            if (!latestDidCommit) {
+                latestPhotoPath.takeIf {
+                    it.isNotBlank() && it != latestOriginalPhotoPath
+                }?.let { deleteStoredImageByPath(context, it) }
             }
         }
     }
@@ -73,7 +80,7 @@ fun EditPhoto(
                 val previousUnsavedPath = photoPath.takeIf {
                     it.isNotBlank() && it != originalPhotoPath && it != savedPath
                 }
-                previousUnsavedPath?.let(::deleteFileByPath)
+                previousUnsavedPath?.let { deleteStoredImageByPath(context, it) }
                 photoPath = savedPath
             }.onFailure { e ->
                 error = "Failed to save image: ${e.localizedMessage}"

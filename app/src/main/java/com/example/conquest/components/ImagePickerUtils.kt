@@ -13,6 +13,8 @@ import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 
+const val IMAGE_STORAGE_DIR = "images"
+
 /**
  * Returns the file extension inferred from the [Uri] MIME type, or null if unknown.
  */
@@ -23,16 +25,45 @@ fun getFileExtension(context: Context, uri: Uri): String? {
     return mimeTypeMap.getExtensionFromMimeType(mimeType)
 }
 
+fun buildManagedImageRelativePath(
+    fileNamePrefix: String,
+    extension: String,
+    timestamp: Long = System.currentTimeMillis(),
+): String {
+    return "$IMAGE_STORAGE_DIR/${fileNamePrefix}_${timestamp}.$extension"
+}
+
+private fun getManagedImageFile(context: Context, storedPath: String): File {
+    return File(context.filesDir, storedPath)
+}
+
+fun resolveStoredImagePath(context: Context, storedPath: String): String {
+    val normalizedPath = storedPath.trim()
+    if (normalizedPath.isEmpty()) {
+        return ""
+    }
+    return getManagedImageFile(context, normalizedPath).absolutePath
+}
+
+fun deleteStoredImageByPath(context: Context, storedPath: String): Boolean {
+    val normalizedPath = storedPath.trim()
+    if (normalizedPath.isEmpty()) {
+        return true
+    }
+    return getManagedImageFile(context, normalizedPath).delete()
+}
+
 /**
- * Copies the content addressed by [uri] into app internal storage ([Context.filesDir]) as [fileName].
+ * Copies the content addressed by [uri] into app internal storage ([Context.filesDir]) as [storedPath].
  *
- * @return absolute path of the saved file.
+ * @return relative stored path of the saved file.
  */
-fun copyUriToInternalStorage(context: Context, uri: Uri, fileName: String): String {
+fun copyUriToInternalStorage(context: Context, uri: Uri, storedPath: String): String {
     val inputStream: InputStream = context.contentResolver.openInputStream(uri)
         ?: throw IllegalArgumentException("Unable to open input stream for uri=$uri")
 
-    val file = File(context.filesDir, fileName)
+    val file = getManagedImageFile(context, storedPath)
+    file.parentFile?.mkdirs()
     val outputStream: OutputStream = file.outputStream()
 
     inputStream.use { input ->
@@ -41,7 +72,7 @@ fun copyUriToInternalStorage(context: Context, uri: Uri, fileName: String): Stri
         }
     }
 
-    return file.absolutePath
+    return storedPath
 }
 
 /**
@@ -58,8 +89,8 @@ fun saveImageUriToInternalStorage(
 ): Result<String> {
     return runCatching {
         val extension = getFileExtension(context, uri) ?: fallbackExtension
-        val fileName = "${fileNamePrefix}_${System.currentTimeMillis()}.$extension"
-        copyUriToInternalStorage(context, uri, fileName)
+        val storedPath = buildManagedImageRelativePath(fileNamePrefix = fileNamePrefix, extension = extension)
+        copyUriToInternalStorage(context, uri, storedPath)
     }
 }
 fun saveBitmapToInternalStorage(
@@ -68,15 +99,16 @@ fun saveBitmapToInternalStorage(
     fileNamePrefix: String,
 ): Result<String> {
     return runCatching {
-        val fileName = "${fileNamePrefix}_${System.currentTimeMillis()}.jpg"
-        val file = File(context.filesDir, fileName)
+        val storedPath = buildManagedImageRelativePath(fileNamePrefix = fileNamePrefix, extension = "jpg")
+        val file = getManagedImageFile(context, storedPath)
+        file.parentFile?.mkdirs()
         file.outputStream().use { output ->
             val compressed = bitmap.compress(Bitmap.CompressFormat.JPEG, 95, output)
             if (!compressed) {
                 error("Failed to compress bitmap")
             }
         }
-        file.absolutePath
+        storedPath
     }
 }
 

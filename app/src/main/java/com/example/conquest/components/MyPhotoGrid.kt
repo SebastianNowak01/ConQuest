@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
 import com.example.conquest.ui.theme.UIConsts
 
@@ -43,6 +44,8 @@ fun MyPhotoGrid(
     onItemClick: (MyPhotoGridItem) -> Unit,
     onItemLongClick: (MyPhotoGridItem) -> Unit,
 ) {
+    val context = LocalContext.current
+
     if (photos.isEmpty()) {
         Box(
             modifier = emptyModifier,
@@ -84,8 +87,9 @@ fun MyPhotoGrid(
                 elevation = CardDefaults.cardElevation(defaultElevation = UIConsts.elevationS),
                 shape = RoundedCornerShape(UIConsts.cornerRadiusM),
             ) {
+                val resolvedPhotoPath = resolveStoredImagePath(context, photo.path)
                 AsyncImage(
-                    model = photo.path,
+                    model = resolvedPhotoPath,
                     contentDescription = contentDescription,
                     modifier = Modifier.fillMaxSize(),
                 )

@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
@@ -35,8 +36,10 @@ fun MyImageBox(
     emptyContentDescription: String = "Pick image",
     previewWhenPhotoExists: Boolean = false,
 ) {
+    val context = LocalContext.current
     var showPreview by remember(photoPath) { mutableStateOf(false) }
     val hasPhoto = photoPath.isNotEmpty()
+    val resolvedPhotoPath = resolveStoredImagePath(context, photoPath)
 
     val clickModifier = if (!clickable) {
         Modifier
@@ -63,7 +66,7 @@ fun MyImageBox(
             return
         }
         AsyncImage(
-            model = photoPath,
+            model = resolvedPhotoPath,
             contentDescription = contentDescription,
             contentScale = ContentScale.Crop,
             modifier = Modifier

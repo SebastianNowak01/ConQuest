@@ -13,12 +13,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
-import com.example.conquest.deleteFileByPath
 import com.example.conquest.components.DatePickerFieldToModal
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyHeaderText
@@ -28,6 +28,7 @@ import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MySaveCancelRow
 import com.example.conquest.components.MySnackbarHost
 import com.example.conquest.components.MySwitchCard
+import com.example.conquest.components.deleteStoredImageByPath
 import com.example.conquest.components.saveImageUriToInternalStorage
 import com.example.conquest.data.classes.CosplayFormState
 import com.example.conquest.ui.theme.UIConsts
@@ -52,6 +53,10 @@ fun EditCosplay(
     var originalPhotoPath by remember { mutableStateOf<String?>(null) }
     var didCommit by remember { mutableStateOf(false) }
 
+    val latestPhotoPath by rememberUpdatedState(form.cosplayPhotoPath)
+    val latestOriginalPhotoPath by rememberUpdatedState(originalPhotoPath)
+    val latestDidCommit by rememberUpdatedState(didCommit)
+
     LaunchedEffect(cosplay?.uid) {
         cosplay?.let { loaded ->
             form = CosplayFormState.fromEntity(loaded)
@@ -59,13 +64,13 @@ fun EditCosplay(
         }
     }
 
-    DisposableEffect(form.cosplayPhotoPath, originalPhotoPath, didCommit) {
+    DisposableEffect(Unit) {
         onDispose {
-            if (!didCommit) {
-                val pendingPath = form.cosplayPhotoPath.takeIf {
-                    it.isNotBlank() && it != originalPhotoPath
+            if (!latestDidCommit) {
+                val pendingPath = latestPhotoPath.takeIf {
+                    it.isNotBlank() && it != latestOriginalPhotoPath
                 }
-                pendingPath?.let(::deleteFileByPath)
+                pendingPath?.let { deleteStoredImageByPath(context, it) }
             }
         }
     }
@@ -82,7 +87,7 @@ fun EditCosplay(
                 val previousUnsavedPath = form.cosplayPhotoPath.takeIf {
                     it.isNotBlank() && it != originalPhotoPath && it != savedPath
                 }
-                previousUnsavedPath?.let(::deleteFileByPath)
+                previousUnsavedPath?.let { deleteStoredImageByPath(context, it) }
                 form = form.copy(cosplayPhotoPath = savedPath)
             }.onFailure { error ->
                 scope.launch {
@@ -166,4 +171,3 @@ fun EditCosplay(
         MySnackbarHost(hostState = snackbarHostState)
     }
 }
-

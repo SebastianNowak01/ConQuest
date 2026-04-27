@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
@@ -21,6 +22,9 @@ fun MyPhotoPreview(
     contentDescription: String?,
     onDismiss: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val resolvedPhotoPath = resolveStoredImagePath(context, photoPath)
+
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(
@@ -34,7 +38,7 @@ fun MyPhotoPreview(
                 .clickable(onClick = onDismiss),
         ) {
             AsyncImage(
-                model = photoPath,
+                model = resolvedPhotoPath,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -51,7 +55,7 @@ fun MyPhotoPreview(
             )
 
             AsyncImage(
-                model = photoPath,
+                model = resolvedPhotoPath,
                 contentDescription = contentDescription,
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
