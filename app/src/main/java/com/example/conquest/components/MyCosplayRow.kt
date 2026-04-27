@@ -37,7 +37,7 @@ fun MyCosplayRow(
             Text(
                 text = series,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.secondary,
+                color = MaterialTheme.colorScheme.primary,
             )
         }
     }

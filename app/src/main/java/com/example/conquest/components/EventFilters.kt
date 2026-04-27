@@ -62,12 +62,12 @@ fun EventListItem(event: Event) {
     Text(
         text = event.eventLocation,
         style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.secondary,
+        color = MaterialTheme.colorScheme.primary,
     )
     Text(
         text = "${event.eventType.displayName} - ${convertDateToString(event.eventDate)}",
         style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.secondary,
+        color = MaterialTheme.colorScheme.primary,
     )
     if (!event.description.isNullOrBlank()) {
         Text(

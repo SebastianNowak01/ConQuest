@@ -110,7 +110,7 @@ fun StatCard(
                 Text(
                     text = value,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.secondary
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
