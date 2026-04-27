@@ -103,10 +103,6 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
                 photos = gridPhotos,
                 selectedIds = selectedIds,
                 columns = GridCells.Adaptive(minSize = UIConsts.photoThumbSize),
-                emptyText = "No images added yet.",
-                emptyModifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxSize(),
                 contentDescription = "Cosplay photo",
                 onItemClick = { photo ->
                     if (!selectionMode) {

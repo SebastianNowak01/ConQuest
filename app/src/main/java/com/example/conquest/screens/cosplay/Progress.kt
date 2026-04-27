@@ -129,53 +129,40 @@ fun ProgressScreen(
                 )
             }
 
-            if (photos.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text("No progress photos yet")
-                }
-            } else {
-                MyPhotoGrid(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxSize(),
-                    photos = gridPhotos,
-                    selectedIds = selectedIds,
-                    columns = GridCells.Adaptive(minSize = UIConsts.photoThumbSize),
-                    contentPadding = PaddingValues(),
-                    emptyText = "No progress photos yet",
-                    contentDescription = "Progress photo",
-                    onItemClick = { photo ->
-                        if (!selectionMode) {
-                            navController.navigate(EditProgressPhoto(photo.id, cosplayId))
-                            return@MyPhotoGrid
-                        }
-                        val id = photo.id
-                        selectedIds = if (selectedIds.contains(id)) {
-                            selectedIds - id
-                        } else {
-                            selectedIds + id
-                        }
-                        if (selectedIds.isEmpty()) {
-                            selectionMode = false
-                        }
-                    },
-                    onItemLongClick = { photo ->
-                        selectionMode = true
-                        selectedIds = selectedIds + photo.id
-                    },
-                )
-            }
+            MyPhotoGrid(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxSize(),
+                photos = gridPhotos,
+                selectedIds = selectedIds,
+                columns = GridCells.Adaptive(minSize = UIConsts.photoThumbSize),
+                contentPadding = PaddingValues(),
+                contentDescription = "Progress photo",
+                onItemClick = { photo ->
+                    if (!selectionMode) {
+                        navController.navigate(EditProgressPhoto(photo.id, cosplayId))
+                        return@MyPhotoGrid
+                    }
+                    val id = photo.id
+                    selectedIds = if (selectedIds.contains(id)) {
+                        selectedIds - id
+                    } else {
+                        selectedIds + id
+                    }
+                    if (selectedIds.isEmpty()) {
+                        selectionMode = false
+                    }
+                },
+                onItemLongClick = { photo ->
+                    selectionMode = true
+                    selectedIds = selectedIds + photo.id
+                },
+            )
         }
 
         if (!selectionMode) {
             Row(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter),
+                modifier = Modifier.align(Alignment.BottomCenter),
                 horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingL),
             ) {
                 MyFab(

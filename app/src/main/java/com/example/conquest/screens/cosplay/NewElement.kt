@@ -88,7 +88,7 @@ fun NewElement(
             MyImageBox(
                 photoPath = form.photoPath,
                 contentDescription = "Selected image",
-                size = UIConsts.imageSizeS,
+                size = UIConsts.imageSizeM,
                 clickable = true,
                 onClick = { launcher.launch("image/*") },
             )

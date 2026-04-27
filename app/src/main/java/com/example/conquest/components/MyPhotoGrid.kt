@@ -36,25 +36,11 @@ fun MyPhotoGrid(
     selectedIds: Set<Int>,
     columns: GridCells,
     contentPadding: PaddingValues = PaddingValues(),
-    emptyText: String,
-    emptyModifier: Modifier = Modifier
-        .fillMaxWidth()
-        .height(UIConsts.placeholderHeightL),
     contentDescription: String,
     onItemClick: (MyPhotoGridItem) -> Unit,
     onItemLongClick: (MyPhotoGridItem) -> Unit,
 ) {
     val context = LocalContext.current
-
-    if (photos.isEmpty()) {
-        Box(
-            modifier = emptyModifier,
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(emptyText)
-        }
-        return
-    }
 
     LazyVerticalGrid(
         columns = columns,

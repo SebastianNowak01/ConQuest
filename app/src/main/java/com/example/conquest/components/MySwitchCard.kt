@@ -28,7 +28,7 @@ fun MySwitchCard(
         modifier = modifier
             .fillMaxWidth(),
         shape = RoundedCornerShape(UIConsts.cornerRadiusL),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         Row(
             modifier = Modifier
