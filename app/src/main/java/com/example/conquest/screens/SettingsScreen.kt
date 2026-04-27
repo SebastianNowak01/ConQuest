@@ -8,30 +8,38 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.window.PopupProperties
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.stringPreferencesKey
+import com.example.conquest.components.MyOuterBox
+import com.example.conquest.ui.theme.UIConsts
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.Serializable
-import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.launch
-import androidx.compose.runtime.getValue
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.window.PopupProperties
-import androidx.compose.material3.MenuAnchorType
-import com.example.conquest.ui.theme.UIConsts
+import kotlinx.serialization.Serializable
 
 @Serializable
 object SettingsScreenParams
@@ -46,51 +54,52 @@ fun SettingsScreen() {
     val options = listOf("dark", "light", "automatic")
     var expanded by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = UIConsts.paddingL)
-            .background(MaterialTheme.colorScheme.background),
-
-        verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        ExposedDropdownMenuBox(
-            expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-            OutlinedTextField(
-                value = selectedOption.replaceFirstChar { it.uppercase() },
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Theme") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier
-                    .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true)
-                    .fillMaxWidth(0.9f),
-                shape = RoundedCornerShape(UIConsts.cornerRadiusL),
-                textStyle = MaterialTheme.typography.bodyLarge
-            )
-            DropdownMenu(
+    MyOuterBox {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = UIConsts.paddingL),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            ExposedDropdownMenuBox(
                 expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .background(
-                        color = MaterialTheme.colorScheme.tertiary,
-                    ),
-                properties = PopupProperties(clippingEnabled = true)
+                onExpandedChange = { expanded = !expanded },
             ) {
-                options.forEach { selectionOption ->
-                    DropdownMenuItem(
-                        text = { Text(selectionOption.replaceFirstChar { it.uppercase() }) },
-                        onClick = {
-                            coroutineScope.launch {
-                                setDarkModeOption(context, selectionOption)
-                            }
-                            expanded = false
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = UIConsts.paddingS)
-                    )
+                OutlinedTextField(
+                    value = selectedOption.replaceFirstChar { it.uppercase() },
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Theme") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    modifier = Modifier
+                        .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true)
+                        .fillMaxWidth(0.9f),
+                    shape = RoundedCornerShape(UIConsts.cornerRadiusL),
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                )
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .background(color = MaterialTheme.colorScheme.tertiary),
+                    properties = PopupProperties(clippingEnabled = true),
+                ) {
+                    options.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            text = { Text(selectionOption.replaceFirstChar { it.uppercase() }) },
+                            onClick = {
+                                coroutineScope.launch {
+                                    setDarkModeOption(context, selectionOption)
+                                }
+                                expanded = false
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = UIConsts.paddingS),
+                        )
+                    }
                 }
             }
         }

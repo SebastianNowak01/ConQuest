@@ -24,6 +24,8 @@ object UIConsts {
     val previewBlurRadius = 24.dp
     val previewImagePadding = 24.dp
     val previewScrimAlpha = 0.35f
+    const val decorativeBackgroundAlphaLight = 0.2f
+    const val decorativeBackgroundAlphaDark = 0.2f
 
     val placeholderHeightL = 200.dp
 
