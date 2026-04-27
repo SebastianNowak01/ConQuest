@@ -145,9 +145,10 @@ fun topAppBarColorsObject(): TopAppBarColors {
 @Composable
 fun topAppBarTextFieldColorsObject(): TextFieldColors {
     return TextFieldDefaults.colors(
-        focusedContainerColor = MaterialTheme.colorScheme.tertiary,
-        unfocusedContainerColor = MaterialTheme.colorScheme.tertiary,
-        disabledContainerColor = MaterialTheme.colorScheme.tertiary,
+        focusedContainerColor = MaterialTheme.colorScheme.background,
+        unfocusedContainerColor = MaterialTheme.colorScheme.background,
+        disabledContainerColor = MaterialTheme.colorScheme.background,
+        errorContainerColor = MaterialTheme.colorScheme.background,
         focusedIndicatorColor = Color.Transparent,
         unfocusedIndicatorColor = Color.Transparent,
         disabledIndicatorColor = Color.Transparent,

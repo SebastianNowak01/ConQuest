@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.getValue
@@ -15,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.deleteFileByPath
 import com.example.conquest.components.DatePickerFieldToModal
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyHeaderText
@@ -43,6 +45,15 @@ fun NewCosplay(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var form by remember { mutableStateOf(CosplayFormState()) }
+    var didCommit by remember { mutableStateOf(false) }
+
+    DisposableEffect(form.cosplayPhotoPath, didCommit) {
+        onDispose {
+            if (!didCommit) {
+                form.cosplayPhotoPath.takeIf { it.isNotBlank() }?.let(::deleteFileByPath)
+            }
+        }
+    }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -53,6 +64,10 @@ fun NewCosplay(
                 uri = it,
                 fileNamePrefix = "cosplay_cover",
             ).onSuccess { savedPath ->
+                val previousUnsavedPath = form.cosplayPhotoPath.takeIf {
+                    it.isNotBlank() && it != savedPath
+                }
+                previousUnsavedPath?.let(::deleteFileByPath)
                 form = form.copy(cosplayPhotoPath = savedPath)
             }.onFailure { error ->
                 scope.launch {
@@ -67,6 +82,15 @@ fun NewCosplay(
     MyOuterBox {
         MyColumn {
             MyHeaderText(text = "New Project")
+
+            MyImageBox(
+                photoPath = form.cosplayPhotoPath,
+                contentDescription = "Selected cosplay photo",
+                size = UIConsts.imageSizeM,
+                clickable = true,
+                onClick = { launcher.launch("image/*") },
+                emptyContentDescription = "Pick cosplay photo",
+            )
 
             MySwitchCard(
                 label = if (form.inProgress) "In Progress" else "Planned",
@@ -85,15 +109,6 @@ fun NewCosplay(
                 onValueChange = { form = form.copy(series = it) },
                 label = "Series*",
                 singleLine = true,
-            )
-
-            MyImageBox(
-                photoPath = form.cosplayPhotoPath,
-                contentDescription = "Selected cosplay photo",
-                size = UIConsts.imageSizeM,
-                clickable = true,
-                onClick = { launcher.launch("image/*") },
-                emptyContentDescription = "Pick cosplay photo",
             )
 
             DatePickerFieldToModal(
@@ -120,7 +135,10 @@ fun NewCosplay(
             snackbarHostState = snackbarHostState,
             isValid = form.isValid,
             onCancel = { navController.popBackStack() },
-            onCommit = { cosplayViewModel.insertCosplay(form.toEntity(uid = 0, finished = false)) },
+            onCommit = {
+                didCommit = true
+                cosplayViewModel.insertCosplay(form.toEntity(uid = 0, finished = false))
+            },
             postCommit = { navController.popBackStack() },
         )
 

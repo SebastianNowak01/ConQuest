@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -55,6 +57,12 @@ fun MyInputField(
         singleLine = singleLine,
         maxLines = maxLines,
         keyboardOptions = KeyboardOptions(keyboardType = resolvedKeyboardType),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.background,
+            unfocusedContainerColor = MaterialTheme.colorScheme.background,
+            disabledContainerColor = MaterialTheme.colorScheme.background,
+            errorContainerColor = MaterialTheme.colorScheme.background,
+        ),
     )
 }
 

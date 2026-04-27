@@ -21,6 +21,9 @@ interface CosplayDao {
     @Query("SELECT * FROM cosplays WHERE uid = :cosplayId LIMIT 1")
     fun getCosplayById(cosplayId: Int): Flow<Cosplay?>
 
+    @Query("SELECT cosplay_photo_path FROM cosplays WHERE uid IN (:ids) AND cosplay_photo_path IS NOT NULL")
+    suspend fun getCosplayPhotoPathsByIdsOnce(ids: Set<Int>): List<String>
+
     @Query(
         """
         UPDATE cosplays

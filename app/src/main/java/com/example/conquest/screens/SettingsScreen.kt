@@ -16,6 +16,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -77,6 +78,12 @@ fun SettingsScreen() {
                         .fillMaxWidth(0.9f),
                     shape = RoundedCornerShape(UIConsts.cornerRadiusL),
                     textStyle = MaterialTheme.typography.bodyLarge,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.background,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                        disabledContainerColor = MaterialTheme.colorScheme.background,
+                        errorContainerColor = MaterialTheme.colorScheme.background,
+                    ),
                 )
                 DropdownMenu(
                     expanded = expanded,

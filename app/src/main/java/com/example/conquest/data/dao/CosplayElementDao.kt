@@ -27,6 +27,9 @@ interface CosplayElementDao {
     @Query("SELECT DISTINCT cosplay_id FROM cosplay_elements WHERE id IN (:ids)")
     suspend fun getCosplayIdsForElementIdsOnce(ids: Set<Int>): List<Int>
 
+    @Query("SELECT photo_path FROM cosplay_elements WHERE id IN (:ids) AND photo_path IS NOT NULL")
+    suspend fun getPhotoPathsForElementIdsOnce(ids: Set<Int>): List<String>
+
     @Update
     suspend fun updateElement(cosplayElement: CosplayElement)
 }

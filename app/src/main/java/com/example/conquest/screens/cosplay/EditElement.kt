@@ -3,15 +3,25 @@ package com.example.conquest.screens.cosplay
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.deleteFileByPath
 import com.example.conquest.components.MyImageBox
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
@@ -39,6 +49,19 @@ fun EditElement(
     var form by remember { mutableStateOf(ElementFormState()) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    var originalPhotoPath by remember { mutableStateOf<String?>(null) }
+    var didCommit by remember { mutableStateOf(false) }
+
+    DisposableEffect(form.photoPath, originalPhotoPath, didCommit) {
+        onDispose {
+            if (!didCommit) {
+                val pendingPath = form.photoPath.takeIf {
+                    it.isNotBlank() && it != originalPhotoPath
+                }
+                pendingPath?.let(::deleteFileByPath)
+            }
+        }
+    }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = GetContent()
@@ -49,6 +72,10 @@ fun EditElement(
                 uri = uri,
                 fileNamePrefix = "cosplay_element",
             ).onSuccess { savedPath ->
+                val previousUnsavedPath = form.photoPath.takeIf {
+                    it.isNotBlank() && it != originalPhotoPath && it != savedPath
+                }
+                previousUnsavedPath?.let(::deleteFileByPath)
                 form = form.copy(photoPath = savedPath)
             }.onFailure { e ->
                 scope.launch {
@@ -61,6 +88,7 @@ fun EditElement(
     LaunchedEffect(element?.id) {
         element?.let { loaded ->
             form = ElementFormState.fromEntity(loaded)
+            originalPhotoPath = loaded.photoPath
         }
     }
 
@@ -126,7 +154,11 @@ fun EditElement(
             onCancel = { navController.popBackStack() },
             onCommit = {
                 val current = element ?: return@MySaveCancelRow
-                cosplayViewModel.updateElement(form.toUpdatedEntity(current))
+                val updated = form.toUpdatedEntity(current)
+                val oldPath = current.photoPath
+                val oldPathToDelete = if (updated.photoPath != oldPath) oldPath else null
+                didCommit = true
+                cosplayViewModel.updateElement(updated, oldPathToDelete = oldPathToDelete)
             },
             postCommit = { navController.popBackStack() },
         )

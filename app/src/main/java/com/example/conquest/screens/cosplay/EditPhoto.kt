@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.deleteFileByPath
 import com.example.conquest.components.MyImageBox
 import com.example.conquest.components.MyOuterBox
 import com.example.conquest.components.MyColumn
@@ -48,6 +50,16 @@ fun EditPhoto(
     var photoPath by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
     var error by remember { mutableStateOf("") }
+    var originalPhotoPath by remember { mutableStateOf("") }
+    var didCommit by remember { mutableStateOf(false) }
+
+    DisposableEffect(photoPath, originalPhotoPath, didCommit) {
+        onDispose {
+            if (!didCommit) {
+                photoPath.takeIf { it.isNotBlank() && it != originalPhotoPath }?.let(::deleteFileByPath)
+            }
+        }
+    }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -58,6 +70,10 @@ fun EditPhoto(
                 uri = uri,
                 fileNamePrefix = "cosplay_photo",
             ).onSuccess { savedPath ->
+                val previousUnsavedPath = photoPath.takeIf {
+                    it.isNotBlank() && it != originalPhotoPath && it != savedPath
+                }
+                previousUnsavedPath?.let(::deleteFileByPath)
                 photoPath = savedPath
             }.onFailure { e ->
                 error = "Failed to save image: ${e.localizedMessage}"
@@ -68,6 +84,7 @@ fun EditPhoto(
     LaunchedEffect(photo) {
         photo?.let {
             photoPath = it.path
+            originalPhotoPath = it.path
             notes = it.notes ?: ""
         }
     }
@@ -122,6 +139,7 @@ fun EditPhoto(
                         val newPath = photoPath.ifEmpty { oldPath }
                         val updated = current.copy(path = newPath, notes = notes.ifBlank { null })
                         val deleteOld = if (newPath != oldPath) oldPath else null
+                        didCommit = true
                         cosplayViewModel.updatePhoto(updated, oldPathToDelete = deleteOld)
                     }
                     navController.popBackStack()

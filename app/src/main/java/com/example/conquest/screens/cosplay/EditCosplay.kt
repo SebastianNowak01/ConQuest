@@ -6,6 +6,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -17,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.deleteFileByPath
 import com.example.conquest.components.DatePickerFieldToModal
 import com.example.conquest.components.MyColumn
 import com.example.conquest.components.MyHeaderText
@@ -47,10 +49,24 @@ fun EditCosplay(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var form by remember { mutableStateOf(CosplayFormState()) }
+    var originalPhotoPath by remember { mutableStateOf<String?>(null) }
+    var didCommit by remember { mutableStateOf(false) }
 
     LaunchedEffect(cosplay?.uid) {
         cosplay?.let { loaded ->
             form = CosplayFormState.fromEntity(loaded)
+            originalPhotoPath = loaded.cosplayPhotoPath
+        }
+    }
+
+    DisposableEffect(form.cosplayPhotoPath, originalPhotoPath, didCommit) {
+        onDispose {
+            if (!didCommit) {
+                val pendingPath = form.cosplayPhotoPath.takeIf {
+                    it.isNotBlank() && it != originalPhotoPath
+                }
+                pendingPath?.let(::deleteFileByPath)
+            }
         }
     }
 
@@ -63,6 +79,10 @@ fun EditCosplay(
                 uri = it,
                 fileNamePrefix = "cosplay_cover",
             ).onSuccess { savedPath ->
+                val previousUnsavedPath = form.cosplayPhotoPath.takeIf {
+                    it.isNotBlank() && it != originalPhotoPath && it != savedPath
+                }
+                previousUnsavedPath?.let(::deleteFileByPath)
                 form = form.copy(cosplayPhotoPath = savedPath)
             }.onFailure { error ->
                 scope.launch {
@@ -77,6 +97,15 @@ fun EditCosplay(
     MyOuterBox {
         MyColumn {
             MyHeaderText(text = "Edit Cosplay")
+
+            MyImageBox(
+                photoPath = form.cosplayPhotoPath,
+                contentDescription = "Selected cosplay photo",
+                size = UIConsts.imageSizeM,
+                clickable = true,
+                onClick = { launcher.launch("image/*") },
+                emptyContentDescription = "Pick cosplay photo",
+            )
 
             MySwitchCard(
                 label = if (form.inProgress) "In Progress" else "Planned",
@@ -96,15 +125,6 @@ fun EditCosplay(
                 onValueChange = { form = form.copy(series = it) },
                 label = "Series*",
                 singleLine = true,
-            )
-
-            MyImageBox(
-                photoPath = form.cosplayPhotoPath,
-                contentDescription = "Selected cosplay photo",
-                size = UIConsts.imageSizeM,
-                clickable = true,
-                onClick = { launcher.launch("image/*") },
-                emptyContentDescription = "Pick cosplay photo",
             )
 
             DatePickerFieldToModal(
@@ -134,7 +154,11 @@ fun EditCosplay(
             onCancel = { navController.popBackStack() },
             onCommit = {
                 val current = cosplay ?: return@MySaveCancelRow
-                cosplayViewModel.updateCosplay(form.toUpdatedEntity(current))
+                val updated = form.toUpdatedEntity(current)
+                val oldPath = current.cosplayPhotoPath
+                val oldPathToDelete = if (updated.cosplayPhotoPath != oldPath) oldPath else null
+                didCommit = true
+                cosplayViewModel.updateCosplay(updated, oldPathToDelete = oldPathToDelete)
             },
             postCommit = { navController.popBackStack() },
         )

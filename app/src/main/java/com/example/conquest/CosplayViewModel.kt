@@ -1,6 +1,7 @@
 package com.example.conquest
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.conquest.data.classes.CosplaySortOrder
@@ -24,8 +25,10 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.io.File
 
 class CosplayViewModel(application: Application) : AndroidViewModel(application) {
+    private val internalFilesRoot: String = application.filesDir.canonicalPath
     internal val dao = (application as ConQuestApplication).database.cosplayDao()
     internal val photoDao = (application as ConQuestApplication).database.cosplayPhotoDao()
     internal val elementDao = (application as ConQuestApplication).database.cosplayElementDao()
@@ -116,22 +119,25 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
         return dao.getCosplayById(cosplayId)
     }
 
-    fun updateCosplay(cosplay: Cosplay) {
+    fun updateCosplay(cosplay: Cosplay, oldPathToDelete: String? = null) {
         viewModelScope.launch {
             dao.updateCosplay(cosplay)
             refreshCosplayStats(cosplay.uid)
+            deleteManagedImageFile(oldPathToDelete)
         }
     }
 
     fun deleteCosplaysByIds(cosplayIds: Set<Int>) {
         viewModelScope.launch {
+            val cosplayCovers = dao.getCosplayPhotoPathsByIdsOnce(cosplayIds)
             val photos = photoDao.getPhotosForCosplayOnce(cosplayIds)
             photoDao.deletePhotos(photos)
-            photos.forEach { deleteFileByPath(it.path) }
+            photos.forEach { deleteManagedImageFile(it.path) }
             val progressPhotos = progressPhotoDao.getPhotosForCosplayOnce(cosplayIds)
             progressPhotoDao.deletePhotos(progressPhotos)
-            progressPhotos.forEach { deleteFileByPath(it.path) }
+            progressPhotos.forEach { deleteManagedImageFile(it.path) }
             dao.deleteCosplaysByIds(cosplayIds)
+            cosplayCovers.forEach { deleteManagedImageFile(it) }
         }
     }
 
@@ -156,7 +162,7 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch {
             val toDelete = photoDao.getPhotosByIdsOnce(ids)
             photoDao.deletePhotosByIds(ids)
-            toDelete.forEach { deleteFileByPath(it.path) }
+            toDelete.forEach { deleteManagedImageFile(it.path) }
         }
     }
 
@@ -166,7 +172,7 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     fun updatePhoto(updated: CosplayPhoto, oldPathToDelete: String? = null) {
         viewModelScope.launch {
             photoDao.updatePhoto(updated)
-            oldPathToDelete?.let { deleteFileByPath(it) }
+            deleteManagedImageFile(oldPathToDelete)
         }
     }
 
@@ -191,7 +197,9 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     fun deleteElementsByIds(ids: Set<Int>) {
         viewModelScope.launch {
             val cosplayIds = elementDao.getCosplayIdsForElementIdsOnce(ids).toSet()
+            val photoPaths = elementDao.getPhotoPathsForElementIdsOnce(ids)
             elementDao.deleteElementsByIds(ids)
+            photoPaths.forEach { deleteManagedImageFile(it) }
             refreshCosplayStats(cosplayIds)
         }
     }
@@ -226,12 +234,11 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
         return elementDao.getElementById(id)
     }
 
-    fun updateElement(
-        cosplayElement: CosplayElement
-    ) {
+    fun updateElement(cosplayElement: CosplayElement, oldPathToDelete: String? = null) {
         viewModelScope.launch {
             elementDao.updateElement(cosplayElement)
             refreshCosplayStats(cosplayElement.cosplayId)
+            deleteManagedImageFile(oldPathToDelete)
         }
     }
 
@@ -303,7 +310,7 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch {
             val toDelete = progressPhotoDao.getPhotosByIdsOnce(ids)
             progressPhotoDao.deletePhotosByIds(ids)
-            toDelete.forEach { deleteFileByPath(it.path) }
+            toDelete.forEach { deleteManagedImageFile(it.path) }
         }
     }
 
@@ -316,13 +323,41 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
             progressPhotoDao.updatePhoto(photo)
         }
     }
+
+    private fun deleteManagedImageFile(path: String?) {
+        val normalizedPath = path?.trim().orEmpty()
+        if (normalizedPath.isEmpty()) {
+            return
+        }
+
+        val filePath = runCatching { File(normalizedPath).canonicalPath }
+            .getOrElse {
+                Log.w("ConQuestFileCleanup", "Skipping non-canonical image path", it)
+                return
+            }
+
+        if (!filePath.startsWith(internalFilesRoot + File.separator)) {
+            Log.w("ConQuestFileCleanup", "Skipping non-internal image path: $filePath")
+            return
+        }
+
+        deleteFileByPath(filePath)
+    }
 }
 
-fun deleteFileByPath(path: String) {
+fun deleteFileByPath(path: String): Boolean {
     try {
-        val file = java.io.File(path)
-        if (file.exists()) file.delete()
+        val file = File(path)
+        if (!file.exists()) {
+            return true
+        }
+        val deleted = file.delete()
+        if (!deleted) {
+            Log.w("ConQuestFileCleanup", "Failed to delete file at path: $path")
+        }
+        return deleted
     } catch (e: Exception) {
-        e.printStackTrace()
+        Log.e("ConQuestFileCleanup", "Error deleting file at path: $path", e)
+        return false
     }
 }

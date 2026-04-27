@@ -4,12 +4,19 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.conquest.CosplayViewModel
+import com.example.conquest.deleteFileByPath
 import com.example.conquest.components.saveImageUriToInternalStorage
 import com.example.conquest.components.MyImageBox
 import com.example.conquest.components.MyOuterBox
@@ -38,6 +45,15 @@ fun NewElement(
     val scope = rememberCoroutineScope()
 
     var form by remember { mutableStateOf(ElementFormState()) }
+    var didCommit by remember { mutableStateOf(false) }
+
+    DisposableEffect(form.photoPath, didCommit) {
+        onDispose {
+            if (!didCommit) {
+                form.photoPath.takeIf { it.isNotBlank() }?.let(::deleteFileByPath)
+            }
+        }
+    }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -48,6 +64,10 @@ fun NewElement(
                 uri = it,
                 fileNamePrefix = "cosplay_element",
             ).onSuccess { savedPath ->
+                val previousUnsavedPath = form.photoPath.takeIf {
+                    it.isNotBlank() && it != savedPath
+                }
+                previousUnsavedPath?.let(::deleteFileByPath)
                 form = form.copy(photoPath = savedPath)
             }.onFailure { e ->
                 scope.launch {
@@ -60,6 +80,14 @@ fun NewElement(
     MyOuterBox {
         MyColumn {
             MyHeaderText(text = "Add Element")
+
+            MyImageBox(
+                photoPath = form.photoPath,
+                contentDescription = "Selected image",
+                size = UIConsts.imageSizeS,
+                clickable = true,
+                onClick = { launcher.launch("image/*") },
+            )
 
             MyInputField(
                 value = form.name,
@@ -76,14 +104,6 @@ fun NewElement(
                 singleLine = true,
                 filterDecimal = true,
                 shape = RoundedCornerShape(UIConsts.cornerRadiusL),
-            )
-
-            MyImageBox(
-                photoPath = form.photoPath,
-                contentDescription = "Selected image",
-                size = UIConsts.imageSizeS,
-                clickable = true,
-                onClick = { launcher.launch("image/*") },
             )
 
             MySwitchCard(
@@ -104,6 +124,7 @@ fun NewElement(
             isValid = form.isValid,
             onCancel = { navController.popBackStack() },
             onCommit = {
+                didCommit = true
                 cosplayViewModel.insertElement(
                     form.toEntity(
                         cosplayId = cosplayId, id = 0, notes = null
