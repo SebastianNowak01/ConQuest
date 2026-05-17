@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.conquest"
+    namespace = "com.maeldev.conquest"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.conquest"
+        applicationId = "com.maeldev.conquest"
         minSdk = 34
         targetSdk = 35
         versionCode = 1
