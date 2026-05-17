@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.conquest"
+    namespace = "com.maeldev.conquest"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.conquest"
+        applicationId = "com.maeldev.conquest"
         minSdk = 34
         targetSdk = 35
         versionCode = 1
@@ -58,8 +58,11 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.coil.compose)
     implementation (libs.androidx.material.icons.extended)
+    implementation(libs.core.ktx)
     ksp(libs.androidx.room.compiler.v250)
     testImplementation(libs.junit)
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.robolectric)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
