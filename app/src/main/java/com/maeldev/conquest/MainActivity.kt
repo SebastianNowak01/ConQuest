@@ -22,12 +22,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.maeldev.conquest.components.Drawer
 import com.maeldev.conquest.components.MainNavigation
+import com.maeldev.conquest.components.MyBackgroundImage
 import com.maeldev.conquest.components.MyTopAppBar
 import com.maeldev.conquest.components.getTopAppBarConfig
 import com.maeldev.conquest.components.noDrawerRoutes
@@ -67,43 +69,46 @@ class MainActivity : ComponentActivity() {
                 )
 
             ConQuestTheme(darkTheme = darkTheme) {
-                Drawer(
-                    navController = navController,
-                    drawerState = drawerState,
-                ) {
-                    Scaffold(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        contentColor = MaterialTheme.colorScheme.primary,
-                        topBar = {
-                            MyTopAppBar(
-                                config = topBarConfig,
-                                searchQuery = searchQuery,
-                                navController = navController,
-                                navBackStackEntry = navBackStackEntry,
-                                onSearchQueryChange = { searchQuery = it },
-                                onMenuClick = { scope.launch { drawerState.open() } },
-                            )
-                        },
-                    ) { padding ->
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(padding),
-                        ) {
-                            if (!isNoDrawerRoute) {
-                                HorizontalDivider(thickness = 1.dp)
-                            }
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = androidx.compose.ui.Alignment.TopCenter,
+                Box(modifier = Modifier.fillMaxSize()) {
+                    MyBackgroundImage()
+                    Drawer(
+                        navController = navController,
+                        drawerState = drawerState,
+                    ) {
+                        Scaffold(
+                            containerColor = Color.Transparent,
+                            contentColor = MaterialTheme.colorScheme.primary,
+                            topBar = {
+                                MyTopAppBar(
+                                    config = topBarConfig,
+                                    searchQuery = searchQuery,
+                                    navController = navController,
+                                    navBackStackEntry = navBackStackEntry,
+                                    onSearchQueryChange = { searchQuery = it },
+                                    onMenuClick = { scope.launch { drawerState.open() } },
+                                )
+                            },
+                        ) { padding ->
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(padding),
                             ) {
+                                if (!isNoDrawerRoute) {
+                                    HorizontalDivider(thickness = 1.dp)
+                                }
                                 Box(
-                                    modifier = Modifier.widthIn(max = 600.dp),
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = androidx.compose.ui.Alignment.TopCenter,
                                 ) {
-                                    MainNavigation(
-                                        navController = navController,
-                                        searchQuery = if (isNoDrawerRoute) "" else searchQuery,
-                                    )
+                                    Box(
+                                        modifier = Modifier.widthIn(max = 600.dp),
+                                    ) {
+                                        MainNavigation(
+                                            navController = navController,
+                                            searchQuery = if (isNoDrawerRoute) "" else searchQuery,
+                                        )
+                                    }
                                 }
                             }
                         }
