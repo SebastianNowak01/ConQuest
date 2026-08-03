@@ -26,9 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
-import com.maeldev.conquest.CosplayViewModel
+import com.maeldev.conquest.viewmodel.EventViewModel
 import com.maeldev.conquest.data.classes.CosplaySortOrder
 import com.maeldev.conquest.data.classes.EventSortOption
 import com.maeldev.conquest.data.entity.EventType
@@ -170,11 +169,11 @@ fun EventsTopAppBar(
     onSearchQueryChange: (String) -> Unit,
     onMenuClick: () -> Unit,
 ) {
-    val owner = navBackStackEntry ?: return
-    val cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory)
-    val selectedType by cosplayViewModel.eventsFilterType.collectAsState()
-    val selectedOrder by cosplayViewModel.eventsSortOrder.collectAsState()
-    val selectedSortOption by cosplayViewModel.eventsSortOption.collectAsState()
+    navBackStackEntry ?: return
+    val eventViewModel: EventViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    val selectedType by eventViewModel.eventsFilterType.collectAsState()
+    val selectedOrder by eventViewModel.eventsSortOrder.collectAsState()
+    val selectedSortOption by eventViewModel.eventsSortOption.collectAsState()
 
     TopAppBar(
         colors = topAppBarColorsObject(),
@@ -200,15 +199,15 @@ fun EventsTopAppBar(
         actions = {
             EventsFilterButton(
                 selectedType = selectedType,
-                onTypeChange = cosplayViewModel::setEventsFilterType,
+                onTypeChange = eventViewModel::setEventsFilterType,
             )
             EventsSortByButton(
                 selectedSortOption = selectedSortOption,
-                onSortOptionChange = cosplayViewModel::setEventsSortOption,
+                onSortOptionChange = eventViewModel::setEventsSortOption,
             )
             EventsOrderButton(
                 selectedOrder = selectedOrder,
-                onOrderChange = cosplayViewModel::setEventsSortOrder,
+                onOrderChange = eventViewModel::setEventsSortOrder,
             )
         },
     )

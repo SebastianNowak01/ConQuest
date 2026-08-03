@@ -21,9 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.maeldev.conquest.CosplayViewModel
+import com.maeldev.conquest.viewmodel.ElementViewModel
 import com.maeldev.conquest.components.MyImageBox
 import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MyColumn
@@ -44,10 +43,10 @@ data class EditElement(val elementId: Int)
 
 @Composable
 fun EditElement(
-    elementId: Int, navController: NavController, cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    elementId: Int, navController: NavController, elementViewModel: ElementViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val context = LocalContext.current
-    val element by cosplayViewModel.getElementById(elementId).collectAsState(initial = null)
+    val element by elementViewModel.getElementById(elementId).collectAsState(initial = null)
 
     var form by remember { mutableStateOf(ElementFormState()) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -174,8 +173,7 @@ fun EditElement(
                 val updated = form.toUpdatedEntity(current)
                 val oldPath = current.photoPath
                 val oldPathToDelete = if (updated.photoPath != oldPath) oldPath else null
-                didCommit = true
-                cosplayViewModel.updateElement(updated, oldPathToDelete = oldPathToDelete)
+                elementViewModel.updateElement(updated, oldPathToDelete = oldPathToDelete)
             },
             postCommit = { navController.popBackStack() },
         )

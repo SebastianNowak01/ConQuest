@@ -1,6 +1,7 @@
-package com.maeldev.conquest
+package com.maeldev.conquest.viewmodel
 
 import androidx.test.core.app.ApplicationProvider
+import com.maeldev.conquest.ConQuestApplication
 import com.maeldev.conquest.data.classes.CosplaySortOption
 import com.maeldev.conquest.data.entity.Cosplay
 import kotlinx.coroutines.flow.first
@@ -21,20 +22,18 @@ class CosplayViewModelTest {
 
     private lateinit var viewModel: CosplayViewModel
     private lateinit var application: ConQuestApplication
+    private lateinit var db: CosplayDatabase
 
     @Before
     fun setup() {
         application = ApplicationProvider.getApplicationContext<ConQuestApplication>()
-        val db = Room.inMemoryDatabaseBuilder(application, CosplayDatabase::class.java)
+        db = Room.inMemoryDatabaseBuilder(application, CosplayDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         viewModel = CosplayViewModel(
             application,
             db.cosplayDao(),
             db.cosplayPhotoDao(),
-            db.cosplayElementDao(),
-            db.cosplayTaskDao(),
-            db.eventDao(),
             db.progressPhotoDao()
         )
     }
@@ -49,7 +48,7 @@ class CosplayViewModelTest {
     @Test
     fun insertCosplay_addsToDatabase() = runBlocking {
         val cosplay = Cosplay(
-            uid = 0, // 0 will auto-generate ID
+            uid = 0,
             inProgress = true,
             finished = false,
             name = "Naruto",
@@ -60,11 +59,9 @@ class CosplayViewModelTest {
         )
         
         viewModel.insertCosplay(cosplay)
-        
-        // Wait briefly for viewModelScope coroutine to complete insertion
         Thread.sleep(100)
         
-        val cosplays = viewModel.dao.getAllCosplays().first()
+        val cosplays = db.cosplayDao().getAllCosplays().first()
         assertEquals(1, cosplays.size)
         assertEquals("Naruto", cosplays[0].name)
     }

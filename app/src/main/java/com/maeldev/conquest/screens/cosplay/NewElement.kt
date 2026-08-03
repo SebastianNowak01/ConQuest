@@ -16,9 +16,8 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.maeldev.conquest.CosplayViewModel
+import com.maeldev.conquest.viewmodel.ElementViewModel
 import com.maeldev.conquest.components.deleteStoredImageByPath
 import com.maeldev.conquest.components.saveImageUriToInternalStorage
 import com.maeldev.conquest.components.MyImageBox
@@ -42,7 +41,7 @@ fun NewElement(
     cosplayId: Int,
     navController: NavController,
 ) {
-    val cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    val elementViewModel: ElementViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -140,8 +139,7 @@ fun NewElement(
             isValid = form.isValid,
             onCancel = { navController.popBackStack() },
             onCommit = {
-                didCommit = true
-                cosplayViewModel.insertElement(
+                elementViewModel.insertElement(
                     form.toEntity(
                         cosplayId = cosplayId, id = 0, notes = null
                     )

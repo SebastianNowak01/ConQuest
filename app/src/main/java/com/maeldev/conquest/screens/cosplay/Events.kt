@@ -9,9 +9,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.maeldev.conquest.CosplayViewModel
+import com.maeldev.conquest.viewmodel.EventViewModel
 import com.maeldev.conquest.components.EventListItem
 import com.maeldev.conquest.components.MyAddFab
 import com.maeldev.conquest.components.MyLazyColumn
@@ -28,12 +27,12 @@ object Events
 fun EventsScreen(
     navController: NavController,
     searchQuery: String,
-    cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    eventViewModel: EventViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
-    val events by cosplayViewModel.events.collectAsState()
-    val selectedType by cosplayViewModel.eventsFilterType.collectAsState()
-    val selectedOrder by cosplayViewModel.eventsSortOrder.collectAsState()
-    val selectedSortOption by cosplayViewModel.eventsSortOption.collectAsState()
+    val events by eventViewModel.events.collectAsState()
+    val selectedType by eventViewModel.eventsFilterType.collectAsState()
+    val selectedOrder by eventViewModel.eventsSortOrder.collectAsState()
+    val selectedSortOption by eventViewModel.eventsSortOption.collectAsState()
     var selectionMode by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(setOf<Int>()) }
 
@@ -82,7 +81,7 @@ fun EventsScreen(
                     selectedIds = emptySet()
                 },
                 onDeleteSelection = {
-                    cosplayViewModel.deleteEventsByIds(selectedIds)
+                    eventViewModel.deleteEventsByIds(selectedIds)
                     selectionMode = false
                     selectedIds = emptySet()
                 },

@@ -26,9 +26,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.maeldev.conquest.CosplayViewModel
+import com.maeldev.conquest.viewmodel.PhotoViewModel
 import com.maeldev.conquest.components.MyImageBox
 import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MyColumn
@@ -45,10 +44,10 @@ data class EditPhoto(val photoId: Int)
 
 @Composable
 fun EditPhoto(
-    photoId: Int, navController: NavController, cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    photoId: Int, navController: NavController, photoViewModel: PhotoViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val context = LocalContext.current
-    val photo by cosplayViewModel.getPhotoById(photoId).collectAsState(initial = null)
+    val photo by photoViewModel.getPhotoById(photoId).collectAsState(initial = null)
 
     var photoPath by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
@@ -158,8 +157,7 @@ fun EditPhoto(
                         val newPath = photoPath.ifEmpty { oldPath }
                         val updated = current.copy(path = newPath, notes = notes.ifBlank { null })
                         val deleteOld = if (newPath != oldPath) oldPath else null
-                        didCommit = true
-                        cosplayViewModel.updatePhoto(updated, oldPathToDelete = deleteOld)
+                        photoViewModel.updatePhoto(updated, oldPathToDelete = deleteOld)
                     }
                     navController.popBackStack()
                 },

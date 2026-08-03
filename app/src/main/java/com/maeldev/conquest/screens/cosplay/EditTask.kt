@@ -1,7 +1,6 @@
 package com.maeldev.conquest.screens.cosplay
 
 import com.maeldev.conquest.AppViewModelProvider
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -9,9 +8,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.maeldev.conquest.CosplayViewModel
+import com.maeldev.conquest.viewmodel.TaskViewModel
 import com.maeldev.conquest.components.DatePickerFieldToModal
 import com.maeldev.conquest.components.MyColumn
 import com.maeldev.conquest.components.MyHeaderText
@@ -31,9 +29,9 @@ data class EditTask(val taskId: Int)
 
 @Composable
 fun EditTask(
-    taskId: Int, navController: NavController, cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    taskId: Int, navController: NavController, taskViewModel: TaskViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val task by cosplayViewModel.getTaskById(taskId).collectAsState(initial = null)
+    val task by taskViewModel.getTaskById(taskId).collectAsState(initial = null)
 
     var form by remember { mutableStateOf(TaskFormState()) }
     var notes by remember { mutableStateOf("") }
@@ -100,7 +98,7 @@ fun EditTask(
             onCancel = { navController.popBackStack() },
             onCommit = {
                 val current = task ?: return@MySaveCancelRow
-                cosplayViewModel.updateTask(
+                taskViewModel.updateTask(
                     form.toUpdatedEntity(
                         current = current,
                         notes = notes.ifBlank { null },

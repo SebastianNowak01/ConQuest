@@ -15,11 +15,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.toRoute
-import com.maeldev.conquest.CosplayViewModel
+import com.maeldev.conquest.viewmodel.TaskViewModel
 import com.maeldev.conquest.components.MyAddFab
 import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MyLazyColumn
@@ -32,13 +31,13 @@ fun TasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry)
     val mainArgs = navBackStackEntry.toRoute<MainCosplayScreen>()
     val cosplayId = mainArgs.uid
 
-    val cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    val taskViewModel: TaskViewModel = viewModel(factory = AppViewModelProvider.Factory)
 
     LaunchedEffect(cosplayId) {
-        cosplayViewModel.setTaskCosplayId(cosplayId)
+        taskViewModel.setTaskCosplayId(cosplayId)
     }
 
-    val tasks by cosplayViewModel.tasks.collectAsState()
+    val tasks by taskViewModel.tasks.collectAsState()
 
     var selectionMode by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(setOf<Int>()) }
@@ -51,7 +50,7 @@ fun TasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry)
                     selectedIds = emptySet()
                 },
                 onDeleteSelection = {
-                    cosplayViewModel.deleteTasksByIds(selectedIds)
+                    taskViewModel.deleteTasksByIds(selectedIds)
                     selectionMode = false
                     selectedIds = emptySet()
                 },

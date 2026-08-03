@@ -26,9 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
-import com.maeldev.conquest.CosplayViewModel
+import com.maeldev.conquest.viewmodel.CosplayViewModel
 import com.maeldev.conquest.data.classes.CosplaySortOrder
 import com.maeldev.conquest.data.classes.CosplaySortOption
 import com.maeldev.conquest.data.classes.CosplayStatusFilter
@@ -161,7 +160,7 @@ fun MainScreenTopAppBar(
     onSearchQueryChange: (String) -> Unit,
     onMenuClick: () -> Unit,
 ) {
-    val owner = navBackStackEntry ?: return
+    navBackStackEntry ?: return
     val cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val selectedFilter by cosplayViewModel.mainScreenFilter.collectAsState()
     val selectedSort by cosplayViewModel.mainScreenSort.collectAsState()

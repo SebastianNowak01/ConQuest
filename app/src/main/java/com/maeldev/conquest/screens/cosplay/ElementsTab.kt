@@ -17,11 +17,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.toRoute
-import com.maeldev.conquest.CosplayViewModel
+import com.maeldev.conquest.viewmodel.ElementViewModel
 import com.maeldev.conquest.components.MyAddFab
 import com.maeldev.conquest.components.MyImageBox
 import com.maeldev.conquest.components.MyLazyColumn
@@ -34,13 +33,13 @@ fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEnt
     val mainArgs = navBackStackEntry.toRoute<MainCosplayScreen>()
     val cosplayId = mainArgs.uid
 
-    val cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    val elementViewModel: ElementViewModel = viewModel(factory = AppViewModelProvider.Factory)
 
     LaunchedEffect(cosplayId) {
-        cosplayViewModel.setElementCosplayId(cosplayId)
+        elementViewModel.setElementCosplayId(cosplayId)
     }
 
-    val elements by cosplayViewModel.elements.collectAsState()
+    val elements by elementViewModel.elements.collectAsState()
 
     var selectionMode by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(setOf<Int>()) }
@@ -61,7 +60,7 @@ fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEnt
                     selectedIds = emptySet()
                 },
                 onDeleteSelection = {
-                    cosplayViewModel.deleteElementsByIds(selectedIds)
+                    elementViewModel.deleteElementsByIds(selectedIds)
                     selectionMode = false
                     selectedIds = emptySet()
                 },
