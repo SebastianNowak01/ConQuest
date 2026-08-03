@@ -11,6 +11,7 @@ data class EventFormState(
     val eventType: EventType = EventType.EXPO,
     val eventDate: Date? = getCurrentDate(),
     val description: String = "",
+    val alarm: Boolean = false,
     val cosplayIds: Set<Int> = emptySet(),
 ) {
     companion object {
@@ -21,6 +22,7 @@ data class EventFormState(
                 eventType = event.eventType,
                 eventDate = event.eventDate,
                 description = event.description.orEmpty(),
+                alarm = event.alarm,
             )
         }
     }
@@ -36,6 +38,7 @@ data class EventFormState(
             eventType = eventType,
             eventDate = requireNotNull(eventDate) { "Event date required" },
             description = description.trim().ifBlank { null },
+            alarm = alarm,
         )
     }
 
@@ -46,6 +49,7 @@ data class EventFormState(
             eventType = eventType,
             eventDate = requireNotNull(eventDate) { "Event date required" },
             description = description.trim().ifBlank { null },
+            alarm = alarm,
         )
     }
 }

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CosplayTaskDao {
     @Insert
-    suspend fun insertTask(task: CosplayTask)
+    suspend fun insertTask(task: CosplayTask): Long
 
     @Query("DELETE FROM cosplay_tasks WHERE id IN (:ids)")
     suspend fun deleteTasksByIds(ids: Set<Int>)
@@ -23,6 +23,9 @@ interface CosplayTaskDao {
 
     @Query("SELECT * FROM cosplay_tasks")
     fun getAllTasks(): Flow<List<CosplayTask>>
+
+    @Query("SELECT * FROM cosplay_tasks WHERE alarm = 1 AND date IS NOT NULL AND date > :now")
+    suspend fun getTasksWithActiveAlarms(now: Long = System.currentTimeMillis()): List<CosplayTask>
 
     @Query("SELECT DISTINCT cosplay_id FROM cosplay_tasks WHERE id IN (:ids)")
     suspend fun getCosplayIdsForTaskIdsOnce(ids: Set<Int>): List<Int>

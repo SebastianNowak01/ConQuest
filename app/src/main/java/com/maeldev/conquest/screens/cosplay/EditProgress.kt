@@ -1,5 +1,6 @@
 package com.maeldev.conquest.screens.cosplay
 
+import com.maeldev.conquest.AppViewModelProvider
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -12,7 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.maeldev.conquest.CosplayViewModel
+import com.maeldev.conquest.viewmodel.ProgressPhotoViewModel
 import com.maeldev.conquest.components.MyColumn
 import com.maeldev.conquest.components.MyHeaderText
 import com.maeldev.conquest.components.MyImageBox
@@ -34,9 +35,9 @@ fun EditProgressPhoto(
     photoId: Int,
     cosplayId: Int,
     navController: NavController,
-    cosplayViewModel: CosplayViewModel = viewModel(),
+    progressPhotoViewModel: ProgressPhotoViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
-    val photo by cosplayViewModel.getProgressPhotoById(photoId, cosplayId).collectAsState(initial = null)
+    val photo by progressPhotoViewModel.getProgressPhotoById(photoId, cosplayId).collectAsState(initial = null)
     val snackbarHostState = remember { SnackbarHostState() }
     var notes by remember { mutableStateOf("") }
 
@@ -68,7 +69,7 @@ fun EditProgressPhoto(
 
             TextButton(onClick = {
                 val current = photo ?: return@TextButton
-                cosplayViewModel.updateProgressPhoto(current.copy(notes = null))
+                progressPhotoViewModel.updateProgressPhoto(current.copy(notes = null))
                 notes = ""
             }) {
                 Text("Delete Note")
@@ -81,7 +82,7 @@ fun EditProgressPhoto(
             onCancel = { navController.popBackStack() },
             onCommit = {
                 val current = photo ?: return@MySaveCancelRow
-                cosplayViewModel.updateProgressPhoto(current.copy(notes = notes.ifBlank { null }))
+                progressPhotoViewModel.updateProgressPhoto(current.copy(notes = notes.ifBlank { null }))
             },
             postCommit = { navController.popBackStack() },
         )

@@ -1,5 +1,6 @@
 package com.maeldev.conquest.components
 
+import com.maeldev.conquest.AppViewModelProvider
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,7 +25,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
-import com.maeldev.conquest.CosplayViewModel
+import com.maeldev.conquest.viewmodel.CosplayViewModel
 import com.maeldev.conquest.data.entity.Cosplay
 import com.maeldev.conquest.screens.cosplay.EditCosplay
 import com.maeldev.conquest.theme.UIConsts
@@ -110,7 +111,7 @@ private fun CosplayTopAppBar(
     navController: NavHostController,
     onMenuClick: () -> Unit
 ) {
-    val cosplayViewModel: CosplayViewModel = viewModel()
+    val cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val cosplayId = navBackStackEntry?.arguments?.getInt("uid")
     val cosplayFlow = remember(cosplayId) {
         if (cosplayId == null) {

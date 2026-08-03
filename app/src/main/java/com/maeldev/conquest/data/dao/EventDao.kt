@@ -35,6 +35,9 @@ interface EventDao {
     @Query("SELECT * FROM events ORDER BY event_date ASC")
     fun getAllEvents(): Flow<List<Event>>
 
+    @Query("SELECT * FROM events WHERE alarm = 1 AND event_date IS NOT NULL AND event_date > :now")
+    suspend fun getEventsWithActiveAlarms(now: Long = System.currentTimeMillis()): List<Event>
+
     @Query("SELECT * FROM events WHERE id = :id LIMIT 1")
     fun getEventById(id: Int): Flow<Event?>
 }

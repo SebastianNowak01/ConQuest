@@ -1,5 +1,6 @@
 package com.maeldev.conquest.screens.cosplay
 
+import com.maeldev.conquest.AppViewModelProvider
 import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,7 +25,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.toRoute
-import com.maeldev.conquest.CosplayViewModel
+import com.maeldev.conquest.viewmodel.PhotoViewModel
 import com.maeldev.conquest.components.MyFab
 import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MyPhotoGrid
@@ -37,13 +38,13 @@ import com.maeldev.conquest.theme.UIConsts
 fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController) {
     val args = navBackStackEntry.toRoute<MainCosplayScreen>()
     val context = LocalContext.current
-    val cosplayViewModel: CosplayViewModel = viewModel()
+    val photoViewModel: PhotoViewModel = viewModel(factory = AppViewModelProvider.Factory)
 
     LaunchedEffect(args.uid) {
-        cosplayViewModel.setCosplayId(args.uid)
+        photoViewModel.setCosplayId(args.uid)
     }
 
-    val photos by cosplayViewModel.photos.collectAsState()
+    val photos by photoViewModel.photos.collectAsState()
     val gridPhotos = remember(photos) {
         photos.map { photo ->
             MyPhotoGridItem(
@@ -72,7 +73,7 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
                     selectedIds = emptySet()
                 },
                 onDeleteSelection = {
-                    cosplayViewModel.deletePhotosByIds(selectedIds)
+                    photoViewModel.deletePhotosByIds(selectedIds)
                     selectionMode = false
                     selectedIds = emptySet()
                 },
@@ -89,7 +90,7 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
             PickAndSaveImage(
                 context = context,
                 modifier = Modifier.align(Alignment.BottomCenter),
-                onImageSaved = { savedPath -> cosplayViewModel.addPhoto(args.uid, savedPath) },
+                onImageSaved = { savedPath -> photoViewModel.addPhoto(args.uid, savedPath) },
             )
         }
 

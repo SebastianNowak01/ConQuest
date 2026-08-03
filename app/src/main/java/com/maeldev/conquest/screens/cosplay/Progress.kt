@@ -1,5 +1,6 @@
 package com.maeldev.conquest.screens.cosplay
 
+import com.maeldev.conquest.AppViewModelProvider
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.maeldev.conquest.CosplayViewModel
+import com.maeldev.conquest.viewmodel.ProgressPhotoViewModel
 import com.maeldev.conquest.components.MyFab
 import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MyPhotoGrid
@@ -45,10 +46,10 @@ data class Progress(val cosplayId: Int)
 fun ProgressScreen(
     navController: NavController,
     cosplayId: Int,
-    cosplayViewModel: CosplayViewModel = viewModel(),
+    progressPhotoViewModel: ProgressPhotoViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val context = LocalContext.current
-    val photos by cosplayViewModel.progressPhotos.collectAsState()
+    val photos by progressPhotoViewModel.progressPhotos.collectAsState()
     val gridPhotos = remember(photos) {
         photos.map { photo ->
             MyPhotoGridItem(
@@ -70,14 +71,14 @@ fun ProgressScreen(
     }
 
     LaunchedEffect(cosplayId) {
-        cosplayViewModel.setProgressCosplayId(cosplayId)
+        progressPhotoViewModel.setProgressCosplayId(cosplayId)
     }
 
     val galleryLauncher =
         pickAndSaveImageLauncher(
             context = context,
             fileNamePrefix = "progress_photo",
-            onSaved = { path -> cosplayViewModel.addProgressPhoto(cosplayId, path) },
+            onSaved = { path -> progressPhotoViewModel.addProgressPhoto(cosplayId, path) },
             onError = { throwable ->
                 error = "Failed to save image: ${throwable.localizedMessage}"
             },
@@ -94,7 +95,7 @@ fun ProgressScreen(
             bitmap = bitmap,
             fileNamePrefix = "progress_photo",
         ).onSuccess { path ->
-            cosplayViewModel.addProgressPhoto(cosplayId, path)
+            progressPhotoViewModel.addProgressPhoto(cosplayId, path)
         }.onFailure { throwable ->
             error = "Failed to save image: ${throwable.localizedMessage}"
         }
@@ -108,7 +109,7 @@ fun ProgressScreen(
                     selectedIds = emptySet()
                 },
                 onDeleteSelection = {
-                    cosplayViewModel.deleteProgressPhotosByIds(selectedIds)
+                    progressPhotoViewModel.deleteProgressPhotosByIds(selectedIds)
                     selectionMode = false
                     selectedIds = emptySet()
                 },

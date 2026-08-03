@@ -16,6 +16,7 @@ data class Event(
     @ColumnInfo(name = "event_type") val eventType: EventType,
     @ColumnInfo(name = "event_date") val eventDate: Date,
     @ColumnInfo(name = "description") val description: String?,
+    @ColumnInfo(name = "alarm") val alarm: Boolean = false,
 )
 
 enum class EventType {

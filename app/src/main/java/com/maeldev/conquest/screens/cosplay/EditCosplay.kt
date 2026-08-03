@@ -1,5 +1,6 @@
 package com.maeldev.conquest.screens.cosplay
 
+import com.maeldev.conquest.AppViewModelProvider
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,7 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.maeldev.conquest.CosplayViewModel
+import com.maeldev.conquest.viewmodel.CosplayViewModel
 import com.maeldev.conquest.components.DatePickerFieldToModal
 import com.maeldev.conquest.components.MyColumn
 import com.maeldev.conquest.components.MyHeaderText
@@ -28,12 +29,14 @@ import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MySaveCancelRow
 import com.maeldev.conquest.components.MySnackbarHost
 import com.maeldev.conquest.components.MySwitchCard
+
 import com.maeldev.conquest.components.deleteStoredImageByPath
 import com.maeldev.conquest.components.saveImageUriToInternalStorage
 import com.maeldev.conquest.data.classes.CosplayFormState
 import com.maeldev.conquest.theme.UIConsts
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+
 
 @Serializable
 data class EditCosplay(val cosplayId: Int)
@@ -43,7 +46,7 @@ data class EditCosplay(val cosplayId: Int)
 fun EditCosplay(
     cosplayId: Int,
     navController: NavController,
-    cosplayViewModel: CosplayViewModel = viewModel(),
+    cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val cosplay by cosplayViewModel.getCosplayById(cosplayId).collectAsState(initial = null)
     val snackbarHostState = remember { SnackbarHostState() }
@@ -151,7 +154,7 @@ fun EditCosplay(
             DatePickerFieldToModal(
                 label = "Due date",
                 selectedDate = form.dueDate,
-                onDateSelected = { form = form.copy(dueDate = it) },
+                onDateSelected = { form = form.copy(dueDate = it) }
             )
 
             MyInputField(
@@ -172,7 +175,6 @@ fun EditCosplay(
                 val updated = form.toUpdatedEntity(current)
                 val oldPath = current.cosplayPhotoPath
                 val oldPathToDelete = if (updated.cosplayPhotoPath != oldPath) oldPath else null
-                didCommit = true
                 cosplayViewModel.updateCosplay(updated, oldPathToDelete = oldPathToDelete)
             },
             postCommit = { navController.popBackStack() },

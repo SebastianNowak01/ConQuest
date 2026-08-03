@@ -1,5 +1,6 @@
 package com.maeldev.conquest.screens
 
+import com.maeldev.conquest.AppViewModelProvider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -9,7 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.maeldev.conquest.CosplayViewModel
+import com.maeldev.conquest.viewmodel.CosplayViewModel
 import com.maeldev.conquest.components.MyAddFab
 import com.maeldev.conquest.components.MyCosplayRow
 import com.maeldev.conquest.components.MyLazyColumn
@@ -29,7 +30,7 @@ fun MainScreen(
     navController: NavController,
     searchQuery: String,
 ) {
-    val cosplayViewModel: CosplayViewModel = viewModel()
+    val cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val cosplays by cosplayViewModel.allCosplays.collectAsState()
     val selectedFilter by cosplayViewModel.mainScreenFilter.collectAsState()
     val selectedSort by cosplayViewModel.mainScreenSort.collectAsState()

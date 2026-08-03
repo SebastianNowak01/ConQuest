@@ -1,5 +1,6 @@
 package com.maeldev.conquest.screens.cosplay
 
+import com.maeldev.conquest.AppViewModelProvider
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.MaterialTheme
@@ -15,18 +16,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.maeldev.conquest.CosplayViewModel
+import com.maeldev.conquest.viewmodel.TaskViewModel
 import com.maeldev.conquest.components.DatePickerFieldToModal
-import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MyColumn
 import com.maeldev.conquest.components.MyHeaderText
 import com.maeldev.conquest.components.MyInputField
+import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MySaveCancelRow
 import com.maeldev.conquest.components.MySnackbarHost
 import com.maeldev.conquest.components.MySwitchCard
+
 import com.maeldev.conquest.data.classes.TaskFormState
 import com.maeldev.conquest.theme.UIConsts
 import kotlinx.serialization.Serializable
+
 
 @Serializable
 data class NewTask(val cosplayId: Int)
@@ -36,7 +39,7 @@ fun NewTask(
     cosplayId: Int,
     navController: NavController,
 ) {
-    val cosplayViewModel: CosplayViewModel = viewModel()
+    val taskViewModel: TaskViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val snackbarHostState = remember { SnackbarHostState() }
 
     var form by remember { mutableStateOf(TaskFormState()) }
@@ -89,7 +92,7 @@ fun NewTask(
                 }
             },
             onCommit = {
-                cosplayViewModel.insertTask(form.toEntity(cosplayId = cosplayId))
+                taskViewModel.insertTask(form.toEntity(cosplayId = cosplayId))
             },
             postCommit = {
                 navController.navigate(MainCosplayScreen(uid = cosplayId, initialTab = 1)) {

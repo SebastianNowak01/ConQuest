@@ -1,12 +1,13 @@
 package com.maeldev.conquest.screens.cosplay
 
+import com.maeldev.conquest.AppViewModelProvider
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -16,7 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.maeldev.conquest.CosplayViewModel
+import com.maeldev.conquest.viewmodel.CosplayViewModel
 import com.maeldev.conquest.components.DatePickerFieldToModal
 import com.maeldev.conquest.components.MyColumn
 import com.maeldev.conquest.components.MyHeaderText
@@ -26,12 +27,14 @@ import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MySaveCancelRow
 import com.maeldev.conquest.components.MySnackbarHost
 import com.maeldev.conquest.components.MySwitchCard
+
 import com.maeldev.conquest.components.deleteStoredImageByPath
 import com.maeldev.conquest.components.saveImageUriToInternalStorage
 import com.maeldev.conquest.data.classes.CosplayFormState
 import com.maeldev.conquest.theme.UIConsts
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+
 
 @Serializable
 object NewCosplay
@@ -41,7 +44,7 @@ object NewCosplay
 fun NewCosplay(
     navController: NavController,
 ) {
-    val cosplayViewModel: CosplayViewModel = viewModel()
+    val cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -133,7 +136,8 @@ fun NewCosplay(
             DatePickerFieldToModal(
                 label = "Due date",
                 selectedDate = form.dueDate,
-                onDateSelected = { form = form.copy(dueDate = it) })
+                onDateSelected = { form = form.copy(dueDate = it) }
+            )
 
             MyInputField(
                 value = form.budget,
