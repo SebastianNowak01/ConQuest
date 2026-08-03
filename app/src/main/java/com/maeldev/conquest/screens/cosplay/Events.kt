@@ -1,5 +1,6 @@
 package com.maeldev.conquest.screens.cosplay
 
+import com.maeldev.conquest.AppViewModelProvider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -7,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.maeldev.conquest.CosplayViewModel
@@ -26,7 +28,7 @@ object Events
 fun EventsScreen(
     navController: NavController,
     searchQuery: String,
-    cosplayViewModel: CosplayViewModel = viewModel(),
+    cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val events by cosplayViewModel.events.collectAsState()
     val selectedType by cosplayViewModel.eventsFilterType.collectAsState()

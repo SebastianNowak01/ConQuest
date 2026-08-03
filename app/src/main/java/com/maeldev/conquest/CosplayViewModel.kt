@@ -17,6 +17,8 @@ import com.maeldev.conquest.data.entity.Event
 import com.maeldev.conquest.data.entity.EventCosplayCrossRef
 import com.maeldev.conquest.data.entity.EventType
 import com.maeldev.conquest.data.entity.ProgressPhoto
+import com.maeldev.conquest.data.ReminderEntityType
+import com.maeldev.conquest.data.ReminderScheduler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,13 +30,16 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.File
 
-class CosplayViewModel(application: Application) : AndroidViewModel(application) {
-    internal val dao = (application as ConQuestApplication).database.cosplayDao()
-    internal val photoDao = (application as ConQuestApplication).database.cosplayPhotoDao()
-    internal val elementDao = (application as ConQuestApplication).database.cosplayElementDao()
-    internal val taskDao = (application as ConQuestApplication).database.cosplayTaskDao()
-    internal val eventDao = (application as ConQuestApplication).database.eventDao()
-    internal val progressPhotoDao = (application as ConQuestApplication).database.progressPhotoDao()
+class CosplayViewModel(
+    application: Application,
+    val dao: com.maeldev.conquest.data.dao.CosplayDao,
+    val photoDao: com.maeldev.conquest.data.dao.CosplayPhotoDao,
+    val elementDao: com.maeldev.conquest.data.dao.CosplayElementDao,
+    val taskDao: com.maeldev.conquest.data.dao.CosplayTaskDao,
+    val eventDao: com.maeldev.conquest.data.dao.EventDao,
+    val progressPhotoDao: com.maeldev.conquest.data.dao.ProgressPhotoDao
+) : AndroidViewModel(application) {
+
 
     val allCosplays =
         dao.getAllCosplays().stateIn(viewModelScope, SharingStarted.Lazily, emptyList<Cosplay>())
@@ -132,6 +137,7 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
 
     fun deleteCosplaysByIds(cosplayIds: Set<Int>) {
         viewModelScope.launch {
+            getApplication<Application>()
             val cosplayCovers = dao.getCosplayPhotoPathsByIdsOnce(cosplayIds)
             val photos = photoDao.getPhotosForCosplayOnce(cosplayIds)
             photoDao.deletePhotos(photos)
@@ -225,13 +231,16 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
 
     fun insertTask(task: CosplayTask) {
         viewModelScope.launch {
-            taskDao.insertTask(task)
+            val taskId = taskDao.insertTask(task).toInt()
+            handleReminderScheduling(ReminderEntityType.TASK, taskId, task.alarm, task.date, "Task Reminder", task.taskName)
             refreshCosplayStats(task.cosplayId)
         }
     }
 
     fun deleteTasksByIds(ids: Set<Int>) {
         viewModelScope.launch {
+            val context = getApplication<Application>()
+            ids.forEach { id -> ReminderScheduler.cancelReminder(context, ReminderEntityType.TASK, id) }
             val cosplayIds = taskDao.getCosplayIdsForTaskIdsOnce(ids).toSet()
             taskDao.deleteTasksByIds(ids)
             refreshCosplayStats(cosplayIds)
@@ -257,6 +266,7 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     fun updateTask(task: CosplayTask) {
         viewModelScope.launch {
             taskDao.updateTask(task)
+            handleReminderScheduling(ReminderEntityType.TASK, task.id, task.alarm, task.date, "Task Reminder", task.taskName)
             refreshCosplayStats(task.cosplayId)
         }
     }
@@ -267,6 +277,7 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
     fun insertEvent(event: Event, cosplayIds: Set<Int> = emptySet()) {
         viewModelScope.launch {
             val eventId = eventDao.insertEvent(event).toInt()
+            handleReminderScheduling(ReminderEntityType.EVENT, eventId, event.alarm, event.eventDate, "Event Reminder", event.eventName)
             replaceEventCosplayLinks(eventId = eventId, cosplayIds = cosplayIds)
             refreshCosplayStats(cosplayIds)
         }
@@ -276,6 +287,7 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch {
             val existingCosplayIds = eventDao.getCosplayIdsForEventOnce(event.id).toSet()
             eventDao.updateEvent(event)
+            handleReminderScheduling(ReminderEntityType.EVENT, event.id, event.alarm, event.eventDate, "Event Reminder", event.eventName)
             if (cosplayIds != null) {
                 replaceEventCosplayLinks(eventId = event.id, cosplayIds = cosplayIds)
                 refreshCosplayStats(existingCosplayIds + cosplayIds)
@@ -287,6 +299,8 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
 
     fun deleteEventsByIds(ids: Set<Int>) {
         viewModelScope.launch {
+            val context = getApplication<Application>()
+            ids.forEach { id -> ReminderScheduler.cancelReminder(context, ReminderEntityType.EVENT, id) }
             val cosplayIds = eventDao.getCosplayIdsForEventIdsOnce(ids).toSet()
             eventDao.deleteEventsByIds(ids)
             refreshCosplayStats(cosplayIds)
@@ -342,6 +356,36 @@ class CosplayViewModel(application: Application) : AndroidViewModel(application)
             getApplication(),
             path.orEmpty()
         )
+    }
+
+    private fun handleReminderScheduling(
+        entityType: ReminderEntityType,
+        entityId: Int,
+        alarm: Boolean,
+        date: java.util.Date?,
+        title: String,
+        message: String,
+    ) {
+        val context = getApplication<Application>()
+        if (alarm && date != null) {
+            val cal = java.util.Calendar.getInstance().apply {
+                time = date
+                set(java.util.Calendar.HOUR_OF_DAY, 9)
+                set(java.util.Calendar.MINUTE, 0)
+                set(java.util.Calendar.SECOND, 0)
+                set(java.util.Calendar.MILLISECOND, 0)
+            }
+            ReminderScheduler.scheduleReminder(
+                context = context,
+                entityType = entityType,
+                entityId = entityId,
+                triggerAtMillis = cal.timeInMillis,
+                title = title,
+                message = message,
+            )
+        } else {
+            ReminderScheduler.cancelReminder(context, entityType, entityId)
+        }
     }
 }
 

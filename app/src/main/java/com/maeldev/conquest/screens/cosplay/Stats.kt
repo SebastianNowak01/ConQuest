@@ -1,5 +1,6 @@
 package com.maeldev.conquest.screens.cosplay
 
+import com.maeldev.conquest.AppViewModelProvider
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.maeldev.conquest.CosplayViewModel
 import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.theme.UIConsts
@@ -35,7 +37,7 @@ data class Stats(val cosplayId: Int)
 @Composable
 fun StatsScreen(
     cosplayId: Int,
-    cosplayViewModel: CosplayViewModel = viewModel(),
+    cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val cosplay by cosplayViewModel.getCosplayById(cosplayId).collectAsState(initial = null)
     val progressPhotos by cosplayViewModel.progressPhotos.collectAsState()

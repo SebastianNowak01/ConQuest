@@ -1,5 +1,6 @@
 package com.maeldev.conquest.screens.cosplay
 
+import com.maeldev.conquest.AppViewModelProvider
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.maeldev.conquest.CosplayViewModel
 import com.maeldev.conquest.components.MyFab
@@ -45,7 +47,7 @@ data class Progress(val cosplayId: Int)
 fun ProgressScreen(
     navController: NavController,
     cosplayId: Int,
-    cosplayViewModel: CosplayViewModel = viewModel(),
+    cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val context = LocalContext.current
     val photos by cosplayViewModel.progressPhotos.collectAsState()

@@ -1,5 +1,6 @@
 package com.maeldev.conquest.components
 
+import com.maeldev.conquest.AppViewModelProvider
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -24,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import com.maeldev.conquest.CosplayViewModel
@@ -160,7 +162,7 @@ fun MainScreenTopAppBar(
     onMenuClick: () -> Unit,
 ) {
     val owner = navBackStackEntry ?: return
-    val cosplayViewModel: CosplayViewModel = viewModel(viewModelStoreOwner = owner)
+    val cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val selectedFilter by cosplayViewModel.mainScreenFilter.collectAsState()
     val selectedSort by cosplayViewModel.mainScreenSort.collectAsState()
     val selectedOrder by cosplayViewModel.mainScreenSortOrder.collectAsState()

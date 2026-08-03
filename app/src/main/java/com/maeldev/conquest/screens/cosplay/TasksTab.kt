@@ -1,5 +1,6 @@
 package com.maeldev.conquest.screens.cosplay
 
+import com.maeldev.conquest.AppViewModelProvider
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.MaterialTheme
@@ -13,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
@@ -30,7 +32,7 @@ fun TasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry)
     val mainArgs = navBackStackEntry.toRoute<MainCosplayScreen>()
     val cosplayId = mainArgs.uid
 
-    val cosplayViewModel: CosplayViewModel = viewModel()
+    val cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory)
 
     LaunchedEffect(cosplayId) {
         cosplayViewModel.setTaskCosplayId(cosplayId)

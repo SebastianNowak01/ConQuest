@@ -10,4 +10,9 @@ class ConQuestApplication : Application() {
             applicationContext, CosplayDatabase::class.java, "cosplays_database"
         ).fallbackToDestructiveMigration(true).build()
     }
+
+    override fun onCreate() {
+        super.onCreate()
+        com.maeldev.conquest.data.ReminderNotificationHelper.createNotificationChannel(this)
+    }
 }

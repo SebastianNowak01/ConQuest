@@ -1,8 +1,11 @@
 package com.maeldev.conquest.screens.cosplay
 
+import com.maeldev.conquest.AppViewModelProvider
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -15,7 +18,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.maeldev.conquest.CosplayViewModel
@@ -28,12 +33,14 @@ import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MySaveCancelRow
 import com.maeldev.conquest.components.MySnackbarHost
 import com.maeldev.conquest.components.MySwitchCard
+
 import com.maeldev.conquest.components.deleteStoredImageByPath
 import com.maeldev.conquest.components.saveImageUriToInternalStorage
 import com.maeldev.conquest.data.classes.CosplayFormState
 import com.maeldev.conquest.theme.UIConsts
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+
 
 @Serializable
 data class EditCosplay(val cosplayId: Int)
@@ -43,7 +50,7 @@ data class EditCosplay(val cosplayId: Int)
 fun EditCosplay(
     cosplayId: Int,
     navController: NavController,
-    cosplayViewModel: CosplayViewModel = viewModel(),
+    cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val cosplay by cosplayViewModel.getCosplayById(cosplayId).collectAsState(initial = null)
     val snackbarHostState = remember { SnackbarHostState() }
@@ -151,7 +158,7 @@ fun EditCosplay(
             DatePickerFieldToModal(
                 label = "Due date",
                 selectedDate = form.dueDate,
-                onDateSelected = { form = form.copy(dueDate = it) },
+                onDateSelected = { form = form.copy(dueDate = it) }
             )
 
             MyInputField(

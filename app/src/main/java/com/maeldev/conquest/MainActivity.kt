@@ -41,6 +41,9 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 0)
+
         enableEdgeToEdge()
         setContent {
             val context = LocalContext.current
