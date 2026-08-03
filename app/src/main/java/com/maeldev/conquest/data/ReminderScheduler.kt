@@ -91,7 +91,7 @@ object ReminderScheduler {
             }
 
             eventDao.getEventsWithActiveAlarms().forEach { event ->
-                event.eventDate?.let { date ->
+                event.eventDate.let { date ->
                     val cal = java.util.Calendar.getInstance().apply {
                         time = date
                         set(java.util.Calendar.HOUR_OF_DAY, 9)
