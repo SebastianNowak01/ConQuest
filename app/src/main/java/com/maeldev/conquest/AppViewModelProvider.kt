@@ -64,6 +64,17 @@ object AppViewModelProvider {
                         progressPhotoDao = db.progressPhotoDao()
                     ) as T
                 }
+                modelClass.isAssignableFrom(com.maeldev.conquest.viewmodel.ExportImportViewModel::class.java) -> {
+                    com.maeldev.conquest.viewmodel.ExportImportViewModel(
+                        application = application,
+                        cosplayDao = db.cosplayDao(),
+                        elementDao = db.cosplayElementDao(),
+                        taskDao = db.cosplayTaskDao(),
+                        photoDao = db.cosplayPhotoDao(),
+                        progressPhotoDao = db.progressPhotoDao(),
+                        eventDao = db.eventDao()
+                    ) as T
+                }
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
         }

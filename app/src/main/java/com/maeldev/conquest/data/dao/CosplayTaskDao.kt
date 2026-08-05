@@ -18,6 +18,9 @@ interface CosplayTaskDao {
     @Query("SELECT * FROM cosplay_tasks WHERE cosplay_id = :cosplayId")
     fun getTasksForCosplay(cosplayId: Int): Flow<List<CosplayTask>>
 
+    @Query("SELECT * FROM cosplay_tasks WHERE cosplay_id IN (:cosplayIds)")
+    suspend fun getTasksForCosplaysOnce(cosplayIds: Set<Int>): List<CosplayTask>
+
     @Query("SELECT * FROM cosplay_tasks WHERE id = :id")
     fun getTaskById(id: Int): Flow<CosplayTask?>
 

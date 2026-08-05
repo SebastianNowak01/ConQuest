@@ -7,8 +7,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun MyOuterBox(content: @Composable BoxScope.() -> Unit) {
-    Box(modifier = Modifier.fillMaxSize()) {
+fun MyOuterBox(
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit
+) {
+    Box(modifier = modifier.fillMaxSize()) {
         content()
     }
 }

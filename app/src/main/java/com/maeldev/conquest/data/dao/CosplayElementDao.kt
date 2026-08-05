@@ -18,6 +18,9 @@ interface CosplayElementDao {
     @Query("SELECT * FROM cosplay_elements WHERE cosplay_id = :cosplayId")
     fun getElementsForCosplay(cosplayId: Int): Flow<List<CosplayElement>>
 
+    @Query("SELECT * FROM cosplay_elements WHERE cosplay_id IN (:cosplayIds)")
+    suspend fun getElementsForCosplaysOnce(cosplayIds: Set<Int>): List<CosplayElement>
+
     @Query("SELECT * FROM cosplay_elements WHERE id = :id LIMIT 1")
     fun getElementById(id: Int): Flow<CosplayElement?>
 
