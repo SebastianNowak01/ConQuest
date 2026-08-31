@@ -8,7 +8,10 @@ import android.webkit.MimeTypeMap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
@@ -141,6 +144,27 @@ fun interface ImagePickAndSaveLauncher {
     fun launch()
 }
 
+@Composable
+fun DiscardUnsavedImageEffect(
+    context: Context,
+    currentPhotoPath: String,
+    originalPhotoPath: String?,
+    isCommitted: Boolean
+) {
+    val latestPhotoPath by rememberUpdatedState(currentPhotoPath)
+    val latestOriginalPhotoPath by rememberUpdatedState(originalPhotoPath)
+    val latestIsCommitted by rememberUpdatedState(isCommitted)
 
-
-
+    DisposableEffect(Unit) {
+        onDispose {
+            if (!latestIsCommitted) {
+                val pendingPath = latestPhotoPath.takeIf {
+                    it.isNotBlank() && it != latestOriginalPhotoPath
+                }
+                pendingPath?.let {
+                    deleteStoredImageByPath(context, it)
+                }
+            }
+        }
+    }
+}

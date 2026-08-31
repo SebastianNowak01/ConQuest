@@ -26,11 +26,17 @@ interface EventDao {
     @Query("SELECT DISTINCT cosplay_id FROM event_cosplay_cross_ref WHERE event_id IN (:eventIds)")
     suspend fun getCosplayIdsForEventIdsOnce(eventIds: Set<Int>): List<Int>
 
+    @Query("SELECT * FROM event_cosplay_cross_ref WHERE cosplay_id IN (:cosplayIds)")
+    suspend fun getEventCrossRefsForCosplaysOnce(cosplayIds: Set<Int>): List<EventCosplayCrossRef>
+
     @Update
     suspend fun updateEvent(event: Event)
 
     @Query("DELETE FROM events WHERE id IN (:ids)")
     suspend fun deleteEventsByIds(ids: Set<Int>)
+
+    @Query("SELECT * FROM events WHERE id IN (:ids)")
+    suspend fun getEventsByIdsOnce(ids: Set<Int>): List<Event>
 
     @Query("SELECT * FROM events ORDER BY event_date ASC")
     fun getAllEvents(): Flow<List<Event>>

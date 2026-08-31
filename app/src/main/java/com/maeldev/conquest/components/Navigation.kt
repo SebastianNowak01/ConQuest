@@ -8,6 +8,7 @@ import androidx.navigation.toRoute
 import com.maeldev.conquest.screens.MainScreen
 import com.maeldev.conquest.screens.SettingsScreen
 import com.maeldev.conquest.screens.SettingsScreenParams
+import com.maeldev.conquest.screens.ExportSelectionScreen
 import com.maeldev.conquest.screens.cosplay.EditCosplay
 import com.maeldev.conquest.screens.cosplay.EditElement
 import com.maeldev.conquest.screens.cosplay.EditEvent
@@ -44,7 +45,10 @@ fun MainNavigation(
             )
         }
         composable<SettingsScreenParams> {
-            SettingsScreen()
+            SettingsScreen(navController = navController)
+        }
+        composable<ExportSelectionScreen> {
+            ExportSelectionScreen(navController = navController)
         }
         composable<Events> {
             EventsScreen(

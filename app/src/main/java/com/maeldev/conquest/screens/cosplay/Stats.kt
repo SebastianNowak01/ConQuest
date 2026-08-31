@@ -58,7 +58,7 @@ fun StatsScreen(
                 StatCard(
                     icon = Icons.Default.AttachMoney,
                     title = "Total Cost",
-                    value = String.format("$%.2f", currentCosplay.totalSpend)
+                    value = String.format(java.util.Locale.getDefault(), "$%.2f", currentCosplay.totalSpend)
                 )
                 Spacer(
                     modifier = Modifier.height(

@@ -40,7 +40,6 @@ fun MyImageBox(
     var showPreview by remember(photoPath) { mutableStateOf(false) }
     val hasPhoto = photoPath.isNotEmpty()
     val resolvedPhotoPath = resolveStoredImagePath(context, photoPath)
-
     val clickModifier = if (!clickable) {
         Modifier
     } else if (previewWhenPhotoExists && hasPhoto) {
