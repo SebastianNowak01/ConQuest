@@ -42,6 +42,14 @@ fun TasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry)
     var selectionMode by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(setOf<Int>()) }
 
+    LaunchedEffect(tasks) {
+        val visibleIds = tasks.map { it.id }.toSet()
+        selectedIds = selectedIds.intersect(visibleIds)
+        if (selectedIds.isEmpty()) {
+            selectionMode = false
+        }
+    }
+
     MyOuterBox {
         if (selectionMode) {
             MySelectionModeFabs(

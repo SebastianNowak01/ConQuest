@@ -14,12 +14,15 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
 import java.util.Date
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 @RunWith(AndroidJUnit4::class)
 class ExportImportTest {
@@ -81,13 +84,11 @@ class ExportImportTest {
         )
         elementDao.insertElement(element)
 
-        // Mock an image file in the expected directory
         val imageDir = File(context.filesDir, "images")
         imageDir.mkdirs()
         val testImageFile = File(imageDir, "test_photo.jpg")
         testImageFile.writeText("fake image content")
 
-        // 2. Export to a temporary ZIP file
         val tempZipFile = File.createTempFile("export_test", ".zip", context.cacheDir)
         val zipUri = Uri.fromFile(tempZipFile)
 
@@ -107,7 +108,6 @@ class ExportImportTest {
         assertTrue(tempZipFile.exists())
         assertTrue(tempZipFile.length() > 0)
 
-        // 3. Import from the temporary ZIP file
         val importResult = ExportImportUtil.importCosplays(
             context = context,
             sourceUri = zipUri,
@@ -121,7 +121,6 @@ class ExportImportTest {
 
         assertTrue("Import failed: ${importResult.exceptionOrNull()?.message}", importResult.isSuccess)
 
-        // 4. Verify data was duplicated (new IDs)
         val allCosplays = cosplayDao.getAllCosplays().first()
         assertEquals(2, allCosplays.size)
 
@@ -133,13 +132,48 @@ class ExportImportTest {
         assertEquals(1, importedElements.size)
         assertEquals("Test Element", importedElements[0].name)
 
-        // Check if image file exists
         val importedImageFile = File(context.filesDir, "images/test_photo.jpg")
         assertTrue(importedImageFile.exists())
 
-        // Cleanup
         tempZipFile.delete()
         testImageFile.delete()
         }
     }
+
+    @Test
+    fun importRejectsEntriesThatEscapeTheImagesDirectory() {
+        runBlocking {
+            val context = ApplicationProvider.getApplicationContext<Context>()
+
+            val maliciousZip = File.createTempFile("traversal_test", ".zip", context.cacheDir)
+            ZipOutputStream(maliciousZip.outputStream()).use { zos ->
+                zos.putNextEntry(ZipEntry("data.json"))
+                zos.write("{\"version\":1,\"cosplays\":[]}".toByteArray())
+                zos.closeEntry()
+
+                zos.putNextEntry(ZipEntry("images/../../traversal_marker.txt"))
+                zos.write("owned".toByteArray())
+                zos.closeEntry()
+            }
+
+            val result = ExportImportUtil.importCosplays(
+                context = context,
+                sourceUri = Uri.fromFile(maliciousZip),
+                cosplayDao = cosplayDao,
+                elementDao = elementDao,
+                taskDao = taskDao,
+                photoDao = photoDao,
+                progressPhotoDao = progressPhotoDao,
+                eventDao = eventDao
+            )
+
+            assertTrue("Traversal entry should have been rejected", result.isFailure)
+
+            val escaped = File(context.filesDir.parentFile, "traversal_marker.txt")
+            assertFalse("Entry escaped the images directory: " + escaped.absolutePath, escaped.exists())
+
+            maliciousZip.delete()
+        }
+    }
 }
+

@@ -9,6 +9,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -17,6 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -26,9 +28,11 @@ import com.maeldev.conquest.components.MyCosplayRow
 import com.maeldev.conquest.components.MyExportSelectionModeFabs
 import com.maeldev.conquest.components.MyLazyColumn
 import com.maeldev.conquest.components.MyOuterBox
+import com.maeldev.conquest.components.MySnackbarHost
 import com.maeldev.conquest.viewmodel.CosplayViewModel
 import com.maeldev.conquest.viewmodel.ExportImportState
 import com.maeldev.conquest.viewmodel.ExportImportViewModel
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -49,6 +53,9 @@ fun ExportSelectionScreen(navController: NavController) {
     var selectionMode by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(setOf<Int>()) }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
     LaunchedEffect(cosplays) {
         val visibleIds = cosplays.map { it.uid }.toSet()
         selectedIds = selectedIds.intersect(visibleIds)
@@ -58,9 +65,19 @@ fun ExportSelectionScreen(navController: NavController) {
     }
 
     LaunchedEffect(exportState) {
-        if (exportState is ExportImportState.Success) {
-            exportImportViewModel.resetState()
-            navController.popBackStack()
+        when (val state = exportState) {
+            is ExportImportState.Success -> {
+                exportImportViewModel.resetState()
+                navController.popBackStack()
+            }
+            is ExportImportState.Error -> {
+                // Stay on the screen so the selection is preserved and the export can be retried.
+                exportImportViewModel.resetState()
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar("Export failed: ${state.message}")
+                }
+            }
+            else -> Unit
         }
     }
 
@@ -136,6 +153,8 @@ fun ExportSelectionScreen(navController: NavController) {
                     photoPath = cosplay.cosplayPhotoPath ?: "",
                 )
             }
+
+            MySnackbarHost(hostState = snackbarHostState)
         }
     }
 }

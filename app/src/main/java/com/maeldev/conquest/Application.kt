@@ -8,7 +8,9 @@ class ConQuestApplication : Application() {
     val database: CosplayDatabase by lazy {
         Room.databaseBuilder(
             applicationContext, CosplayDatabase::class.java, "cosplays_database"
-        ).fallbackToDestructiveMigration(true).build()
+        )
+            .fallbackToDestructiveMigrationOnDowngrade(true)
+            .build()
     }
 
     override fun onCreate() {
