@@ -1,11 +1,9 @@
 package com.maeldev.conquest.data
 
 import android.app.AlarmManager
-import android.app.NotificationManager
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -21,7 +19,6 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
 class ReminderSchedulerTest {
-
     private lateinit var context: Context
 
     @Before

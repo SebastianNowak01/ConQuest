@@ -1,6 +1,5 @@
 package com.maeldev.conquest.data
 
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
@@ -20,7 +19,6 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
 class ReminderNotificationHelperTest {
-
     private lateinit var context: Context
 
     @Before
@@ -59,9 +57,10 @@ class ReminderNotificationHelperTest {
 
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channels = notificationManager.notificationChannels.filter {
-            it.id == ReminderNotificationHelper.CHANNEL_ID
-        }
+        val channels =
+            notificationManager.notificationChannels.filter {
+                it.id == ReminderNotificationHelper.CHANNEL_ID
+            }
 
         assertEquals("Channel should not be duplicated", 1, channels.size)
     }

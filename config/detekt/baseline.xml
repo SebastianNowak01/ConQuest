@@ -1,0 +1,55 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:ExportImportUtil.kt$ExportImportUtil$suspend fun exportCosplays( context: Context, cosplayIds: Set&lt;Int&gt;, targetUri: Uri, cosplayDao: CosplayDao, elementDao: CosplayElementDao, taskDao: CosplayTaskDao, photoDao: CosplayPhotoDao, progressPhotoDao: ProgressPhotoDao, eventDao: EventDao ): Result&lt;Unit&gt;</ID>
+    <ID>CyclomaticComplexMethod:ExportImportUtil.kt$ExportImportUtil$suspend fun importCosplays( context: Context, sourceUri: Uri, cosplayDao: CosplayDao, elementDao: CosplayElementDao, taskDao: CosplayTaskDao, photoDao: CosplayPhotoDao, progressPhotoDao: ProgressPhotoDao, eventDao: EventDao ): Result&lt;Unit&gt;</ID>
+    <ID>CyclomaticComplexMethod:MainScreenListTransforms.kt$fun sortMainScreenCosplays( cosplays: List&lt;Cosplay&gt;, sort: CosplaySortOption, order: CosplaySortOrder, ): List&lt;Cosplay&gt;</ID>
+    <ID>LongMethod:ExportImportUtil.kt$ExportImportUtil$suspend fun exportCosplays( context: Context, cosplayIds: Set&lt;Int&gt;, targetUri: Uri, cosplayDao: CosplayDao, elementDao: CosplayElementDao, taskDao: CosplayTaskDao, photoDao: CosplayPhotoDao, progressPhotoDao: ProgressPhotoDao, eventDao: EventDao ): Result&lt;Unit&gt;</ID>
+    <ID>LongMethod:ExportImportUtil.kt$ExportImportUtil$suspend fun importCosplays( context: Context, sourceUri: Uri, cosplayDao: CosplayDao, elementDao: CosplayElementDao, taskDao: CosplayTaskDao, photoDao: CosplayPhotoDao, progressPhotoDao: ProgressPhotoDao, eventDao: EventDao ): Result&lt;Unit&gt;</ID>
+    <ID>LongMethod:MainActivity.kt$MainActivity$@OptIn(ExperimentalMaterial3Api::class) override fun onCreate(savedInstanceState: Bundle?)</ID>
+    <ID>LongParameterList:EventViewModel.kt$EventViewModel$( entityType: ReminderEntityType, entityId: Int, alarm: Boolean, date: java.util.Date?, title: String, message: String, )</ID>
+    <ID>LongParameterList:ExportImportUtil.kt$ExportImportUtil$( context: Context, cosplayIds: Set&lt;Int&gt;, targetUri: Uri, cosplayDao: CosplayDao, elementDao: CosplayElementDao, taskDao: CosplayTaskDao, photoDao: CosplayPhotoDao, progressPhotoDao: ProgressPhotoDao, eventDao: EventDao )</ID>
+    <ID>LongParameterList:ExportImportUtil.kt$ExportImportUtil$( context: Context, sourceUri: Uri, cosplayDao: CosplayDao, elementDao: CosplayElementDao, taskDao: CosplayTaskDao, photoDao: CosplayPhotoDao, progressPhotoDao: ProgressPhotoDao, eventDao: EventDao )</ID>
+    <ID>LongParameterList:ExportImportViewModel.kt$ExportImportViewModel$( application: Application, private val cosplayDao: CosplayDao, private val elementDao: CosplayElementDao, private val taskDao: CosplayTaskDao, private val photoDao: CosplayPhotoDao, private val progressPhotoDao: ProgressPhotoDao, private val eventDao: EventDao )</ID>
+    <ID>LongParameterList:ReminderScheduler.kt$ReminderScheduler$( context: Context, entityType: ReminderEntityType, entityId: Int, triggerAtMillis: Long, title: String, message: String, )</ID>
+    <ID>LongParameterList:TaskViewModel.kt$TaskViewModel$( entityType: ReminderEntityType, entityId: Int, alarm: Boolean, date: java.util.Date?, title: String, message: String, )</ID>
+    <ID>MagicNumber:Color.kt$0xFF249D57</ID>
+    <ID>MagicNumber:Color.kt$0xFF2E2E2E</ID>
+    <ID>MagicNumber:Color.kt$0xFF2F4F3B</ID>
+    <ID>MagicNumber:Color.kt$0xFF4CAF6A</ID>
+    <ID>MagicNumber:Color.kt$0xFF589D6A</ID>
+    <ID>MagicNumber:Color.kt$0xFF5C5C5C</ID>
+    <ID>MagicNumber:Color.kt$0xFFD6D6D6</ID>
+    <ID>MagicNumber:Color.kt$0xFFF9F9F9</ID>
+    <ID>MagicNumber:EventViewModel.kt$EventViewModel$9</ID>
+    <ID>MagicNumber:EventsTopAppBar.kt$180f</ID>
+    <ID>MagicNumber:ImagePickerUtils.kt$95</ID>
+    <ID>MagicNumber:MainScreenListTransforms.kt$86_400_000L</ID>
+    <ID>MagicNumber:MainScreenTopAppBar.kt$180f</ID>
+    <ID>MagicNumber:MyBackgroundImage.kt$0.5f</ID>
+    <ID>MagicNumber:MyInputField.kt$6</ID>
+    <ID>MagicNumber:ReminderScheduler.kt$ReminderScheduler$100_000</ID>
+    <ID>MagicNumber:ReminderScheduler.kt$ReminderScheduler$9</ID>
+    <ID>MagicNumber:SettingsScreen.kt$0.9f</ID>
+    <ID>MagicNumber:TaskViewModel.kt$TaskViewModel$9</ID>
+    <ID>MatchingDeclarationName:Application.kt$ConQuestApplication : Application</ID>
+    <ID>MatchingDeclarationName:CosplayElements.kt$CosplayElement</ID>
+    <ID>MatchingDeclarationName:CosplayPhotos.kt$CosplayPhoto</ID>
+    <ID>MatchingDeclarationName:CosplayTasks.kt$CosplayTask</ID>
+    <ID>MatchingDeclarationName:Cosplays.kt$Cosplay</ID>
+    <ID>MatchingDeclarationName:DateUtils.kt$DateConverter</ID>
+    <ID>MatchingDeclarationName:EditProgress.kt$EditProgressPhoto</ID>
+    <ID>MatchingDeclarationName:MyPhotoGrid.kt$MyPhotoGridItem</ID>
+    <ID>MatchingDeclarationName:ProgressPhotos.kt$ProgressPhoto</ID>
+    <ID>MatchingDeclarationName:SettingsScreen.kt$SettingsScreenParams</ID>
+    <ID>MaxLineLength:CosplayDatabase.kt$CosplayDatabase$entities = [Cosplay::class, CosplayPhoto::class, CosplayElement::class, CosplayTask::class, Event::class, EventCosplayCrossRef::class, ProgressPhoto::class]</ID>
+    <ID>MaxLineLength:ElementsTab.kt$deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "element" else "elements"}."</ID>
+    <ID>MaxLineLength:Events.kt$deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "event" else "events"}."</ID>
+    <ID>MaxLineLength:MainScreen.kt$deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "cosplay" else "cosplays"}."</ID>
+    <ID>MaxLineLength:PhotosTab.kt$deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "photo" else "photos"}."</ID>
+    <ID>MaxLineLength:Progress.kt$deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "progress photo" else "progress photos"}."</ID>
+    <ID>MaxLineLength:TasksTab.kt$deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "task" else "tasks"}."</ID>
+    <ID>TooManyFunctions:EventDao.kt$EventDao</ID>
+  </CurrentIssues>
+</SmellBaseline>

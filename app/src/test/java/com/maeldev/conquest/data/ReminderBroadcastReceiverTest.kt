@@ -3,7 +3,6 @@ package com.maeldev.conquest.data
 import android.content.Context
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
@@ -19,7 +18,6 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
 class ReminderBroadcastReceiverTest {
-
     private lateinit var context: Context
 
     @Before
@@ -33,11 +31,12 @@ class ReminderBroadcastReceiverTest {
     @Test
     fun onReceive_postsNotificationWithIntentExtras() {
         val receiver = ReminderBroadcastReceiver()
-        val intent = Intent().apply {
-            putExtra("title", "Task Reminder")
-            putExtra("message", "Finish costume")
-            putExtra("notification_id", 12345)
-        }
+        val intent =
+            Intent().apply {
+                putExtra("title", "Task Reminder")
+                putExtra("message", "Finish costume")
+                putExtra("notification_id", 12345)
+            }
 
         receiver.onReceive(context, intent)
 
@@ -51,10 +50,11 @@ class ReminderBroadcastReceiverTest {
     @Test
     fun onReceive_usesDefaultTitleWhenMissing() {
         val receiver = ReminderBroadcastReceiver()
-        val intent = Intent().apply {
-            // No "title" extra
-            putExtra("notification_id", 999)
-        }
+        val intent =
+            Intent().apply {
+                // No "title" extra
+                putExtra("notification_id", 999)
+            }
 
         // Should not crash even without title
         receiver.onReceive(context, intent)

@@ -47,6 +47,7 @@ object ExportImportUtil {
      * Like [runCatching], but lets [CancellationException] propagate instead of reporting a
      * cancelled scope as an export/import failure.
      */
+    @Suppress("TooGenericExceptionCaught") // Mirrors runCatching: any failure becomes Result.failure.
     private inline fun <T> runCatchingCancellable(block: () -> T): Result<T> {
         return try {
             Result.success(block())

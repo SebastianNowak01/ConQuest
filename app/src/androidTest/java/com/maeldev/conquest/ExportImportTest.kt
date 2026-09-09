@@ -26,7 +26,6 @@ import java.util.zip.ZipOutputStream
 
 @RunWith(AndroidJUnit4::class)
 class ExportImportTest {
-
     private lateinit var db: CosplayDatabase
     private lateinit var cosplayDao: CosplayDao
     private lateinit var elementDao: CosplayElementDao
@@ -55,88 +54,92 @@ class ExportImportTest {
     @Test
     fun testExportAndImportCosplays() {
         runBlocking {
-        val context = ApplicationProvider.getApplicationContext<Context>()
+            val context = ApplicationProvider.getApplicationContext<Context>()
 
-        // 1. Setup mock data
-        val initialDate = Date()
-        val cosplay = Cosplay(
-            uid = 0,
-            inProgress = true,
-            finished = false,
-            name = "Test Export Cosplay",
-            series = "Test Series",
-            initialDate = initialDate,
-            dueDate = null,
-            budget = 100.0,
-            cosplayPhotoPath = "images/test_photo.jpg"
-        )
-        val cosplayId = cosplayDao.insertCosplay(cosplay).toInt()
+            // 1. Setup mock data
+            val initialDate = Date()
+            val cosplay =
+                Cosplay(
+                    uid = 0,
+                    inProgress = true,
+                    finished = false,
+                    name = "Test Export Cosplay",
+                    series = "Test Series",
+                    initialDate = initialDate,
+                    dueDate = null,
+                    budget = 100.0,
+                    cosplayPhotoPath = "images/test_photo.jpg",
+                )
+            val cosplayId = cosplayDao.insertCosplay(cosplay).toInt()
 
-        val element = CosplayElement(
-            id = 0,
-            cosplayId = cosplayId,
-            name = "Test Element",
-            cost = 10.0,
-            ready = false,
-            photoPath = null,
-            bought = false,
-            notes = null
-        )
-        elementDao.insertElement(element)
+            val element =
+                CosplayElement(
+                    id = 0,
+                    cosplayId = cosplayId,
+                    name = "Test Element",
+                    cost = 10.0,
+                    ready = false,
+                    photoPath = null,
+                    bought = false,
+                    notes = null,
+                )
+            elementDao.insertElement(element)
 
-        val imageDir = File(context.filesDir, "images")
-        imageDir.mkdirs()
-        val testImageFile = File(imageDir, "test_photo.jpg")
-        testImageFile.writeText("fake image content")
+            val imageDir = File(context.filesDir, "images")
+            imageDir.mkdirs()
+            val testImageFile = File(imageDir, "test_photo.jpg")
+            testImageFile.writeText("fake image content")
 
-        val tempZipFile = File.createTempFile("export_test", ".zip", context.cacheDir)
-        val zipUri = Uri.fromFile(tempZipFile)
+            val tempZipFile = File.createTempFile("export_test", ".zip", context.cacheDir)
+            val zipUri = Uri.fromFile(tempZipFile)
 
-        val exportResult = ExportImportUtil.exportCosplays(
-            context = context,
-            cosplayIds = setOf(cosplayId),
-            targetUri = zipUri,
-            cosplayDao = cosplayDao,
-            elementDao = elementDao,
-            taskDao = taskDao,
-            photoDao = photoDao,
-            progressPhotoDao = progressPhotoDao,
-            eventDao = eventDao
-        )
+            val exportResult =
+                ExportImportUtil.exportCosplays(
+                    context = context,
+                    cosplayIds = setOf(cosplayId),
+                    targetUri = zipUri,
+                    cosplayDao = cosplayDao,
+                    elementDao = elementDao,
+                    taskDao = taskDao,
+                    photoDao = photoDao,
+                    progressPhotoDao = progressPhotoDao,
+                    eventDao = eventDao,
+                )
 
-        assertTrue("Export failed: ${exportResult.exceptionOrNull()?.message}", exportResult.isSuccess)
-        assertTrue(tempZipFile.exists())
-        assertTrue(tempZipFile.length() > 0)
+            assertTrue("Export failed: ${exportResult.exceptionOrNull()?.message}", exportResult.isSuccess)
+            assertTrue(tempZipFile.exists())
+            assertTrue(tempZipFile.length() > 0)
 
-        val importResult = ExportImportUtil.importCosplays(
-            context = context,
-            sourceUri = zipUri,
-            cosplayDao = cosplayDao,
-            elementDao = elementDao,
-            taskDao = taskDao,
-            photoDao = photoDao,
-            progressPhotoDao = progressPhotoDao,
-            eventDao = eventDao
-        )
+            val importResult =
+                ExportImportUtil.importCosplays(
+                    context = context,
+                    sourceUri = zipUri,
+                    cosplayDao = cosplayDao,
+                    elementDao = elementDao,
+                    taskDao = taskDao,
+                    photoDao = photoDao,
+                    progressPhotoDao = progressPhotoDao,
+                    eventDao = eventDao,
+                )
 
-        assertTrue("Import failed: ${importResult.exceptionOrNull()?.message}", importResult.isSuccess)
+            assertTrue("Import failed: ${importResult.exceptionOrNull()?.message}", importResult.isSuccess)
 
-        val allCosplays = cosplayDao.getAllCosplays().first()
-        assertEquals(2, allCosplays.size)
+            val allCosplays = cosplayDao.getAllCosplays().first()
+            assertEquals(2, allCosplays.size)
 
-        val importedCosplay = allCosplays.find { it.uid != cosplayId }
-        requireNotNull(importedCosplay)
-        assertEquals("Test Export Cosplay", importedCosplay.name)
+            val importedCosplay = allCosplays.find { it.uid != cosplayId }
+            requireNotNull(importedCosplay)
+            assertEquals("Test Export Cosplay", importedCosplay.name)
 
-        val importedElements = elementDao.getElementsForCosplay(importedCosplay.uid).first()
-        assertEquals(1, importedElements.size)
-        assertEquals("Test Element", importedElements[0].name)
+            val importedElements = elementDao.getElementsForCosplay(importedCosplay.uid).first()
+            assertEquals(1, importedElements.size)
+            assertEquals("Test Element", importedElements[0].name)
 
-        val importedImageFile = File(context.filesDir, "images/test_photo.jpg")
-        assertTrue(importedImageFile.exists())
+            val importedImageFile = File(context.filesDir, "images/test_photo.jpg")
+            assertTrue(importedImageFile.exists())
 
-        tempZipFile.delete()
-        testImageFile.delete()
+            tempZipFile.delete()
+            testImageFile.delete()
         }
     }
 
@@ -156,16 +159,17 @@ class ExportImportTest {
                 zos.closeEntry()
             }
 
-            val result = ExportImportUtil.importCosplays(
-                context = context,
-                sourceUri = Uri.fromFile(maliciousZip),
-                cosplayDao = cosplayDao,
-                elementDao = elementDao,
-                taskDao = taskDao,
-                photoDao = photoDao,
-                progressPhotoDao = progressPhotoDao,
-                eventDao = eventDao
-            )
+            val result =
+                ExportImportUtil.importCosplays(
+                    context = context,
+                    sourceUri = Uri.fromFile(maliciousZip),
+                    cosplayDao = cosplayDao,
+                    elementDao = elementDao,
+                    taskDao = taskDao,
+                    photoDao = photoDao,
+                    progressPhotoDao = progressPhotoDao,
+                    eventDao = eventDao,
+                )
 
             assertTrue("Traversal entry should have been rejected", result.isFailure)
 
@@ -176,4 +180,3 @@ class ExportImportTest {
         }
     }
 }
-

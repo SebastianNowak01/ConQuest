@@ -6,7 +6,6 @@ import org.junit.Test
 import java.util.Date
 
 class FormStateValidationTest {
-
     @Test
     fun taskFormState_isValid() {
         val validState = TaskFormState(taskName = "Fix prop", date = Date())

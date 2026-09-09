@@ -23,7 +23,7 @@ object UIConsts {
     val imageSizeM = 80.dp
     val previewBlurRadius = 24.dp
     val previewImagePadding = 24.dp
-    val previewScrimAlpha = 0.35f
+    const val previewScrimAlpha = 0.35f
     const val decorativeBackgroundAlphaLight = 0.2f
     const val decorativeBackgroundAlphaDark = 0.2f
 
@@ -35,10 +35,10 @@ object UIConsts {
 
     val letterSpacingS = 1.5.sp
 
-    val columnWidthFraction = 0.9f
+    const val columnWidthFraction = 0.9f
 
     val snackbarHostVerticalOffset = 140.dp
-    val fabCornerRadius = 50
+    const val fabCornerRadius = 50
 
     val searchBarVerticalPadding = 6.dp
     val columnVerticalSpacing = 20.dp

@@ -11,28 +11,27 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class MyInputFieldTest {
-
     @get:Rule
     val composeTestRule = createComposeRule()
 
     @Test
     fun myInputField_displaysLabelAndUpdatesValue() {
         var textValue = ""
-        
+
         composeTestRule.setContent {
             MyInputField(
                 label = "Test Label",
                 value = textValue,
-                onValueChange = { textValue = it }
+                onValueChange = { textValue = it },
             )
         }
 
         // Verify label is displayed
         composeTestRule.onNodeWithText("Test Label").assertExists()
-        
+
         // Enter text
         composeTestRule.onNodeWithText("Test Label").performTextInput("New text")
-        
+
         // Verify state is updated
         assertEquals("New text", textValue)
     }
