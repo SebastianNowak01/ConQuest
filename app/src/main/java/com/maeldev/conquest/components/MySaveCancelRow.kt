@@ -1,8 +1,8 @@
 package com.maeldev.conquest.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -16,14 +16,33 @@ import androidx.compose.ui.unit.Dp
 import com.maeldev.conquest.theme.UIConsts
 import kotlinx.coroutines.launch
 
+/** The accessibility labels and the "something is missing" message for a save/cancel row. */
+data class SaveCancelLabels(
+    val invalidMessage: String = "Please fill out all required fields!",
+    val cancel: String = "Cancel",
+    val save: String = "Save",
+)
+
+/**
+ * What the validating [MySaveCancelRow] does on each outcome.
+ *
+ * [onInvalidAttempt] is what lets the form mark which fields are missing, since the snackbar
+ * message cannot name them.
+ */
+data class SaveCancelActions(
+    val onCancel: () -> Unit,
+    val onCommit: () -> Unit,
+    val postCommit: () -> Unit,
+    val onInvalidAttempt: () -> Unit = {},
+)
+
 @Composable
 fun BoxScope.MySaveCancelRow(
-    modifier: Modifier = Modifier,
-    bottomPadding: Dp = UIConsts.paddingM,
     onCancel: () -> Unit,
     onSave: () -> Unit,
-    cancelContentDescription: String = "Cancel",
-    saveContentDescription: String = "Save",
+    modifier: Modifier = Modifier,
+    bottomPadding: Dp = UIConsts.paddingM,
+    labels: SaveCancelLabels = SaveCancelLabels(),
 ) {
     Row(
         // MyFab applies the navigation bar inset itself, so the row does not repeat it.
@@ -31,7 +50,7 @@ fun BoxScope.MySaveCancelRow(
             modifier
                 .align(androidx.compose.ui.Alignment.BottomCenter)
                 .padding(bottom = bottomPadding),
-        horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingL)
+        horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingL),
     ) {
         // Cancel is deliberately not the error colour: the delete action in selection mode is a
         // red FAB with this same Close icon, and leaving a form without saving is not destruction.
@@ -40,7 +59,7 @@ fun BoxScope.MySaveCancelRow(
             containerColor = MaterialTheme.colorScheme.tertiary,
             contentColor = MaterialTheme.colorScheme.primary,
             icon = Icons.Default.Close,
-            contentDescription = cancelContentDescription,
+            contentDescription = labels.cancel,
         )
 
         MyFab(
@@ -48,46 +67,37 @@ fun BoxScope.MySaveCancelRow(
             containerColor = MaterialTheme.colorScheme.secondary,
             contentColor = MaterialTheme.colorScheme.primary,
             icon = Icons.Default.Check,
-            contentDescription = saveContentDescription,
+            contentDescription = labels.save,
         )
     }
 }
 
 @Composable
 fun BoxScope.MySaveCancelRow(
-    modifier: Modifier = Modifier,
-    bottomPadding: Dp = UIConsts.paddingM,
     snackbarHostState: SnackbarHostState,
     isValid: Boolean,
-    invalidMessage: String = "Please fill out all required fields!",
-    onInvalidAttempt: () -> Unit = {},
-    onCancel: () -> Unit,
-    onCommit: () -> Unit,
-    postCommit: () -> Unit,
-    cancelContentDescription: String = "Cancel",
-    saveContentDescription: String = "Save",
+    actions: SaveCancelActions,
+    modifier: Modifier = Modifier,
+    bottomPadding: Dp = UIConsts.paddingM,
+    labels: SaveCancelLabels = SaveCancelLabels(),
 ) {
     val coroutineScope = rememberCoroutineScope()
 
     MySaveCancelRow(
         modifier = modifier,
         bottomPadding = bottomPadding,
-        onCancel = onCancel,
+        onCancel = actions.onCancel,
         onSave = {
             if (!isValid) {
-                // The snackbar says something is missing; onInvalidAttempt is what lets the
-                // form mark which fields, since the message cannot name them.
-                onInvalidAttempt()
+                actions.onInvalidAttempt()
                 coroutineScope.launch {
-                    snackbarHostState.showSnackbar(invalidMessage)
+                    snackbarHostState.showSnackbar(labels.invalidMessage)
                 }
                 return@MySaveCancelRow
             }
-            onCommit()
-            postCommit()
+            actions.onCommit()
+            actions.postCommit()
         },
-        cancelContentDescription = cancelContentDescription,
-        saveContentDescription = saveContentDescription,
+        labels = labels,
     )
 }
-

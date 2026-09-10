@@ -25,14 +25,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.maeldev.conquest.data.classes.CosplayStatus
 import com.maeldev.conquest.data.entity.Cosplay
+import com.maeldev.conquest.theme.DarkGreen
+import com.maeldev.conquest.theme.LightGreen
 import com.maeldev.conquest.theme.UIConsts
 
 private val CosplayStatus.icon: ImageVector
-    get() = when (this) {
-        CosplayStatus.Planned -> Icons.Default.Schedule
-        CosplayStatus.InProgress -> Icons.Default.PlayArrow
-        CosplayStatus.Done -> Icons.Default.CheckCircle
-    }
+    get() =
+        when (this) {
+            CosplayStatus.Planned -> Icons.Default.Schedule
+            CosplayStatus.InProgress -> Icons.Default.PlayArrow
+            CosplayStatus.Done -> Icons.Default.CheckCircle
+        }
 
 /**
  * A cosplay as it appears in the main list.
@@ -50,11 +53,14 @@ fun MyCosplayRow(cosplay: Cosplay) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             MyImageBox(
                 photoPath = cosplay.cosplayPhotoPath.orEmpty(),
-                contentDescription = cosplay.name,
-                size = UIConsts.imageSizeS,
                 clickable = false,
                 onClick = {},
-                emptyContentDescription = "Cosplay photo",
+                config =
+                    MyImageBoxConfig(
+                        size = UIConsts.imageSizeS,
+                        contentDescription = cosplay.name,
+                        emptyContentDescription = "Cosplay photo",
+                    ),
             )
 
             Column(
@@ -98,8 +104,11 @@ fun MyCosplayRow(cosplay: Cosplay) {
                         .weight(1f)
                         .height(UIConsts.progressBarHeight)
                         .clip(RoundedCornerShape(UIConsts.progressBarHeight)),
-                color = MaterialTheme.colorScheme.secondary,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                color = LightGreen,
+                trackColor = DarkGreen,
+                // Material 3 draws a dot in the indicator colour at the end of the track by
+                // default, which reads as stray light green on a bar that is barely filled.
+                drawStopIndicator = {},
             )
             Text(
                 text = "${cosplay.overallPercentage}% done",

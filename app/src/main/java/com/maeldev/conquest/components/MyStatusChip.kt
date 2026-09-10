@@ -58,7 +58,8 @@ fun MyStatusChip(
                     horizontal = UIConsts.paddingS,
                     vertical = UIConsts.chipVerticalPadding,
                 ),
-            horizontalArrangement = Arrangement.spacedBy(UIConsts.paddingXS),
+            horizontalArrangement =
+                Arrangement.spacedBy(UIConsts.paddingXS, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(

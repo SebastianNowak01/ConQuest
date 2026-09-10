@@ -21,33 +21,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
 import com.maeldev.conquest.theme.UIConsts
 
 /**
  * Image slot: an avatar in a list row, or the editable picture at the top of a form.
  *
- * On a form pass [showEditBadge] and [onClear]. Without them the control is an unlabelled grey
+ * On a form set `showEditBadge` on the config and pass [onClear]. Without them the control is an unlabelled grey
  * circle that gives no sign it can be tapped, and a picture, once chosen, cannot be taken back
  * off — only replaced.
  */
 @Composable
 fun MyImageBox(
-    modifier: Modifier = Modifier,
     photoPath: String,
-    contentDescription: String? = null,
-    size: Dp,
-    shape: Shape = CircleShape,
+    config: MyImageBoxConfig,
     clickable: Boolean,
     onClick: () -> Unit,
-    emptyContentDescription: String = "Pick image",
-    previewWhenPhotoExists: Boolean = false,
-    showEditBadge: Boolean = false,
+    modifier: Modifier = Modifier,
     onClear: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
@@ -57,41 +50,43 @@ fun MyImageBox(
     val clickModifier =
         when {
             !clickable -> Modifier
-            previewWhenPhotoExists && hasPhoto -> Modifier.clickable { showPreview = true }
+            config.previewWhenPhotoExists && hasPhoto -> Modifier.clickable { showPreview = true }
             else -> Modifier.clickable(onClick = onClick)
         }
 
-    Box(modifier = modifier.size(size)) {
+    Box(modifier = modifier.size(config.size)) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(shape)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .then(clickModifier),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .clip(config.shape)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .then(clickModifier),
             contentAlignment = Alignment.Center,
         ) {
             if (hasPhoto) {
                 AsyncImage(
                     model = resolvedPhotoPath,
-                    contentDescription = contentDescription,
+                    contentDescription = config.contentDescription,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(shape),
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .clip(config.shape),
                 )
             } else {
                 Icon(
                     imageVector = Icons.Default.Image,
-                    contentDescription = emptyContentDescription,
+                    contentDescription = config.emptyContentDescription,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
 
-        if (showEditBadge) {
+        if (config.showEditBadge) {
             MyImageBoxBadge(
                 icon = Icons.Default.Edit,
-                contentDescription = if (hasPhoto) "Change image" else emptyContentDescription,
+                contentDescription = if (hasPhoto) "Change image" else config.emptyContentDescription,
                 onClick = onClick,
                 modifier = Modifier.align(Alignment.BottomEnd),
             )
@@ -110,7 +105,7 @@ fun MyImageBox(
     if (showPreview) {
         MyPhotoPreview(
             photoPath = photoPath,
-            contentDescription = contentDescription,
+            contentDescription = config.contentDescription,
             onDismiss = { showPreview = false },
         )
     }
@@ -124,10 +119,11 @@ private fun MyImageBoxBadge(
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = modifier
-            .size(UIConsts.imageBadgeSize)
-            .clip(CircleShape)
-            .clickable(onClick = onClick),
+        modifier =
+            modifier
+                .size(UIConsts.imageBadgeSize)
+                .clip(CircleShape)
+                .clickable(onClick = onClick),
         shape = CircleShape,
         color = MaterialTheme.colorScheme.secondary,
         contentColor = MaterialTheme.colorScheme.primary,

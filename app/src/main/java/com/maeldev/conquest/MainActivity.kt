@@ -16,11 +16,13 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -38,86 +40,94 @@ import com.maeldev.conquest.theme.ConQuestTheme
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 0)
 
         enableEdgeToEdge()
-        setContent {
-            val context = LocalContext.current
-            val themePref by rememberThemePreference(
-                context
-            )
-            val darkTheme = when (themePref) {
-                "dark" -> true
-                "light" -> false
-                else -> isSystemInDarkTheme()
-            }
+        setContent { ConQuestApp() }
+    }
+}
 
-            val navController = rememberNavController()
-            val drawerState = rememberDrawerState(DrawerValue.Closed)
-            val scope = rememberCoroutineScope()
+/** Resolves the stored theme preference to the dark/light flag the theme expects. */
+@Composable
+private fun isDarkTheme(themePref: String?): Boolean =
+    when (themePref) {
+        "dark" -> true
+        "light" -> false
+        else -> isSystemInDarkTheme()
+    }
 
-            var searchQuery by rememberSaveable { mutableStateOf("") }
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentRoute = navBackStackEntry?.destination?.route
-            val isNoDrawerRoute = currentRoute in noDrawerRoutes
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ConQuestApp() {
+    val context = LocalContext.current
+    val themePref by rememberThemePreference(context)
 
-            val topBarConfig =
-                getTopAppBarConfig(
-                    currentRoute,
-                    noDrawerRoutes
-                )
+    val navController = rememberNavController()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
-            ConQuestTheme(darkTheme = darkTheme) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    MyBackgroundImage()
-                    Drawer(
-                        navController = navController,
-                        drawerState = drawerState,
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    val isNoDrawerRoute = currentRoute in noDrawerRoutes
+
+    val topBarConfig = getTopAppBarConfig(currentRoute, noDrawerRoutes)
+
+    ConQuestTheme(darkTheme = isDarkTheme(themePref)) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            MyBackgroundImage()
+            Drawer(
+                navController = navController,
+                drawerState = drawerState,
+            ) {
+                Scaffold(
+                    containerColor = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    topBar = {
+                        MyTopAppBar(
+                            config = topBarConfig,
+                            searchQuery = searchQuery,
+                            navController = navController,
+                            navBackStackEntry = navBackStackEntry,
+                            onSearchQueryChange = { searchQuery = it },
+                            onMenuClick = { scope.launch { drawerState.open() } },
+                        )
+                    },
+                ) { padding ->
+                    Column(
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .padding(padding),
                     ) {
-                        Scaffold(
-                            containerColor = Color.Transparent,
-                            contentColor = MaterialTheme.colorScheme.primary,
-                            topBar = {
-                                MyTopAppBar(
-                                    config = topBarConfig,
-                                    searchQuery = searchQuery,
-                                    navController = navController,
-                                    navBackStackEntry = navBackStackEntry,
-                                    onSearchQueryChange = { searchQuery = it },
-                                    onMenuClick = { scope.launch { drawerState.open() } },
-                                )
-                            },
-                        ) { padding ->
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(padding),
-                            ) {
-                                if (!isNoDrawerRoute) {
-                                    HorizontalDivider(thickness = 1.dp)
-                                }
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = androidx.compose.ui.Alignment.TopCenter,
-                                ) {
-                                    Box(
-                                        modifier = Modifier.widthIn(max = 600.dp),
-                                    ) {
-                                        MainNavigation(
-                                            navController = navController,
-                                            searchQuery = if (isNoDrawerRoute) "" else searchQuery,
-                                        )
-                                    }
-                                }
-                            }
+                        if (!isNoDrawerRoute) {
+                            HorizontalDivider(thickness = 1.dp)
+                        }
+                        CenteredContent {
+                            MainNavigation(
+                                navController = navController,
+                                searchQuery = if (isNoDrawerRoute) "" else searchQuery,
+                            )
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+/** Centres [content] and caps it at a readable width on tablets and foldables. */
+@Composable
+private fun CenteredContent(content: @Composable () -> Unit) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter,
+    ) {
+        Box(modifier = Modifier.widthIn(max = 600.dp)) {
+            content()
         }
     }
 }

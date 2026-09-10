@@ -1,30 +1,29 @@
 package com.maeldev.conquest.screens
 
-import com.maeldev.conquest.AppViewModelProvider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.TheaterComedy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import com.maeldev.conquest.viewmodel.CosplayViewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.maeldev.conquest.AppViewModelProvider
 import com.maeldev.conquest.components.MyAddFab
 import com.maeldev.conquest.components.MyCosplayRow
 import com.maeldev.conquest.components.MyEmptyState
-import com.maeldev.conquest.components.MySelectionCountLabel
 import com.maeldev.conquest.components.MyLazyColumn
+import com.maeldev.conquest.components.MyListItemActions
 import com.maeldev.conquest.components.MyOuterBox
+import com.maeldev.conquest.components.MySelectionCountLabel
 import com.maeldev.conquest.components.MySelectionModeFabs
 import com.maeldev.conquest.components.rememberSelectionState
 import com.maeldev.conquest.screens.cosplay.MainCosplayScreen
 import com.maeldev.conquest.screens.cosplay.NewCosplay
+import com.maeldev.conquest.viewmodel.CosplayViewModel
 import kotlinx.serialization.Serializable
-import kotlin.collections.minus
-import kotlin.collections.plus
 
 @Serializable
 object MainScreen
@@ -40,25 +39,27 @@ fun MainScreen(
     val selectedSort by cosplayViewModel.mainScreenSort.collectAsState()
     val selectedOrder by cosplayViewModel.mainScreenSortOrder.collectAsState()
 
-    val filteredCosplays = remember(cosplays, searchQuery, selectedFilter) {
-        filterMainScreenCosplays(
-            cosplays = cosplays,
-            searchQuery = searchQuery,
-            selectedFilter = selectedFilter,
-        )
-    }
+    val filteredCosplays =
+        remember(cosplays, searchQuery, selectedFilter) {
+            filterMainScreenCosplays(
+                cosplays = cosplays,
+                searchQuery = searchQuery,
+                selectedFilter = selectedFilter,
+            )
+        }
 
-    val sortedCosplays = remember(
-        filteredCosplays,
-        selectedSort,
-        selectedOrder,
-    ) {
-        sortMainScreenCosplays(
-            cosplays = filteredCosplays,
-            sort = selectedSort,
-            order = selectedOrder,
-        )
-    }
+    val sortedCosplays =
+        remember(
+            filteredCosplays,
+            selectedSort,
+            selectedOrder,
+        ) {
+            sortMainScreenCosplays(
+                cosplays = filteredCosplays,
+                sort = selectedSort,
+                order = selectedOrder,
+            )
+        }
 
     val selection = rememberSelectionState(items = sortedCosplays, id = { it.uid })
 
@@ -75,15 +76,18 @@ fun MainScreen(
         MyLazyColumn(
             items = sortedCosplays,
             key = { it.uid },
-            isSelected = { selection.isSelected(it.uid) },
-            onClick = { cosplay ->
-                if (!selection.isActive) {
-                    navController.navigate(MainCosplayScreen(cosplay.uid))
-                    return@MyLazyColumn
-                }
-                selection.toggle(cosplay.uid)
-            },
-            onLongClick = { cosplay -> selection.select(cosplay.uid) },
+            actions =
+                MyListItemActions(
+                    isSelected = { selection.isSelected(it.uid) },
+                    onClick = { cosplay ->
+                        if (!selection.isActive) {
+                            navController.navigate(MainCosplayScreen(cosplay.uid))
+                            return@MyListItemActions
+                        }
+                        selection.toggle(cosplay.uid)
+                    },
+                    onLongClick = { cosplay -> selection.select(cosplay.uid) },
+                ),
         ) { cosplay ->
             MyCosplayRow(cosplay = cosplay)
         }
@@ -109,7 +113,7 @@ fun MainScreen(
 
         MyAddFab(
             navController,
-            route = NewCosplay
+            route = NewCosplay,
         )
     }
 }

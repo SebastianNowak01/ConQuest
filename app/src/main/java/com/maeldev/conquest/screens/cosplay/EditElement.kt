@@ -1,6 +1,5 @@
 package com.maeldev.conquest.screens.cosplay
 
-import com.maeldev.conquest.AppViewModelProvider
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -11,9 +10,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.maeldev.conquest.viewmodel.ElementViewModel
+import com.maeldev.conquest.AppViewModelProvider
 import com.maeldev.conquest.components.ElementFormContent
 import com.maeldev.conquest.data.classes.ElementFormState
+import com.maeldev.conquest.data.classes.FormActions
+import com.maeldev.conquest.viewmodel.ElementViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -27,7 +28,7 @@ fun EditElement(
 ) {
     val element by elementViewModel.getElementById(elementId).collectAsState(initial = null)
     val snackbarHostState = remember { SnackbarHostState() }
-    
+
     var form by remember { mutableStateOf(ElementFormState()) }
     var baseline by remember { mutableStateOf(ElementFormState()) }
     var originalPhotoPath by remember { mutableStateOf<String?>(null) }
@@ -47,17 +48,20 @@ fun EditElement(
         originalPhotoPath = originalPhotoPath,
         didCommit = didCommit,
         onFormChange = { form = it },
-        snackbarHostState = snackbarHostState,
-        isDirty = form != baseline,
-        onCancel = { navController.popBackStack() },
-        onCommit = {
-            val current = element ?: return@ElementFormContent
-            val updated = form.toUpdatedEntity(current)
-            val oldPath = current.photoPath
-            val oldPathToDelete = if (updated.photoPath != oldPath) oldPath else null
-            didCommit = true
-            elementViewModel.updateElement(updated, oldPathToDelete = oldPathToDelete)
-        },
-        postCommit = { navController.popBackStack() }
+        actions =
+            FormActions(
+                snackbarHostState = snackbarHostState,
+                isDirty = form != baseline,
+                onCancel = { navController.popBackStack() },
+                onCommit = {
+                    val current = element ?: return@FormActions
+                    val updated = form.toUpdatedEntity(current)
+                    val oldPath = current.photoPath
+                    val oldPathToDelete = if (updated.photoPath != oldPath) oldPath else null
+                    didCommit = true
+                    elementViewModel.updateElement(updated, oldPathToDelete = oldPathToDelete)
+                },
+                postCommit = { navController.popBackStack() },
+            ),
     )
 }

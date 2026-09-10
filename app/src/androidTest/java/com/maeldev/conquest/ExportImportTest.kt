@@ -5,7 +5,13 @@ import android.net.Uri
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.maeldev.conquest.data.dao.*
+import com.maeldev.conquest.data.dao.CosplayDao
+import com.maeldev.conquest.data.dao.CosplayDaos
+import com.maeldev.conquest.data.dao.CosplayElementDao
+import com.maeldev.conquest.data.dao.CosplayPhotoDao
+import com.maeldev.conquest.data.dao.CosplayTaskDao
+import com.maeldev.conquest.data.dao.EventDao
+import com.maeldev.conquest.data.dao.ProgressPhotoDao
 import com.maeldev.conquest.data.database.CosplayDatabase
 import com.maeldev.conquest.data.entity.Cosplay
 import com.maeldev.conquest.data.entity.CosplayElement
@@ -33,6 +39,7 @@ class ExportImportTest {
     private lateinit var photoDao: CosplayPhotoDao
     private lateinit var progressPhotoDao: ProgressPhotoDao
     private lateinit var eventDao: EventDao
+    private lateinit var daos: CosplayDaos
 
     @Before
     fun createDb() {
@@ -44,6 +51,15 @@ class ExportImportTest {
         photoDao = db.cosplayPhotoDao()
         progressPhotoDao = db.progressPhotoDao()
         eventDao = db.eventDao()
+        daos =
+            CosplayDaos(
+                cosplayDao = cosplayDao,
+                elementDao = elementDao,
+                taskDao = taskDao,
+                photoDao = photoDao,
+                progressPhotoDao = progressPhotoDao,
+                eventDao = eventDao,
+            )
     }
 
     @After
@@ -98,12 +114,7 @@ class ExportImportTest {
                     context = context,
                     cosplayIds = setOf(cosplayId),
                     targetUri = zipUri,
-                    cosplayDao = cosplayDao,
-                    elementDao = elementDao,
-                    taskDao = taskDao,
-                    photoDao = photoDao,
-                    progressPhotoDao = progressPhotoDao,
-                    eventDao = eventDao,
+                    daos = daos,
                 )
 
             assertTrue("Export failed: ${exportResult.exceptionOrNull()?.message}", exportResult.isSuccess)
@@ -114,12 +125,7 @@ class ExportImportTest {
                 ExportImportUtil.importCosplays(
                     context = context,
                     sourceUri = zipUri,
-                    cosplayDao = cosplayDao,
-                    elementDao = elementDao,
-                    taskDao = taskDao,
-                    photoDao = photoDao,
-                    progressPhotoDao = progressPhotoDao,
-                    eventDao = eventDao,
+                    daos = daos,
                 )
 
             assertTrue("Import failed: ${importResult.exceptionOrNull()?.message}", importResult.isSuccess)
@@ -163,12 +169,7 @@ class ExportImportTest {
                 ExportImportUtil.importCosplays(
                     context = context,
                     sourceUri = Uri.fromFile(maliciousZip),
-                    cosplayDao = cosplayDao,
-                    elementDao = elementDao,
-                    taskDao = taskDao,
-                    photoDao = photoDao,
-                    progressPhotoDao = progressPhotoDao,
-                    eventDao = eventDao,
+                    daos = daos,
                 )
 
             assertTrue("Traversal entry should have been rejected", result.isFailure)
