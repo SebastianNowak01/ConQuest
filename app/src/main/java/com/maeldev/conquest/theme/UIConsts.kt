@@ -29,6 +29,10 @@ object UIConsts {
 
     val placeholderHeightL = 200.dp
 
+    /** Room reserved at the bottom of a form or list for the floating action buttons over it. */
+    val formBottomInset = 96.dp
+    val listBottomInset = 96.dp
+
     val spacingS = 12.dp
     val spacingM = 18.dp
     val spacingL = 24.dp

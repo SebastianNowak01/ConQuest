@@ -16,6 +16,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
 import com.maeldev.conquest.theme.UIConsts
@@ -73,6 +74,8 @@ fun MyPhotoGrid(
                 AsyncImage(
                     model = resolvedPhotoPath,
                     contentDescription = contentDescription,
+                    // Cells are square but photos are not, so crop rather than distort.
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize(),
                 )
             }

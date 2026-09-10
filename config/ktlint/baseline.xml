@@ -38,22 +38,18 @@
         <error line="35" column="25" source="standard:multiline-expression-wrapping" />
         <error line="39" column="39" source="standard:multiline-expression-wrapping" />
         <error line="51" column="10" source="standard:trailing-comma-on-call-site" />
-        <error line="70" column="79" source="standard:trailing-comma-on-call-site" />
-        <error line="90" column="79" source="standard:trailing-comma-on-call-site" />
-        <error line="96" column="75" source="standard:trailing-comma-on-call-site" />
+        <error line="91" column="79" source="standard:trailing-comma-on-call-site" />
+        <error line="97" column="75" source="standard:trailing-comma-on-call-site" />
     </file>
     <file name="src/main/java/com/maeldev/conquest/components/DatePicker.kt">
         <error line="3" column="1" source="standard:import-ordering" />
-        <error line="41" column="38" source="standard:parameter-list-wrapping" />
-        <error line="41" column="38" source="standard:function-signature" />
-        <error line="41" column="59" source="standard:trailing-comma-on-declaration-site" />
-        <error line="64" column="20" source="standard:parameter-list-wrapping" />
-        <error line="64" column="20" source="standard:function-signature" />
-        <error line="64" column="41" source="standard:parameter-list-wrapping" />
-        <error line="64" column="41" source="standard:function-signature" />
-        <error line="64" column="72" source="standard:trailing-comma-on-declaration-site" />
-        <error line="77" column="20" source="standard:multiline-expression-wrapping" />
-        <error line="88" column="18" source="standard:multiline-expression-wrapping" />
+        <error line="67" column="20" source="standard:parameter-list-wrapping" />
+        <error line="67" column="20" source="standard:function-signature" />
+        <error line="67" column="41" source="standard:parameter-list-wrapping" />
+        <error line="67" column="41" source="standard:function-signature" />
+        <error line="67" column="72" source="standard:trailing-comma-on-declaration-site" />
+        <error line="80" column="20" source="standard:multiline-expression-wrapping" />
+        <error line="91" column="18" source="standard:multiline-expression-wrapping" />
     </file>
     <file name="src/main/java/com/maeldev/conquest/components/Drawer.kt">
         <error line="36" column="14" source="standard:multiline-expression-wrapping" />
@@ -171,8 +167,7 @@
         <error line="26" column="10" source="standard:trailing-comma-on-call-site" />
     </file>
     <file name="src/main/java/com/maeldev/conquest/components/MyColumn.kt">
-        <error line="16" column="20" source="standard:multiline-expression-wrapping" />
-        <error line="21" column="59" source="standard:trailing-comma-on-call-site" />
+        <error line="28" column="20" source="standard:multiline-expression-wrapping" />
     </file>
     <file name="src/main/java/com/maeldev/conquest/components/MyConfirmationDialog.kt">
         <error line="34" column="1" source="standard:no-consecutive-blank-lines" />
@@ -242,10 +237,10 @@
         <error line="12" column="45" source="standard:trailing-comma-on-declaration-site" />
     </file>
     <file name="src/main/java/com/maeldev/conquest/components/MyPhotoGrid.kt">
-        <error line="50" column="28" source="standard:multiline-expression-wrapping" />
-        <error line="62" column="26" source="standard:multiline-expression-wrapping" />
-        <error line="63" column="38" source="standard:multiline-expression-wrapping" />
-        <error line="83" column="1" source="standard:no-consecutive-blank-lines" />
+        <error line="51" column="28" source="standard:multiline-expression-wrapping" />
+        <error line="63" column="26" source="standard:multiline-expression-wrapping" />
+        <error line="64" column="38" source="standard:multiline-expression-wrapping" />
+        <error line="86" column="1" source="standard:no-consecutive-blank-lines" />
     </file>
     <file name="src/main/java/com/maeldev/conquest/components/MyPhotoPreview.kt">
         <error line="30" column="22" source="standard:multiline-expression-wrapping" />
@@ -396,19 +391,11 @@
         <error line="82" column="68" source="standard:trailing-comma-on-declaration-site" />
         <error line="92" column="23" source="standard:trailing-comma-on-declaration-site" />
     </file>
-    <file name="src/main/java/com/maeldev/conquest/data/classes/CosplayFormState.kt">
-        <error line="37" column="23" source="standard:parameter-list-wrapping" />
-        <error line="37" column="23" source="standard:function-signature" />
-        <error line="37" column="54" source="standard:trailing-comma-on-declaration-site" />
-    </file>
     <file name="src/main/java/com/maeldev/conquest/data/classes/CosplaySortOption.kt">
         <error line="16" column="1" source="standard:no-consecutive-blank-lines" />
     </file>
     <file name="src/main/java/com/maeldev/conquest/data/classes/CosplaySortOrder.kt">
         <error line="8" column="1" source="standard:no-consecutive-blank-lines" />
-    </file>
-    <file name="src/main/java/com/maeldev/conquest/data/classes/CosplayStatusFilter.kt">
-        <error line="10" column="1" source="standard:no-consecutive-blank-lines" />
     </file>
     <file name="src/main/java/com/maeldev/conquest/data/classes/ElementFormState.kt">
         <error line="48" column="26" source="standard:trailing-comma-on-call-site" />
@@ -548,18 +535,18 @@
     </file>
     <file name="src/main/java/com/maeldev/conquest/screens/MainScreenListTransforms.kt">
         <error line="3" column="1" source="standard:import-ordering" />
-        <error line="9" column="40" source="standard:function-signature" />
-        <error line="9" column="55" source="standard:function-signature" />
-        <error line="9" column="69" source="standard:function-signature" />
-        <error line="13" column="26" source="standard:function-signature" />
-        <error line="13" column="40" source="standard:function-signature" />
-        <error line="13" column="53" source="standard:function-signature" />
-        <error line="22" column="29" source="standard:function-signature" />
-        <error line="22" column="47" source="standard:function-signature" />
-        <error line="22" column="74" source="standard:function-signature" />
-        <error line="51" column="27" source="standard:multiline-expression-wrapping" />
-        <error line="58" column="81" source="standard:trailing-comma-on-call-site" />
-        <error line="73" column="1" source="standard:no-consecutive-blank-lines" />
+        <error line="10" column="40" source="standard:function-signature" />
+        <error line="10" column="55" source="standard:function-signature" />
+        <error line="10" column="69" source="standard:function-signature" />
+        <error line="14" column="26" source="standard:function-signature" />
+        <error line="14" column="40" source="standard:function-signature" />
+        <error line="14" column="53" source="standard:function-signature" />
+        <error line="23" column="29" source="standard:function-signature" />
+        <error line="23" column="47" source="standard:function-signature" />
+        <error line="23" column="74" source="standard:function-signature" />
+        <error line="48" column="27" source="standard:multiline-expression-wrapping" />
+        <error line="55" column="81" source="standard:trailing-comma-on-call-site" />
+        <error line="70" column="1" source="standard:no-consecutive-blank-lines" />
     </file>
     <file name="src/main/java/com/maeldev/conquest/screens/SettingsScreen.kt">
         <error line="78" column="23" source="standard:multiline-expression-wrapping" />
@@ -779,8 +766,8 @@
         <error line="26" column="15" source="standard:property-naming" />
         <error line="27" column="15" source="standard:property-naming" />
         <error line="28" column="15" source="standard:property-naming" />
-        <error line="38" column="15" source="standard:property-naming" />
-        <error line="41" column="15" source="standard:property-naming" />
+        <error line="42" column="15" source="standard:property-naming" />
+        <error line="45" column="15" source="standard:property-naming" />
     </file>
     <file name="src/main/java/com/maeldev/conquest/util/ExportImportUtil.kt">
         <error line="33" column="24" source="standard:multiline-expression-wrapping" />

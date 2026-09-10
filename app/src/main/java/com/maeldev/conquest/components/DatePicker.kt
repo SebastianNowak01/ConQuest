@@ -38,9 +38,12 @@ internal fun getCurrentDate(): Date {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerModal(
-    onDateSelected: (Date?) -> Unit, onDismiss: () -> Unit
+    onDateSelected: (Date?) -> Unit,
+    onDismiss: () -> Unit,
+    initialDate: Date? = null,
 ) {
-    val datePickerState = rememberDatePickerState()
+    // Open on the date the field already holds, instead of always landing on today.
+    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = initialDate?.time)
 
     DatePickerDialog(onDismissRequest = onDismiss, confirmButton = {
         TextButton(onClick = {
@@ -94,10 +97,14 @@ fun DatePickerFieldToModal(
     )
 
     if (showModal) {
-        DatePickerModal(onDateSelected = {
-            onDateSelected(it)
-            showModal = false
-        }, onDismiss = { showModal = false })
+        DatePickerModal(
+            onDateSelected = {
+                onDateSelected(it)
+                showModal = false
+            },
+            onDismiss = { showModal = false },
+            initialDate = selectedDate,
+        )
     }
 }
 

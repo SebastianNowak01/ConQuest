@@ -37,7 +37,7 @@ fun NewCosplay(
         onCancel = { navController.popBackStack() },
         onCommit = {
             didCommit = true
-            cosplayViewModel.insertCosplay(form.toEntity(uid = 0, finished = false))
+            cosplayViewModel.insertCosplay(form.toEntity(uid = 0))
         },
         postCommit = { navController.popBackStack() }
     )

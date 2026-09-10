@@ -64,10 +64,11 @@ fun CosplayFormContent(
                 emptyContentDescription = "Pick cosplay photo",
             )
 
-            MySwitchCard(
-                label = if (form.inProgress) "In Progress" else "Planned",
-                checked = form.inProgress,
-                onCheckedChange = { onFormChange(form.copy(inProgress = it)) }
+            MySectionLabel(text = "Status")
+
+            MyStatusSegmentedRow(
+                selected = form.status,
+                onStatusChange = { onFormChange(form.copy(status = it)) },
             )
 
             MyInputField(
