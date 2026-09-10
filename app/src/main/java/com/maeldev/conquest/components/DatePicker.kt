@@ -65,28 +65,47 @@ fun DatePickerModal(
     }
 }
 
+/**
+ * Date field that opens a picker when tapped.
+ *
+ * An optional field takes [onClear], which puts a clear button in place of the calendar icon
+ * while a date is set — without it a date, once chosen, can never be taken back off.
+ */
 @Composable
 fun DatePickerFieldToModal(
-    label: String, selectedDate: Date?, onDateSelected: (Date?) -> Unit
+    label: String,
+    selectedDate: Date?,
+    onDateSelected: (Date?) -> Unit,
+    onClear: (() -> Unit)? = null,
+    isError: Boolean = false,
+    errorMessage: String? = null,
 ) {
     var showModal by remember { mutableStateOf(false) }
+    val canClear = onClear != null && selectedDate != null
+    val calendarIcon: @Composable () -> Unit = {
+        Icon(Icons.Default.DateRange, contentDescription = "Select date")
+    }
+    val trailing = clearTrailingIcon(canClear, label, onClear) ?: calendarIcon
 
     OutlinedTextField(
         value = selectedDate?.let { convertDateToString(it) } ?: "",
         onValueChange = { },
         label = { Text(label) },
         placeholder = { Text("DD/MM/YYYY") },
-        trailingIcon = {
-            Icon(Icons.Default.DateRange, contentDescription = "Select date")
-        },
+        isError = isError,
+        supportingText = errorSupportingText(isError, errorMessage),
+        trailingIcon = trailing,
         shape = RoundedCornerShape(32.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .pointerInput(Unit) {
+            .pointerInput(canClear) {
                 awaitEachGesture {
                     awaitFirstDown(pass = PointerEventPass.Initial)
-                    val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
-                    if (upEvent != null) {
+                    // Wait for the Final pass so the trailing clear button, which consumes the
+                    // release it handles, is not also treated as a tap on the field itself —
+                    // otherwise clearing a date would reopen the picker in the same gesture.
+                    val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Final)
+                    if (upEvent != null && !upEvent.isConsumed) {
                         showModal = true
                     }
                 }

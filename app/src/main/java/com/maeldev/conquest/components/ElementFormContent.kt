@@ -5,7 +5,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -24,9 +28,12 @@ fun ElementFormContent(
     onCancel: () -> Unit,
     onCommit: () -> Unit,
     postCommit: () -> Unit,
+    isDirty: Boolean = false,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    var showErrors by remember { mutableStateOf(false) }
+    val cancel = rememberDiscardChangesGuard(isDirty = isDirty, onDiscard = onCancel)
 
     DiscardUnsavedImageEffect(
         context = context,
@@ -61,9 +68,16 @@ fun ElementFormContent(
             MyImageBox(
                 photoPath = form.photoPath,
                 contentDescription = "Element image",
-                size = UIConsts.imageSizeM,
+                size = UIConsts.imageSizeL,
+                shape = RoundedCornerShape(UIConsts.cornerRadiusM),
                 clickable = true,
                 onClick = { imageLauncher.launch() },
+                emptyContentDescription = "Pick element photo",
+                showEditBadge = true,
+                onClear = {
+                    discardUnsavedImage(context, form.photoPath, originalPhotoPath)
+                    onFormChange(form.copy(photoPath = ""))
+                },
             )
 
             MyInputField(
@@ -72,16 +86,20 @@ fun ElementFormContent(
                 label = "Name*",
                 singleLine = true,
                 shape = RoundedCornerShape(UIConsts.cornerRadiusL),
+                isError = showErrors && form.name.isBlank(),
+                errorMessage = "Name is required",
             )
 
             MyInputField(
                 value = form.cost,
                 onValueChange = { onFormChange(form.copy(cost = it)) },
-                label = "Cost (Optional)",
+                label = "Cost",
                 singleLine = true,
                 filterDecimal = true,
                 shape = RoundedCornerShape(UIConsts.cornerRadiusL),
             )
+
+            MySectionLabel(text = "Status")
 
             Row(
                 horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingS),
@@ -101,7 +119,7 @@ fun ElementFormContent(
                     modifier = Modifier.weight(1f)
                 )
             }
-            
+
             MyInputField(
                 value = form.notes,
                 onValueChange = { onFormChange(form.copy(notes = it)) },
@@ -115,7 +133,8 @@ fun ElementFormContent(
         MySaveCancelRow(
             snackbarHostState = snackbarHostState,
             isValid = form.isValid,
-            onCancel = onCancel,
+            onInvalidAttempt = { showErrors = true },
+            onCancel = cancel,
             onCommit = onCommit,
             postCommit = postCommit,
         )

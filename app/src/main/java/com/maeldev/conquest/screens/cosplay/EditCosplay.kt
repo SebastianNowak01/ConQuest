@@ -29,12 +29,14 @@ fun EditCosplay(
     val snackbarHostState = remember { SnackbarHostState() }
     
     var form by remember { mutableStateOf(CosplayFormState()) }
+    var baseline by remember { mutableStateOf(CosplayFormState()) }
     var originalPhotoPath by remember { mutableStateOf<String?>(null) }
     var didCommit by remember { mutableStateOf(false) }
 
     LaunchedEffect(cosplay?.uid) {
         cosplay?.let { loaded ->
             form = CosplayFormState.fromEntity(loaded)
+            baseline = form
             originalPhotoPath = loaded.cosplayPhotoPath
         }
     }
@@ -46,6 +48,7 @@ fun EditCosplay(
         didCommit = didCommit,
         onFormChange = { form = it },
         snackbarHostState = snackbarHostState,
+        isDirty = form != baseline,
         onCancel = { navController.popBackStack() },
         onCommit = {
             val current = cosplay ?: return@CosplayFormContent

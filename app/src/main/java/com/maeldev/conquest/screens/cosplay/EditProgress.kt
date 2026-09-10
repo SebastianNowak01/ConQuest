@@ -1,9 +1,7 @@
 package com.maeldev.conquest.screens.cosplay
 
 import com.maeldev.conquest.AppViewModelProvider
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -21,6 +19,7 @@ import com.maeldev.conquest.components.MyInputField
 import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MySaveCancelRow
 import com.maeldev.conquest.components.MySnackbarHost
+import com.maeldev.conquest.components.rememberDiscardChangesGuard
 import com.maeldev.conquest.theme.UIConsts
 import kotlinx.serialization.Serializable
 
@@ -40,10 +39,18 @@ fun EditProgressPhoto(
     val photo by progressPhotoViewModel.getProgressPhotoById(photoId, cosplayId).collectAsState(initial = null)
     val snackbarHostState = remember { SnackbarHostState() }
     var notes by remember { mutableStateOf("") }
+    var baselineNotes by remember { mutableStateOf("") }
 
     LaunchedEffect(photo?.id) {
         notes = photo?.notes.orEmpty()
+        baselineNotes = notes
     }
+
+    val cancel =
+        rememberDiscardChangesGuard(
+            isDirty = notes != baselineNotes,
+            onDiscard = { navController.popBackStack() },
+        )
 
     MyOuterBox {
         MyColumn {
@@ -65,21 +72,14 @@ fun EditProgressPhoto(
                 singleLine = false,
                 maxLines = 6,
                 height = UIConsts.heightM,
+                onClear = { notes = "" },
             )
-
-            TextButton(onClick = {
-                val current = photo ?: return@TextButton
-                progressPhotoViewModel.updateProgressPhoto(current.copy(notes = null))
-                notes = ""
-            }) {
-                Text("Delete Note")
-            }
         }
 
         MySaveCancelRow(
             snackbarHostState = snackbarHostState,
             isValid = true,
-            onCancel = { navController.popBackStack() },
+            onCancel = cancel,
             onCommit = {
                 val current = photo ?: return@MySaveCancelRow
                 progressPhotoViewModel.updateProgressPhoto(current.copy(notes = notes.ifBlank { null }))

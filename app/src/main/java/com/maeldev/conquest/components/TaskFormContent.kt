@@ -2,13 +2,14 @@ package com.maeldev.conquest.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import com.maeldev.conquest.data.classes.TaskFormState
 import com.maeldev.conquest.theme.UIConsts
 
@@ -23,7 +24,11 @@ fun TaskFormContent(
     onCancel: () -> Unit,
     onCommit: () -> Unit,
     postCommit: () -> Unit,
+    isDirty: Boolean = false,
 ) {
+    var showErrors by remember { mutableStateOf(false) }
+    val cancel = rememberDiscardChangesGuard(isDirty = isDirty, onDiscard = onCancel)
+
     MyOuterBox {
         MyColumn {
             MyHeaderText(text = title)
@@ -33,12 +38,11 @@ fun TaskFormContent(
                 onValueChange = { onFormChange(form.copy(taskName = it)) },
                 label = "Task Name*",
                 singleLine = true,
+                isError = showErrors && form.taskName.isBlank(),
+                errorMessage = "Task name is required",
             )
 
-            Text(
-                text = "Status",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-            )
+            MySectionLabel(text = "Status")
             Row(
                 horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingS),
                 verticalAlignment = Alignment.CenterVertically
@@ -60,7 +64,10 @@ fun TaskFormContent(
             DatePickerFieldToModal(
                 label = "Task date*",
                 selectedDate = form.date,
-                onDateSelected = { onFormChange(form.copy(date = it)) })
+                onDateSelected = { onFormChange(form.copy(date = it)) },
+                isError = showErrors && form.date == null,
+                errorMessage = "Task date is required",
+            )
 
             MyInputField(
                 value = notes,
@@ -74,7 +81,8 @@ fun TaskFormContent(
         MySaveCancelRow(
             snackbarHostState = snackbarHostState,
             isValid = form.isValid,
-            onCancel = onCancel,
+            onInvalidAttempt = { showErrors = true },
+            onCancel = cancel,
             onCommit = onCommit,
             postCommit = postCommit,
         )

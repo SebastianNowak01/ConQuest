@@ -21,6 +21,8 @@ object UIConsts {
     val photoThumbSize = 120.dp
     val imageSizeS = 48.dp
     val imageSizeM = 80.dp
+    val imageSizeL = 120.dp
+    val imageBadgeSize = 28.dp
     val previewBlurRadius = 24.dp
     val previewImagePadding = 24.dp
     const val previewScrimAlpha = 0.35f
@@ -29,9 +31,13 @@ object UIConsts {
 
     val placeholderHeightL = 200.dp
 
-    /** Room reserved at the bottom of a form or list for the floating action buttons over it. */
-    val formBottomInset = 96.dp
-    val listBottomInset = 96.dp
+    /**
+     * Room reserved at the bottom of a form or list for the floating action buttons over it:
+     * the 56dp FAB plus the row's own padding and the navigation bar inset, with room to spare
+     * so the last field is not left sitting under the Save button.
+     */
+    val formBottomInset = 144.dp
+    val listBottomInset = 144.dp
 
     val spacingS = 12.dp
     val spacingM = 18.dp
@@ -41,7 +47,8 @@ object UIConsts {
 
     const val columnWidthFraction = 0.9f
 
-    val snackbarHostVerticalOffset = 140.dp
+    /** Clears the Save/Cancel FAB row so a snackbar sits just above it, not over the form. */
+    val snackbarHostVerticalOffset = 88.dp
     const val fabCornerRadius = 50
 
     val searchBarVerticalPadding = 6.dp

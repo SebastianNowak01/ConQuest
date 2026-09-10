@@ -29,10 +29,12 @@ fun EditEvent(
     val snackbarHostState = remember { SnackbarHostState() }
     
     var form by remember { mutableStateOf(EventFormState()) }
+    var baseline by remember { mutableStateOf(EventFormState()) }
 
     LaunchedEffect(event?.id) {
         event?.let { loaded ->
             form = EventFormState.fromEntity(loaded)
+            baseline = form
         }
     }
 
@@ -41,6 +43,7 @@ fun EditEvent(
         form = form,
         onFormChange = { form = it },
         snackbarHostState = snackbarHostState,
+        isDirty = form != baseline,
         onCancel = { navController.popBackStack() },
         onCommit = {
             val current = event ?: return@EventFormContent

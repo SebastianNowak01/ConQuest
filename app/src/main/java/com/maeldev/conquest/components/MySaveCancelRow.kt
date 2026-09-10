@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
@@ -33,20 +33,22 @@ fun BoxScope.MySaveCancelRow(
             .navigationBarsPadding(),
         horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingL)
     ) {
+        // Cancel is deliberately not the error colour: the delete action in selection mode is a
+        // red FAB with this same Close icon, and leaving a form without saving is not destruction.
         MyFab(
             onClick = onCancel,
-            containerColor = MaterialTheme.colorScheme.errorContainer,
+            containerColor = MaterialTheme.colorScheme.tertiary,
             contentColor = MaterialTheme.colorScheme.primary,
             icon = Icons.Default.Close,
-            contentDescription = cancelContentDescription
+            contentDescription = cancelContentDescription,
         )
 
         MyFab(
             onClick = onSave,
             containerColor = MaterialTheme.colorScheme.secondary,
             contentColor = MaterialTheme.colorScheme.primary,
-            icon = Icons.Default.Add,
-            contentDescription = saveContentDescription
+            icon = Icons.Default.Check,
+            contentDescription = saveContentDescription,
         )
     }
 }
@@ -58,6 +60,7 @@ fun BoxScope.MySaveCancelRow(
     snackbarHostState: SnackbarHostState,
     isValid: Boolean,
     invalidMessage: String = "Please fill out all required fields!",
+    onInvalidAttempt: () -> Unit = {},
     onCancel: () -> Unit,
     onCommit: () -> Unit,
     postCommit: () -> Unit,
@@ -72,6 +75,9 @@ fun BoxScope.MySaveCancelRow(
         onCancel = onCancel,
         onSave = {
             if (!isValid) {
+                // The snackbar says something is missing; onInvalidAttempt is what lets the
+                // form mark which fields, since the message cannot name them.
+                onInvalidAttempt()
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(invalidMessage)
                 }
