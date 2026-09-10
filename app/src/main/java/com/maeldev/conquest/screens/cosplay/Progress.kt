@@ -1,6 +1,5 @@
 package com.maeldev.conquest.screens.cosplay
 
-import com.maeldev.conquest.AppViewModelProvider
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -29,18 +28,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.maeldev.conquest.viewmodel.ProgressPhotoViewModel
+import com.maeldev.conquest.AppViewModelProvider
 import com.maeldev.conquest.components.MyEmptyState
 import com.maeldev.conquest.components.MyFab
 import com.maeldev.conquest.components.MyOuterBox
-import com.maeldev.conquest.components.MySelectionCountLabel
 import com.maeldev.conquest.components.MyPhotoGrid
+import com.maeldev.conquest.components.MyPhotoGridActions
 import com.maeldev.conquest.components.MyPhotoGridItem
+import com.maeldev.conquest.components.MySelectionCountLabel
 import com.maeldev.conquest.components.MySelectionModeFabs
-import com.maeldev.conquest.components.rememberSelectionState
 import com.maeldev.conquest.components.pickAndSaveImageLauncher
+import com.maeldev.conquest.components.rememberSelectionState
 import com.maeldev.conquest.components.saveBitmapToInternalStorage
 import com.maeldev.conquest.theme.UIConsts
+import com.maeldev.conquest.viewmodel.ProgressPhotoViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -54,15 +55,16 @@ fun ProgressScreen(
 ) {
     val context = LocalContext.current
     val photos by progressPhotoViewModel.progressPhotos.collectAsState()
-    val gridPhotos = remember(photos) {
-        photos.map { photo ->
-            MyPhotoGridItem(
-                id = photo.id,
-                path = photo.path,
-                hasNote = !photo.notes.isNullOrBlank(),
-            )
+    val gridPhotos =
+        remember(photos) {
+            photos.map { photo ->
+                MyPhotoGridItem(
+                    id = photo.id,
+                    path = photo.path,
+                    hasNote = !photo.notes.isNullOrBlank(),
+                )
+            }
         }
-    }
     val selection = rememberSelectionState(items = gridPhotos, id = { it.id })
     var error by remember { mutableStateOf("") }
 
@@ -80,22 +82,23 @@ fun ProgressScreen(
             },
         )
 
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicturePreview(),
-    ) { bitmap ->
-        if (bitmap == null) {
-            return@rememberLauncherForActivityResult
+    val cameraLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.TakePicturePreview(),
+        ) { bitmap ->
+            if (bitmap == null) {
+                return@rememberLauncherForActivityResult
+            }
+            saveBitmapToInternalStorage(
+                context = context,
+                bitmap = bitmap,
+                fileNamePrefix = "progress_photo",
+            ).onSuccess { path ->
+                progressPhotoViewModel.addProgressPhoto(cosplayId, path)
+            }.onFailure { throwable ->
+                error = "Failed to save image: ${throwable.localizedMessage}"
+            }
         }
-        saveBitmapToInternalStorage(
-            context = context,
-            bitmap = bitmap,
-            fileNamePrefix = "progress_photo",
-        ).onSuccess { path ->
-            progressPhotoViewModel.addProgressPhoto(cosplayId, path)
-        }.onFailure { throwable ->
-            error = "Failed to save image: ${throwable.localizedMessage}"
-        }
-    }
 
     MyOuterBox {
         if (selection.isActive) {
@@ -108,10 +111,11 @@ fun ProgressScreen(
         }
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = UIConsts.paddingM)
-                .padding(bottom = UIConsts.paddingL * 4),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = UIConsts.paddingM)
+                    .padding(bottom = UIConsts.paddingL * 4),
         ) {
             if (error.isNotEmpty()) {
                 Text(
@@ -121,22 +125,26 @@ fun ProgressScreen(
             }
 
             MyPhotoGrid(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxSize(),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .fillMaxSize(),
                 photos = gridPhotos,
                 selectedIds = selection.selectedIds,
                 columns = GridCells.Adaptive(minSize = UIConsts.photoThumbSize),
                 contentPadding = PaddingValues(),
                 contentDescription = "Progress photo",
-                onItemClick = { photo ->
-                    if (!selection.isActive) {
-                        navController.navigate(EditProgressPhoto(photo.id, cosplayId))
-                        return@MyPhotoGrid
-                    }
-                    selection.toggle(photo.id)
-                },
-                onItemLongClick = { photo -> selection.select(photo.id) },
+                actions =
+                    MyPhotoGridActions(
+                        onItemClick = { photo ->
+                            if (!selection.isActive) {
+                                navController.navigate(EditProgressPhoto(photo.id, cosplayId))
+                                return@MyPhotoGridActions
+                            }
+                            selection.toggle(photo.id)
+                        },
+                        onItemLongClick = { photo -> selection.select(photo.id) },
+                    ),
             )
         }
 

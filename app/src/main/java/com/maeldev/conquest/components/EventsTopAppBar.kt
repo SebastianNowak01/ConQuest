@@ -1,6 +1,5 @@
 package com.maeldev.conquest.components
 
-import com.maeldev.conquest.AppViewModelProvider
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -21,33 +20,35 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
-import com.maeldev.conquest.viewmodel.EventViewModel
+import com.maeldev.conquest.AppViewModelProvider
 import com.maeldev.conquest.data.classes.CosplaySortOrder
 import com.maeldev.conquest.data.classes.EventSortOption
 import com.maeldev.conquest.data.entity.EventType
+import com.maeldev.conquest.viewmodel.EventViewModel
 
 @Composable
 private fun EventsFilterButton(
     selectedType: EventType?,
     onTypeChange: (EventType?) -> Unit,
 ) {
-    val (expanded, setExpanded) = remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
 
     MyIcon(
-        onClick = { setExpanded(true) },
+        onClick = { expanded = true },
         imageVector = Icons.Default.FilterList,
         contentDescription = "Filter",
     )
 
     DropdownMenu(
         expanded = expanded,
-        onDismissRequest = { setExpanded(false) },
+        onDismissRequest = { expanded = false },
     ) {
         DropdownMenuItem(
             text = {
@@ -66,7 +67,7 @@ private fun EventsFilterButton(
             },
             onClick = {
                 onTypeChange(null)
-                setExpanded(false)
+                expanded = false
             },
         )
 
@@ -88,7 +89,7 @@ private fun EventsFilterButton(
                 },
                 onClick = {
                     onTypeChange(eventType)
-                    setExpanded(false)
+                    expanded = false
                 },
             )
         }
@@ -100,17 +101,17 @@ private fun EventsSortByButton(
     selectedSortOption: EventSortOption,
     onSortOptionChange: (EventSortOption) -> Unit,
 ) {
-    val (expanded, setExpanded) = remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
 
     MyIcon(
-        onClick = { setExpanded(true) },
+        onClick = { expanded = true },
         imageVector = Icons.AutoMirrored.Filled.Sort,
         contentDescription = "Sort by",
     )
 
     DropdownMenu(
         expanded = expanded,
-        onDismissRequest = { setExpanded(false) },
+        onDismissRequest = { expanded = false },
     ) {
         EventSortOption.entries.forEach { sortOption ->
             DropdownMenuItem(
@@ -130,7 +131,7 @@ private fun EventsSortByButton(
                 },
                 onClick = {
                     onSortOptionChange(sortOption)
-                    setExpanded(false)
+                    expanded = false
                 },
             )
         }
@@ -143,11 +144,12 @@ private fun EventsOrderButton(
     onOrderChange: (CosplaySortOrder) -> Unit,
 ) {
     val currentOrderLabel = selectedOrder.label
-    val nextOrder = if (selectedOrder == CosplaySortOrder.MostToLeast) {
-        CosplaySortOrder.LeastToMost
-    } else {
-        CosplaySortOrder.MostToLeast
-    }
+    val nextOrder =
+        if (selectedOrder == CosplaySortOrder.MostToLeast) {
+            CosplaySortOrder.LeastToMost
+        } else {
+            CosplaySortOrder.MostToLeast
+        }
     val nextOrderLabel = nextOrder.label
 
     val rotation = if (selectedOrder == CosplaySortOrder.MostToLeast) 180f else 0f
@@ -214,4 +216,3 @@ fun EventsTopAppBar(
         },
     )
 }
-

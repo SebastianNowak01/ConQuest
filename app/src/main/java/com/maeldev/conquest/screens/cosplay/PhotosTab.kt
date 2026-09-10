@@ -1,6 +1,5 @@
 package com.maeldev.conquest.screens.cosplay
 
-import com.maeldev.conquest.AppViewModelProvider
 import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,20 +25,25 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.toRoute
-import com.maeldev.conquest.viewmodel.PhotoViewModel
+import com.maeldev.conquest.AppViewModelProvider
 import com.maeldev.conquest.components.MyEmptyState
 import com.maeldev.conquest.components.MyFab
 import com.maeldev.conquest.components.MyOuterBox
-import com.maeldev.conquest.components.MySelectionCountLabel
 import com.maeldev.conquest.components.MyPhotoGrid
+import com.maeldev.conquest.components.MyPhotoGridActions
 import com.maeldev.conquest.components.MyPhotoGridItem
+import com.maeldev.conquest.components.MySelectionCountLabel
 import com.maeldev.conquest.components.MySelectionModeFabs
-import com.maeldev.conquest.components.rememberSelectionState
 import com.maeldev.conquest.components.pickAndSaveImageLauncher
+import com.maeldev.conquest.components.rememberSelectionState
 import com.maeldev.conquest.theme.UIConsts
+import com.maeldev.conquest.viewmodel.PhotoViewModel
 
 @Composable
-fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController) {
+fun PhotosTab(
+    navBackStackEntry: NavBackStackEntry,
+    navController: NavController,
+) {
     val args = navBackStackEntry.toRoute<MainCosplayScreen>()
     val context = LocalContext.current
     val photoViewModel: PhotoViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -49,15 +53,16 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
     }
 
     val photos by photoViewModel.photos.collectAsState()
-    val gridPhotos = remember(photos) {
-        photos.map { photo ->
-            MyPhotoGridItem(
-                id = photo.id,
-                path = photo.path,
-                hasNote = !photo.notes.isNullOrBlank(),
-            )
+    val gridPhotos =
+        remember(photos) {
+            photos.map { photo ->
+                MyPhotoGridItem(
+                    id = photo.id,
+                    path = photo.path,
+                    hasNote = !photo.notes.isNullOrBlank(),
+                )
+            }
         }
-    }
 
     val selection = rememberSelectionState(items = gridPhotos, id = { it.id })
 
@@ -80,27 +85,33 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
         }
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = UIConsts.paddingM)
-                .padding(bottom = UIConsts.paddingL * 4),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = UIConsts.paddingM)
+                    .padding(top = UIConsts.paddingM)
+                    .padding(bottom = UIConsts.paddingL * 4),
         ) {
             MyPhotoGrid(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxSize(),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .fillMaxSize(),
                 photos = gridPhotos,
                 selectedIds = selection.selectedIds,
                 columns = GridCells.Adaptive(minSize = UIConsts.photoThumbSize),
                 contentDescription = "Cosplay photo",
-                onItemClick = { photo ->
-                    if (!selection.isActive) {
-                        navController.navigate(EditPhoto(photo.id))
-                        return@MyPhotoGrid
-                    }
-                    selection.toggle(photo.id)
-                },
-                onItemLongClick = { photo -> selection.select(photo.id) },
+                actions =
+                    MyPhotoGridActions(
+                        onItemClick = { photo ->
+                            if (!selection.isActive) {
+                                navController.navigate(EditPhoto(photo.id))
+                                return@MyPhotoGridActions
+                            }
+                            selection.toggle(photo.id)
+                        },
+                        onItemLongClick = { photo -> selection.select(photo.id) },
+                    ),
             )
         }
 
@@ -125,12 +136,13 @@ fun PickAndSaveImage(
 ) {
     var error by remember { mutableStateOf<String?>(null) }
 
-    val launcher = pickAndSaveImageLauncher(
-        context = context,
-        fileNamePrefix = "cosplay_photo",
-        onSaved = onImageSaved,
-        onError = { throwable -> error = "Failed to save image: ${throwable.localizedMessage}" },
-    )
+    val launcher =
+        pickAndSaveImageLauncher(
+            context = context,
+            fileNamePrefix = "cosplay_photo",
+            onSaved = onImageSaved,
+            onError = { throwable -> error = "Failed to save image: ${throwable.localizedMessage}" },
+        )
 
     MyFab(
         onClick = { launcher.launch() },
@@ -145,4 +157,3 @@ fun PickAndSaveImage(
         Text(it, color = MaterialTheme.colorScheme.error)
     }
 }
-

@@ -1,6 +1,5 @@
 package com.maeldev.conquest.screens.cosplay
 
-import com.maeldev.conquest.AppViewModelProvider
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,26 +19,32 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.maeldev.conquest.viewmodel.PhotoViewModel
-import com.maeldev.conquest.components.MyImageBox
-import com.maeldev.conquest.components.MyOuterBox
+import com.maeldev.conquest.AppViewModelProvider
+import com.maeldev.conquest.components.InputFieldOptions
 import com.maeldev.conquest.components.MyColumn
 import com.maeldev.conquest.components.MyHeaderText
+import com.maeldev.conquest.components.MyImageBox
+import com.maeldev.conquest.components.MyImageBoxConfig
 import com.maeldev.conquest.components.MyInputField
+import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MySaveCancelRow
 import com.maeldev.conquest.components.MySnackbarHost
+import com.maeldev.conquest.components.SaveCancelActions
 import com.maeldev.conquest.components.deleteStoredImageByPath
 import com.maeldev.conquest.components.rememberDiscardChangesGuard
 import com.maeldev.conquest.components.saveImageUriToInternalStorage
-import kotlinx.serialization.Serializable
 import com.maeldev.conquest.theme.UIConsts
+import com.maeldev.conquest.viewmodel.PhotoViewModel
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class EditPhoto(val photoId: Int)
 
 @Composable
 fun EditPhoto(
-    photoId: Int, navController: NavController, photoViewModel: PhotoViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    photoId: Int,
+    navController: NavController,
+    photoViewModel: PhotoViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val context = LocalContext.current
     val photo by photoViewModel.getPhotoById(photoId).collectAsState(initial = null)
@@ -64,37 +69,39 @@ fun EditPhoto(
                 }?.let {
                     deleteStoredImageByPath(
                         context,
-                        it
+                        it,
                     )
                 }
             }
         }
     }
 
-    val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        if (uri != null) {
-            saveImageUriToInternalStorage(
-                context = context,
-                uri = uri,
-                fileNamePrefix = "cosplay_photo",
-            ).onSuccess { savedPath ->
-                val previousUnsavedPath = photoPath.takeIf {
-                    it.isNotBlank() && it != originalPhotoPath && it != savedPath
+    val imagePickerLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent(),
+        ) { uri: Uri? ->
+            if (uri != null) {
+                saveImageUriToInternalStorage(
+                    context = context,
+                    uri = uri,
+                    fileNamePrefix = "cosplay_photo",
+                ).onSuccess { savedPath ->
+                    val previousUnsavedPath =
+                        photoPath.takeIf {
+                            it.isNotBlank() && it != originalPhotoPath && it != savedPath
+                        }
+                    previousUnsavedPath?.let {
+                        deleteStoredImageByPath(
+                            context,
+                            it,
+                        )
+                    }
+                    photoPath = savedPath
+                }.onFailure { e ->
+                    error = "Failed to save image: ${e.localizedMessage}"
                 }
-                previousUnsavedPath?.let {
-                    deleteStoredImageByPath(
-                        context,
-                        it
-                    )
-                }
-                photoPath = savedPath
-            }.onFailure { e ->
-                error = "Failed to save image: ${e.localizedMessage}"
             }
         }
-    }
 
     LaunchedEffect(photo) {
         photo?.let {
@@ -118,13 +125,16 @@ fun EditPhoto(
 
             MyImageBox(
                 photoPath = photoPath,
-                contentDescription = "Reference image",
-                size = UIConsts.heightM,
-                shape = RoundedCornerShape(UIConsts.cornerRadiusM),
                 clickable = true,
                 onClick = { imagePickerLauncher.launch("image/*") },
-                previewWhenPhotoExists = true,
-                showEditBadge = true,
+                config =
+                    MyImageBoxConfig(
+                        size = UIConsts.heightM,
+                        shape = RoundedCornerShape(UIConsts.cornerRadiusM),
+                        contentDescription = "Reference image",
+                        previewWhenPhotoExists = true,
+                        showEditBadge = true,
+                    ),
             )
 
             if (error.isNotEmpty()) {
@@ -135,27 +145,33 @@ fun EditPhoto(
                 value = notes,
                 onValueChange = { notes = it },
                 label = "Notes",
-                singleLine = false,
-                maxLines = 6,
-                height = UIConsts.heightM,
-                shape = RoundedCornerShape(UIConsts.cornerRadiusM),
+                options =
+                    InputFieldOptions(
+                        singleLine = false,
+                        maxLines = 6,
+                        height = UIConsts.heightM,
+                        shape = RoundedCornerShape(UIConsts.cornerRadiusM),
+                    ),
             )
         }
 
         MySaveCancelRow(
             snackbarHostState = snackbarHostState,
             isValid = true,
-            onCancel = cancel,
-            onCommit = {
-                val current = photo ?: return@MySaveCancelRow
-                val oldPath = current.path
-                val newPath = photoPath.ifEmpty { oldPath }
-                val updated = current.copy(path = newPath, notes = notes.ifBlank { null })
-                val deleteOld = if (newPath != oldPath) oldPath else null
-                didCommit = true
-                photoViewModel.updatePhoto(updated, oldPathToDelete = deleteOld)
-            },
-            postCommit = { navController.popBackStack() },
+            actions =
+                SaveCancelActions(
+                    onCancel = cancel,
+                    onCommit = {
+                        val current = photo ?: return@SaveCancelActions
+                        val oldPath = current.path
+                        val newPath = photoPath.ifEmpty { oldPath }
+                        val updated = current.copy(path = newPath, notes = notes.ifBlank { null })
+                        val deleteOld = if (newPath != oldPath) oldPath else null
+                        didCommit = true
+                        photoViewModel.updatePhoto(updated, oldPathToDelete = deleteOld)
+                    },
+                    postCommit = { navController.popBackStack() },
+                ),
         )
 
         MySnackbarHost(hostState = snackbarHostState)

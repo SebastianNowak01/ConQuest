@@ -1,6 +1,5 @@
 package com.maeldev.conquest.screens.cosplay
 
-import com.maeldev.conquest.AppViewModelProvider
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -11,16 +10,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.maeldev.conquest.viewmodel.ProgressPhotoViewModel
+import com.maeldev.conquest.AppViewModelProvider
+import com.maeldev.conquest.components.InputFieldOptions
 import com.maeldev.conquest.components.MyColumn
 import com.maeldev.conquest.components.MyHeaderText
 import com.maeldev.conquest.components.MyImageBox
+import com.maeldev.conquest.components.MyImageBoxConfig
 import com.maeldev.conquest.components.MyInputField
 import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MySaveCancelRow
 import com.maeldev.conquest.components.MySnackbarHost
+import com.maeldev.conquest.components.SaveCancelActions
 import com.maeldev.conquest.components.rememberDiscardChangesGuard
 import com.maeldev.conquest.theme.UIConsts
+import com.maeldev.conquest.viewmodel.ProgressPhotoViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -58,36 +61,44 @@ fun EditProgressPhoto(
 
             MyImageBox(
                 photoPath = photo?.path.orEmpty(),
-                contentDescription = "Progress photo",
-                size = UIConsts.heightM,
                 clickable = true,
                 onClick = {},
-                previewWhenPhotoExists = true,
+                config =
+                    MyImageBoxConfig(
+                        size = UIConsts.heightM,
+                        contentDescription = "Progress photo",
+                        previewWhenPhotoExists = true,
+                    ),
             )
 
             MyInputField(
                 value = notes,
                 onValueChange = { notes = it },
                 label = "Note",
-                singleLine = false,
-                maxLines = 6,
-                height = UIConsts.heightM,
                 onClear = { notes = "" },
+                options =
+                    InputFieldOptions(
+                        singleLine = false,
+                        maxLines = 6,
+                        height = UIConsts.heightM,
+                    ),
             )
         }
 
         MySaveCancelRow(
             snackbarHostState = snackbarHostState,
             isValid = true,
-            onCancel = cancel,
-            onCommit = {
-                val current = photo ?: return@MySaveCancelRow
-                progressPhotoViewModel.updateProgressPhoto(current.copy(notes = notes.ifBlank { null }))
-            },
-            postCommit = { navController.popBackStack() },
+            actions =
+                SaveCancelActions(
+                    onCancel = cancel,
+                    onCommit = {
+                        val current = photo ?: return@SaveCancelActions
+                        progressPhotoViewModel.updateProgressPhoto(current.copy(notes = notes.ifBlank { null }))
+                    },
+                    postCommit = { navController.popBackStack() },
+                ),
         )
 
         MySnackbarHost(hostState = snackbarHostState)
     }
 }
-

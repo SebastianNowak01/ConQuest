@@ -1,6 +1,5 @@
 package com.maeldev.conquest.components
 
-import com.maeldev.conquest.AppViewModelProvider
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -21,44 +20,47 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
-import com.maeldev.conquest.viewmodel.CosplayViewModel
-import com.maeldev.conquest.data.classes.CosplaySortOrder
+import com.maeldev.conquest.AppViewModelProvider
 import com.maeldev.conquest.data.classes.CosplaySortOption
+import com.maeldev.conquest.data.classes.CosplaySortOrder
 import com.maeldev.conquest.data.classes.CosplayStatusFilter
+import com.maeldev.conquest.viewmodel.CosplayViewModel
 
 @Composable
 private fun FilterButton(
     selectedFilter: CosplayStatusFilter,
     onFilterChange: (CosplayStatusFilter) -> Unit,
 ) {
-    val (expanded, setExpanded) = remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
 
     MyIcon(
-        onClick = { setExpanded(true) },
+        onClick = { expanded = true },
         imageVector = Icons.Default.FilterList,
         contentDescription = "Filter",
     )
 
     DropdownMenu(
         expanded = expanded,
-        onDismissRequest = { setExpanded(false) },
+        onDismissRequest = { expanded = false },
     ) {
         CosplayStatusFilter.entries.forEach { filter ->
             DropdownMenuItem(
                 text = {
                     Text(
                         text = filter.label,
-                        fontWeight = if (filter == selectedFilter) {
-                            FontWeight.Bold
-                        } else {
-                            FontWeight.Normal
-                        },
+                        fontWeight =
+                            if (filter == selectedFilter) {
+                                FontWeight.Bold
+                            } else {
+                                FontWeight.Normal
+                            },
                     )
                 },
                 trailingIcon = {
@@ -71,7 +73,7 @@ private fun FilterButton(
                 },
                 onClick = {
                     onFilterChange(filter)
-                    setExpanded(false)
+                    expanded = false
                 },
             )
         }
@@ -84,18 +86,20 @@ private fun OrderButton(
     onOrderChange: (CosplaySortOrder) -> Unit,
 ) {
     val currentOrderLabel = selectedOrder.label
-    val nextOrder = if (selectedOrder == CosplaySortOrder.MostToLeast) {
-        CosplaySortOrder.LeastToMost
-    } else {
-        CosplaySortOrder.MostToLeast
-    }
+    val nextOrder =
+        if (selectedOrder == CosplaySortOrder.MostToLeast) {
+            CosplaySortOrder.LeastToMost
+        } else {
+            CosplaySortOrder.MostToLeast
+        }
     val nextOrderLabel = nextOrder.label
 
-    val rotation = if (selectedOrder == CosplaySortOrder.MostToLeast) {
-        180f
-    } else {
-        0f
-    }
+    val rotation =
+        if (selectedOrder == CosplaySortOrder.MostToLeast) {
+            180f
+        } else {
+            0f
+        }
 
     IconButton(onClick = { onOrderChange(nextOrder) }) {
         Icon(
@@ -111,28 +115,29 @@ private fun SortButton(
     selectedSort: CosplaySortOption,
     onSortChange: (CosplaySortOption) -> Unit,
 ) {
-    val (expanded, setExpanded) = remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
 
     MyIcon(
-        onClick = { setExpanded(true) },
+        onClick = { expanded = true },
         imageVector = Icons.AutoMirrored.Filled.Sort,
         contentDescription = "Sort",
     )
 
     DropdownMenu(
         expanded = expanded,
-        onDismissRequest = { setExpanded(false) },
+        onDismissRequest = { expanded = false },
     ) {
         CosplaySortOption.entries.forEach { sort ->
             DropdownMenuItem(
                 text = {
                     Text(
                         text = sort.label,
-                        fontWeight = if (sort == selectedSort) {
-                            FontWeight.Bold
-                        } else {
-                            FontWeight.Normal
-                        },
+                        fontWeight =
+                            if (sort == selectedSort) {
+                                FontWeight.Bold
+                            } else {
+                                FontWeight.Normal
+                            },
                     )
                 },
                 trailingIcon = {
@@ -145,7 +150,7 @@ private fun SortButton(
                 },
                 onClick = {
                     onSortChange(sort)
-                    setExpanded(false)
+                    expanded = false
                 },
             )
         }

@@ -1,6 +1,5 @@
 package com.maeldev.conquest.components
 
-import com.maeldev.conquest.AppViewModelProvider
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,24 +24,34 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
-import com.maeldev.conquest.viewmodel.CosplayViewModel
+import com.maeldev.conquest.AppViewModelProvider
 import com.maeldev.conquest.data.entity.Cosplay
 import com.maeldev.conquest.screens.cosplay.EditCosplay
 import com.maeldev.conquest.theme.UIConsts
+import com.maeldev.conquest.viewmodel.CosplayViewModel
 import kotlinx.coroutines.flow.flowOf
 
 sealed class MyTopAppBar {
     data object Default : MyTopAppBar()
+
     data object Settings : MyTopAppBar()
+
     data object Events : MyTopAppBar()
+
     data object Progress : MyTopAppBar()
+
     data object Stats : MyTopAppBar()
+
     data object Cosplay : MyTopAppBar()
+
     data object None : MyTopAppBar()
 }
 
 @Composable
-fun getTopAppBarConfig(route: String?, noDrawerRoutes: List<String>): MyTopAppBar {
+fun getTopAppBarConfig(
+    route: String?,
+    noDrawerRoutes: List<String>,
+): MyTopAppBar {
     return when {
         route == null -> MyTopAppBar.None
         route in noDrawerRoutes -> MyTopAppBar.None
@@ -64,10 +73,12 @@ private fun SettingsTopAppBar(onMenuClick: () -> Unit) {
         navigationIcon = {
             IconButton(onClick = onMenuClick) {
                 Icon(
-                    imageVector = Icons.Default.Menu, contentDescription = "Menu"
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Menu",
                 )
             }
-        })
+        },
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,7 +94,7 @@ private fun ProgressTopAppBar(onMenuClick: () -> Unit) {
                     contentDescription = "Menu",
                 )
             }
-        }
+        },
     )
 }
 
@@ -100,7 +111,7 @@ private fun StatsTopAppBar(onMenuClick: () -> Unit) {
                     contentDescription = "Menu",
                 )
             }
-        }
+        },
     )
 }
 
@@ -109,17 +120,18 @@ private fun StatsTopAppBar(onMenuClick: () -> Unit) {
 private fun CosplayTopAppBar(
     navBackStackEntry: NavBackStackEntry?,
     navController: NavHostController,
-    onMenuClick: () -> Unit
+    onMenuClick: () -> Unit,
 ) {
     val cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val cosplayId = navBackStackEntry?.arguments?.getInt("uid")
-    val cosplayFlow = remember(cosplayId) {
-        if (cosplayId == null) {
-            flowOf<Cosplay?>(null)
-        } else {
-            cosplayViewModel.getCosplayById(cosplayId)
+    val cosplayFlow =
+        remember(cosplayId) {
+            if (cosplayId == null) {
+                flowOf<Cosplay?>(null)
+            } else {
+                cosplayViewModel.getCosplayById(cosplayId)
+            }
         }
-    }
     val cosplay by cosplayFlow.collectAsState(initial = null)
 
     TopAppBar(
@@ -128,25 +140,35 @@ private fun CosplayTopAppBar(
             val loadedCosplay = cosplay
             if (loadedCosplay != null) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clickable { navController.navigate(
-                            EditCosplay(
-                                loadedCosplay.uid
-                            )
-                        ) },
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .clickable {
+                                navController.navigate(
+                                    EditCosplay(
+                                        loadedCosplay.uid,
+                                    ),
+                                )
+                            },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     MyImageBox(
                         photoPath = loadedCosplay.cosplayPhotoPath ?: "",
-                        size = UIConsts.imageSizeS,
                         clickable = false,
                         onClick = {},
-                        contentDescription = loadedCosplay.name,
-                        emptyContentDescription = "Cosplay photo",
+                        config =
+                            MyImageBoxConfig(
+                                size = UIConsts.imageSizeS,
+                                contentDescription = loadedCosplay.name,
+                                emptyContentDescription = "Cosplay photo",
+                            ),
                     )
-                    Spacer(modifier = Modifier.width(
-                        UIConsts.paddingS))
+                    Spacer(
+                        modifier =
+                            Modifier.width(
+                                UIConsts.paddingS,
+                            ),
+                    )
                     Column {
                         Text(
                             text = loadedCosplay.name,
@@ -167,10 +189,12 @@ private fun CosplayTopAppBar(
         navigationIcon = {
             IconButton(onClick = onMenuClick) {
                 Icon(
-                    imageVector = Icons.Default.Menu, contentDescription = "Menu"
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Menu",
                 )
             }
-        })
+        },
+    )
 }
 
 @Composable
@@ -183,26 +207,29 @@ fun MyTopAppBar(
     onMenuClick: () -> Unit,
 ) {
     when (config) {
-        MyTopAppBar.None -> {/* No Top App bar*/}
+        MyTopAppBar.None -> { /* No Top App bar*/ }
         MyTopAppBar.Settings -> SettingsTopAppBar(onMenuClick)
-        MyTopAppBar.Events -> EventsTopAppBar(
-            searchQuery = searchQuery,
-            navBackStackEntry = navBackStackEntry,
-            onSearchQueryChange = onSearchQueryChange,
-            onMenuClick = onMenuClick,
-        )
+        MyTopAppBar.Events ->
+            EventsTopAppBar(
+                searchQuery = searchQuery,
+                navBackStackEntry = navBackStackEntry,
+                onSearchQueryChange = onSearchQueryChange,
+                onMenuClick = onMenuClick,
+            )
         MyTopAppBar.Progress -> ProgressTopAppBar(onMenuClick)
         MyTopAppBar.Stats -> StatsTopAppBar(onMenuClick)
-        is MyTopAppBar.Cosplay -> CosplayTopAppBar(
-            navBackStackEntry = navBackStackEntry,
-            navController = navController,
-            onMenuClick = onMenuClick,
-        )
-        MyTopAppBar.Default -> MainScreenTopAppBar(
-            searchQuery = searchQuery,
-            navBackStackEntry = navBackStackEntry,
-            onSearchQueryChange = onSearchQueryChange,
-            onMenuClick = onMenuClick,
-        )
+        is MyTopAppBar.Cosplay ->
+            CosplayTopAppBar(
+                navBackStackEntry = navBackStackEntry,
+                navController = navController,
+                onMenuClick = onMenuClick,
+            )
+        MyTopAppBar.Default ->
+            MainScreenTopAppBar(
+                searchQuery = searchQuery,
+                navBackStackEntry = navBackStackEntry,
+                onSearchQueryChange = onSearchQueryChange,
+                onMenuClick = onMenuClick,
+            )
     }
 }

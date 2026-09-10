@@ -37,6 +37,12 @@ data class MyPhotoGridItem(
     val hasNote: Boolean = false,
 )
 
+/** What a thumbnail in [MyPhotoGrid] does when tapped or long-pressed. */
+data class MyPhotoGridActions(
+    val onItemClick: (MyPhotoGridItem) -> Unit,
+    val onItemLongClick: (MyPhotoGridItem) -> Unit,
+)
+
 @Composable
 fun MyPhotoGrid(
     modifier: Modifier = Modifier,
@@ -45,8 +51,7 @@ fun MyPhotoGrid(
     columns: GridCells,
     contentPadding: PaddingValues = PaddingValues(),
     contentDescription: String,
-    onItemClick: (MyPhotoGridItem) -> Unit,
-    onItemLongClick: (MyPhotoGridItem) -> Unit,
+    actions: MyPhotoGridActions,
 ) {
     val context = LocalContext.current
 
@@ -59,25 +64,28 @@ fun MyPhotoGrid(
     ) {
         items(items = photos, key = { it.id }) { photo ->
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f)
-                    .border(
-                        width = UIConsts.strokeThin,
-                        color = MaterialTheme.colorScheme.outline,
-                        shape = RoundedCornerShape(UIConsts.cornerRadiusM),
-                    )
-                    .combinedClickable(
-                        onClick = { onItemClick(photo) },
-                        onLongClick = { onItemLongClick(photo) },
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .border(
+                            width = UIConsts.strokeThin,
+                            color = MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(UIConsts.cornerRadiusM),
+                        )
+                        .combinedClickable(
+                            onClick = { actions.onItemClick(photo) },
+                            onLongClick = { actions.onItemLongClick(photo) },
+                        ),
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor =
+                            if (selectedIds.contains(photo.id)) {
+                                MaterialTheme.colorScheme.secondaryContainer
+                            } else {
+                                MaterialTheme.colorScheme.background
+                            },
                     ),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (selectedIds.contains(photo.id)) {
-                        MaterialTheme.colorScheme.secondaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.background
-                    },
-                ),
                 elevation = CardDefaults.cardElevation(defaultElevation = UIConsts.elevationS),
                 shape = RoundedCornerShape(UIConsts.cornerRadiusM),
             ) {
@@ -116,4 +124,3 @@ fun MyPhotoGrid(
         }
     }
 }
-

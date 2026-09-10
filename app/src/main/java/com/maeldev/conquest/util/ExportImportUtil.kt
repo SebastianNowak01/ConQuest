@@ -8,12 +8,7 @@ import com.maeldev.conquest.data.classes.CosplayExportDto
 import com.maeldev.conquest.data.classes.ExportDataDto
 import com.maeldev.conquest.data.classes.toDto
 import com.maeldev.conquest.data.classes.toEntity
-import com.maeldev.conquest.data.dao.CosplayDao
-import com.maeldev.conquest.data.dao.CosplayElementDao
-import com.maeldev.conquest.data.dao.CosplayPhotoDao
-import com.maeldev.conquest.data.dao.CosplayTaskDao
-import com.maeldev.conquest.data.dao.EventDao
-import com.maeldev.conquest.data.dao.ProgressPhotoDao
+import com.maeldev.conquest.data.dao.CosplayDaos
 import com.maeldev.conquest.data.entity.EventCosplayCrossRef
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -30,10 +25,11 @@ object ExportImportUtil {
     private const val JSON_ENTRY_NAME = "data.json"
     private const val IMAGES_ENTRY_PREFIX = "$IMAGE_STORAGE_DIR/"
 
-    private val json = Json {
-        prettyPrint = true
-        ignoreUnknownKeys = true
-    }
+    private val json =
+        Json {
+            prettyPrint = true
+            ignoreUnknownKeys = true
+        }
 
     /**
      * Like [runCatching], but lets [CancellationException] propagate instead of reporting a
@@ -73,135 +69,172 @@ object ExportImportUtil {
         context: Context,
         cosplayIds: Set<Int>,
         targetUri: Uri,
-        cosplayDao: CosplayDao,
-        elementDao: CosplayElementDao,
-        taskDao: CosplayTaskDao,
-        photoDao: CosplayPhotoDao,
-        progressPhotoDao: ProgressPhotoDao,
-        eventDao: EventDao,
-    ): Result<Unit> = withContext(Dispatchers.IO) {
-        runCatchingCancellable {
-            val cosplays = cosplayDao.getCosplaysByIdsOnce(cosplayIds)
-            val elements = elementDao.getElementsForCosplaysOnce(cosplayIds)
-            val tasks = taskDao.getTasksForCosplaysOnce(cosplayIds)
-            val photos = photoDao.getPhotosForCosplayOnce(cosplayIds)
-            val progressPhotos = progressPhotoDao.getPhotosForCosplayOnce(cosplayIds)
-            
-            val eventCrossRefs = eventDao.getEventCrossRefsForCosplaysOnce(cosplayIds)
-            val eventIds = eventCrossRefs.map { it.eventId }.toSet()
-            val events = if (eventIds.isNotEmpty()) eventDao.getEventsByIdsOnce(eventIds) else emptyList()
+        daos: CosplayDaos,
+    ): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            runCatchingCancellable {
+                val exportCosplays = buildExportCosplays(cosplayIds, daos)
+                val jsonString = json.encodeToString(ExportDataDto(cosplays = exportCosplays))
 
-            val exportCosplays = cosplays.map { cosplay ->
-                val cosplayEventIds = eventCrossRefs
+                context.contentResolver.openOutputStream(targetUri)?.use { outputStream ->
+                    ZipOutputStream(outputStream).use { zos ->
+                        writeArchive(context, zos, jsonString, collectPhotoPaths(exportCosplays))
+                    }
+                } ?: error("Could not open output stream")
+            }
+        }
+
+    /** Reads every cosplay in [cosplayIds] and its children into serializable DTOs. */
+    private suspend fun buildExportCosplays(
+        cosplayIds: Set<Int>,
+        daos: CosplayDaos,
+    ): List<CosplayExportDto> {
+        val cosplays = daos.cosplayDao.getCosplaysByIdsOnce(cosplayIds)
+        val elements = daos.elementDao.getElementsForCosplaysOnce(cosplayIds)
+        val tasks = daos.taskDao.getTasksForCosplaysOnce(cosplayIds)
+        val photos = daos.photoDao.getPhotosForCosplayOnce(cosplayIds)
+        val progressPhotos = daos.progressPhotoDao.getPhotosForCosplayOnce(cosplayIds)
+
+        val eventCrossRefs = daos.eventDao.getEventCrossRefsForCosplaysOnce(cosplayIds)
+        val eventIds = eventCrossRefs.map { it.eventId }.toSet()
+        val events = if (eventIds.isNotEmpty()) daos.eventDao.getEventsByIdsOnce(eventIds) else emptyList()
+
+        return cosplays.map { cosplay ->
+            val cosplayEventIds =
+                eventCrossRefs
                     .filter { it.cosplayId == cosplay.uid }
                     .map { it.eventId }
                     .toSet()
 
-                CosplayExportDto(
-                    cosplay = cosplay.toDto(),
-                    elements = elements.filter { it.cosplayId == cosplay.uid }.map { it.toDto() },
-                    tasks = tasks.filter { it.cosplayId == cosplay.uid }.map { it.toDto() },
-                    photos = photos.filter { it.cosplayId == cosplay.uid }.map { it.toDto() },
-                    progressPhotos = progressPhotos
+            CosplayExportDto(
+                cosplay = cosplay.toDto(),
+                elements = elements.filter { it.cosplayId == cosplay.uid }.map { it.toDto() },
+                tasks = tasks.filter { it.cosplayId == cosplay.uid }.map { it.toDto() },
+                photos = photos.filter { it.cosplayId == cosplay.uid }.map { it.toDto() },
+                progressPhotos =
+                    progressPhotos
                         .filter { it.cosplayId == cosplay.uid }
                         .map { it.toDto() },
-                    events = events.filter { it.id in cosplayEventIds }.map { it.toDto() },
-                )
+                events = events.filter { it.id in cosplayEventIds }.map { it.toDto() },
+            )
+        }
+    }
+
+    /** Every non-blank image path referenced anywhere in [exportCosplays], deduplicated. */
+    private fun collectPhotoPaths(exportCosplays: List<CosplayExportDto>): Set<String> {
+        val paths = mutableSetOf<String>()
+        exportCosplays.forEach { dto ->
+            dto.cosplay.cosplayPhotoPath?.takeIf { it.isNotBlank() }?.let { paths.add(it) }
+            dto.elements.forEach { element ->
+                element.photoPath?.takeIf { it.isNotBlank() }?.let { paths.add(it) }
             }
+            dto.photos.forEach { if (it.path.isNotBlank()) paths.add(it.path) }
+            dto.progressPhotos.forEach { if (it.path.isNotBlank()) paths.add(it.path) }
+        }
+        return paths
+    }
 
-            val exportData = ExportDataDto(cosplays = exportCosplays)
-            val jsonString = json.encodeToString(exportData)
+    /** Writes the JSON payload followed by every photo that still exists on disk. */
+    private fun writeArchive(
+        context: Context,
+        zos: ZipOutputStream,
+        jsonString: String,
+        photoPaths: Set<String>,
+    ) {
+        zos.putNextEntry(ZipEntry(JSON_ENTRY_NAME))
+        zos.write(jsonString.toByteArray())
+        zos.closeEntry()
 
-            val photoPathsToExport = mutableSetOf<String>()
-            exportCosplays.forEach { dto ->
-                dto.cosplay.cosplayPhotoPath?.takeIf { it.isNotBlank() }?.let { photoPathsToExport.add(it) }
-                dto.elements.forEach { it.photoPath?.takeIf { p -> p.isNotBlank() }?.let { p -> photoPathsToExport.add(p) } }
-                dto.photos.forEach { if (it.path.isNotBlank()) photoPathsToExport.add(it.path) }
-                dto.progressPhotos.forEach { if (it.path.isNotBlank()) photoPathsToExport.add(it.path) }
+        photoPaths.forEach { path ->
+            val file = File(context.filesDir, path)
+            if (!file.exists()) {
+                Log.w("Export", "Photo not found: $path")
+                return@forEach
             }
-
-            context.contentResolver.openOutputStream(targetUri)?.use { outputStream ->
-                ZipOutputStream(outputStream).use { zos ->
-                    // 1. Write JSON
-                    val jsonEntry = ZipEntry(JSON_ENTRY_NAME)
-                    zos.putNextEntry(jsonEntry)
-                    zos.write(jsonString.toByteArray())
-                    zos.closeEntry()
-
-                    // 2. Write Photos
-                    photoPathsToExport.forEach { path ->
-                        val file = File(context.filesDir, path)
-                        if (file.exists()) {
-                            val photoEntry = ZipEntry(path)
-                            zos.putNextEntry(photoEntry)
-                            FileInputStream(file).use { fis ->
-                                fis.copyTo(zos)
-                            }
-                            zos.closeEntry()
-                        } else {
-                            Log.w("Export", "Photo not found: $path")
-                        }
-                    }
-                }
-            } ?: error("Could not open output stream")
+            zos.putNextEntry(ZipEntry(path))
+            FileInputStream(file).use { fis -> fis.copyTo(zos) }
+            zos.closeEntry()
         }
     }
 
     suspend fun importCosplays(
         context: Context,
         sourceUri: Uri,
-        cosplayDao: CosplayDao,
-        elementDao: CosplayElementDao,
-        taskDao: CosplayTaskDao,
-        photoDao: CosplayPhotoDao,
-        progressPhotoDao: ProgressPhotoDao,
-        eventDao: EventDao
-    ): Result<Unit> = withContext(Dispatchers.IO) {
-        runCatchingCancellable {
-            var jsonString: String? = null
-            
-            // Unzip to temp dir to read images, or stream them
-            context.contentResolver.openInputStream(sourceUri)?.use { inputStream ->
-                ZipInputStream(inputStream).use { zis ->
-                    var entry = zis.nextEntry
-                    while (entry != null) {
-                        if (entry.name == JSON_ENTRY_NAME) {
-                            jsonString = zis.readBytes().toString(Charsets.UTF_8)
-                        } else if (entry.name.startsWith(IMAGES_ENTRY_PREFIX)) {
-                            val destFile = resolveImageEntryFile(context, entry.name)
-                            destFile.parentFile?.mkdirs()
-                            destFile.outputStream().use { fos ->
-                                zis.copyTo(fos)
-                            }
-                        }
-                        zis.closeEntry()
-                        entry = zis.nextEntry
-                    }
-                }
-            } ?: error("Could not open input stream")
+        daos: CosplayDaos,
+    ): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            runCatchingCancellable {
+                val jsonString = readArchive(context, sourceUri)
+                val payload = jsonString ?: error("$JSON_ENTRY_NAME not found in the ZIP archive")
 
-            val payload = jsonString ?: error("$JSON_ENTRY_NAME not found in the ZIP archive")
+                val exportData = json.decodeFromString<ExportDataDto>(payload)
+                exportData.cosplays.forEach { cosplayExport -> insertCosplay(cosplayExport, daos) }
+            }
+        }
 
-            val exportData = json.decodeFromString<ExportDataDto>(payload)
+    /**
+     * Extracts the archive's images into the managed images directory and returns the JSON
+     * payload, or null when the archive contains no [JSON_ENTRY_NAME] entry.
+     */
+    private fun readArchive(
+        context: Context,
+        sourceUri: Uri,
+    ): String? {
+        var jsonString: String? = null
 
-            // Insert into DB
-            exportData.cosplays.forEach { cosplayExport ->
-                val newCosplayId = cosplayDao.insertCosplay(cosplayExport.cosplay.toEntity()).toInt()
-
-                cosplayExport.elements.forEach { elementDao.insertElement(it.toEntity(newCosplayId)) }
-                cosplayExport.tasks.forEach { taskDao.insertTask(it.toEntity(newCosplayId)) }
-                cosplayExport.photos.forEach { photoDao.insertPhoto(it.toEntity(newCosplayId)) }
-                cosplayExport.progressPhotos.forEach {
-                    progressPhotoDao.insertPhoto(it.toEntity(newCosplayId))
-                }
-
-                cosplayExport.events.forEach { eventDto ->
-                    val newEventId = eventDao.insertEvent(eventDto.toEntity()).toInt()
-                    eventDao.insertEventCosplayCrossRefs(
-                        listOf(EventCosplayCrossRef(eventId = newEventId, cosplayId = newCosplayId)),
-                    )
+        context.contentResolver.openInputStream(sourceUri)?.use { inputStream ->
+            ZipInputStream(inputStream).use { zis ->
+                var entry = zis.nextEntry
+                while (entry != null) {
+                    jsonString = readEntry(context, zis, entry.name) ?: jsonString
+                    zis.closeEntry()
+                    entry = zis.nextEntry
                 }
             }
+        } ?: error("Could not open input stream")
+
+        return jsonString
+    }
+
+    /**
+     * Handles a single archive entry: extracts images to disk, and returns the JSON payload when
+     * [entryName] is the data entry. Any other entry is ignored.
+     */
+    private fun readEntry(
+        context: Context,
+        zis: ZipInputStream,
+        entryName: String,
+    ): String? {
+        if (entryName == JSON_ENTRY_NAME) {
+            return zis.readBytes().toString(Charsets.UTF_8)
+        }
+        if (entryName.startsWith(IMAGES_ENTRY_PREFIX)) {
+            val destFile = resolveImageEntryFile(context, entryName)
+            destFile.parentFile?.mkdirs()
+            destFile.outputStream().use { fos -> zis.copyTo(fos) }
+        }
+        return null
+    }
+
+    /** Inserts one imported cosplay and all of its children under freshly generated ids. */
+    private suspend fun insertCosplay(
+        cosplayExport: CosplayExportDto,
+        daos: CosplayDaos,
+    ) {
+        val newCosplayId = daos.cosplayDao.insertCosplay(cosplayExport.cosplay.toEntity()).toInt()
+
+        cosplayExport.elements.forEach { daos.elementDao.insertElement(it.toEntity(newCosplayId)) }
+        cosplayExport.tasks.forEach { daos.taskDao.insertTask(it.toEntity(newCosplayId)) }
+        cosplayExport.photos.forEach { daos.photoDao.insertPhoto(it.toEntity(newCosplayId)) }
+        cosplayExport.progressPhotos.forEach {
+            daos.progressPhotoDao.insertPhoto(it.toEntity(newCosplayId))
+        }
+
+        cosplayExport.events.forEach { eventDto ->
+            val newEventId = daos.eventDao.insertEvent(eventDto.toEntity()).toInt()
+            daos.eventDao.insertEventCosplayCrossRefs(
+                listOf(EventCosplayCrossRef(eventId = newEventId, cosplayId = newCosplayId)),
+            )
         }
     }
 }
