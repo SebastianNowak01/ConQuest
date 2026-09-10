@@ -28,13 +28,17 @@ fun EditTask(
     val task by taskViewModel.getTaskById(taskId).collectAsState(initial = null)
     
     var form by remember { mutableStateOf(TaskFormState()) }
+    var baseline by remember { mutableStateOf(TaskFormState()) }
     var notes by remember { mutableStateOf("") }
+    var baselineNotes by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(task?.id) {
         task?.let { loaded ->
             form = TaskFormState.fromEntity(loaded)
+            baseline = form
             notes = loaded.notes.orEmpty()
+            baselineNotes = notes
         }
     }
 
@@ -45,6 +49,7 @@ fun EditTask(
         onFormChange = { form = it },
         onNotesChange = { notes = it },
         snackbarHostState = snackbarHostState,
+        isDirty = form != baseline || notes != baselineNotes,
         onCancel = { navController.popBackStack() },
         onCommit = {
             val current = task ?: return@TaskFormContent

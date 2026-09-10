@@ -24,7 +24,8 @@ fun NewCosplay(
     val cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val snackbarHostState = remember { SnackbarHostState() }
     
-    var form by remember { mutableStateOf(CosplayFormState()) }
+    val baseline = remember { CosplayFormState() }
+    var form by remember { mutableStateOf(baseline) }
     var didCommit by remember { mutableStateOf(false) }
 
     CosplayFormContent(
@@ -34,10 +35,11 @@ fun NewCosplay(
         didCommit = didCommit,
         onFormChange = { form = it },
         snackbarHostState = snackbarHostState,
+        isDirty = form != baseline,
         onCancel = { navController.popBackStack() },
         onCommit = {
             didCommit = true
-            cosplayViewModel.insertCosplay(form.toEntity(uid = 0, finished = false))
+            cosplayViewModel.insertCosplay(form.toEntity(uid = 0))
         },
         postCommit = { navController.popBackStack() }
     )

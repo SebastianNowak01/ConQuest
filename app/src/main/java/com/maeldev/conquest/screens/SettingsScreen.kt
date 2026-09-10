@@ -95,6 +95,8 @@ fun SettingsScreen(navController: NavController) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            MySettingsSectionLabel(text = "Appearance")
+
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded },
@@ -143,7 +145,9 @@ fun SettingsScreen(navController: NavController) {
             }
             
             Spacer(modifier = Modifier.padding(UIConsts.paddingM))
-            
+
+            MySettingsSectionLabel(text = "Your data")
+
             val openDocumentLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.OpenDocument()
             ) { uri ->
@@ -172,6 +176,20 @@ fun SettingsScreen(navController: NavController) {
 
         MySnackbarHost(hostState = snackbarHostState)
     }
+}
+
+/** Heading over a group of settings — the screen was previously a bare stack of controls. */
+@Composable
+private fun MySettingsSectionLabel(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.primary,
+        modifier =
+            Modifier
+                .fillMaxWidth(UIConsts.columnWidthFraction)
+                .padding(bottom = UIConsts.paddingS),
+    )
 }
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")

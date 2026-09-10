@@ -11,7 +11,7 @@ data class CosplayFormState(
     val initialDate: Date? = getCurrentDate(),
     val dueDate: Date? = getCurrentDate(),
     val budget: String = "",
-    val inProgress: Boolean = true,
+    val status: CosplayStatus = CosplayStatus.InProgress,
 ) {
     companion object {
         fun fromEntity(cosplay: Cosplay): CosplayFormState {
@@ -22,7 +22,7 @@ data class CosplayFormState(
                 initialDate = cosplay.initialDate,
                 dueDate = cosplay.dueDate,
                 budget = cosplay.budget?.toString() ?: "",
-                inProgress = cosplay.inProgress,
+                status = CosplayStatus.fromEntity(cosplay),
             )
         }
     }
@@ -33,13 +33,11 @@ data class CosplayFormState(
     val isValid: Boolean
         get() = characterName.isNotBlank() && series.isNotBlank() && initialDate != null
 
-    fun toEntity(
-        uid: Int = 0, finished: Boolean = !inProgress
-    ): Cosplay {
+    fun toEntity(uid: Int = 0): Cosplay {
         return Cosplay(
             uid = uid,
-            inProgress = inProgress,
-            finished = finished,
+            inProgress = status.inProgressFlag,
+            finished = status.finishedFlag,
             name = characterName,
             series = series,
             initialDate = requireNotNull(initialDate) { "Initial date required" },
@@ -54,8 +52,8 @@ data class CosplayFormState(
      */
     fun toUpdatedEntity(current: Cosplay): Cosplay {
         return current.copy(
-            inProgress = inProgress,
-            finished = !inProgress,
+            inProgress = status.inProgressFlag,
+            finished = status.finishedFlag,
             name = characterName,
             series = series,
             initialDate = requireNotNull(initialDate) { "Initial date required" },

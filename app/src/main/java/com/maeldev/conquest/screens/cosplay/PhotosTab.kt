@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,8 +27,10 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.toRoute
 import com.maeldev.conquest.viewmodel.PhotoViewModel
+import com.maeldev.conquest.components.MyEmptyState
 import com.maeldev.conquest.components.MyFab
 import com.maeldev.conquest.components.MyOuterBox
+import com.maeldev.conquest.components.MySelectionCountLabel
 import com.maeldev.conquest.components.MyPhotoGrid
 import com.maeldev.conquest.components.MyPhotoGridItem
 import com.maeldev.conquest.components.MySelectionModeFabs
@@ -50,7 +53,8 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
         photos.map { photo ->
             MyPhotoGridItem(
                 id = photo.id,
-                path = photo.path
+                path = photo.path,
+                hasNote = !photo.notes.isNullOrBlank(),
             )
         }
     }
@@ -99,6 +103,17 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
                 onItemLongClick = { photo -> selection.select(photo.id) },
             )
         }
+
+        if (gridPhotos.isEmpty()) {
+            MyEmptyState(
+                icon = Icons.Default.Image,
+                title = "No reference photos",
+                hint = "Add the references you are working from.",
+                modifier = Modifier.align(Alignment.Center),
+            )
+        }
+
+        MySelectionCountLabel(selection = selection, itemLabelSingular = "photo")
     }
 }
 

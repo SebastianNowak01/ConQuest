@@ -44,13 +44,16 @@ fun MySwitchCard(
             Switch(
                 checked = checked,
                 onCheckedChange = onCheckedChange,
+                // The unchecked track used to be the same secondary colour as the checked one,
+                // so on and off differed only by where the thumb sat — the track, which is what
+                // a switch is normally read from, said nothing.
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.primary,
                     checkedTrackColor = MaterialTheme.colorScheme.secondary,
                     checkedBorderColor = Color.Transparent,
                     uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    uncheckedTrackColor = MaterialTheme.colorScheme.secondary,
-                    uncheckedBorderColor = Color.Transparent,
+                    uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    uncheckedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             )
         }

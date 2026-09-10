@@ -29,12 +29,14 @@ fun EditElement(
     val snackbarHostState = remember { SnackbarHostState() }
     
     var form by remember { mutableStateOf(ElementFormState()) }
+    var baseline by remember { mutableStateOf(ElementFormState()) }
     var originalPhotoPath by remember { mutableStateOf<String?>(null) }
     var didCommit by remember { mutableStateOf(false) }
 
     LaunchedEffect(element?.id) {
         element?.let { loaded ->
             form = ElementFormState.fromEntity(loaded)
+            baseline = form
             originalPhotoPath = loaded.photoPath
         }
     }
@@ -46,6 +48,7 @@ fun EditElement(
         didCommit = didCommit,
         onFormChange = { form = it },
         snackbarHostState = snackbarHostState,
+        isDirty = form != baseline,
         onCancel = { navController.popBackStack() },
         onCommit = {
             val current = element ?: return@ElementFormContent

@@ -25,7 +25,8 @@ fun NewElement(
     val elementViewModel: ElementViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val snackbarHostState = remember { SnackbarHostState() }
     
-    var form by remember { mutableStateOf(ElementFormState()) }
+    val baseline = remember { ElementFormState() }
+    var form by remember { mutableStateOf(baseline) }
     var didCommit by remember { mutableStateOf(false) }
 
     ElementFormContent(
@@ -35,6 +36,7 @@ fun NewElement(
         didCommit = didCommit,
         onFormChange = { form = it },
         snackbarHostState = snackbarHostState,
+        isDirty = form != baseline,
         onCancel = { navController.popBackStack() },
         onCommit = {
             didCommit = true

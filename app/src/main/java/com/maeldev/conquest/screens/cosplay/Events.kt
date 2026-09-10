@@ -1,6 +1,8 @@
 package com.maeldev.conquest.screens.cosplay
 
 import com.maeldev.conquest.AppViewModelProvider
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -8,8 +10,12 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.maeldev.conquest.viewmodel.EventViewModel
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import com.maeldev.conquest.components.EventListItem
 import com.maeldev.conquest.components.MyAddFab
+import com.maeldev.conquest.components.MyEmptyState
+import com.maeldev.conquest.components.MySelectionCountLabel
 import com.maeldev.conquest.components.MyLazyColumn
 import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MySelectionModeFabs
@@ -88,6 +94,25 @@ fun EventsScreen(
         ) { event ->
             EventListItem(event = event)
         }
+
+        if (filteredEvents.isEmpty()) {
+            val nothingSaved = events.isEmpty()
+            val emptyHint =
+                if (nothingSaved) {
+                    "Add the conventions and meets you are going to."
+                } else {
+                    "No event matches the current search and filter."
+                }
+
+            MyEmptyState(
+                icon = Icons.Default.Event,
+                title = if (nothingSaved) "No events yet" else "Nothing matches",
+                hint = emptyHint,
+                modifier = Modifier.align(Alignment.Center),
+            )
+        }
+
+        MySelectionCountLabel(selection = selection, itemLabelSingular = "event")
 
         MyAddFab(navController = navController, route = NewEvent)
     }

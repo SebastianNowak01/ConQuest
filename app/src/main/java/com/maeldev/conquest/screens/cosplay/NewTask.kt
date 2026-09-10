@@ -25,7 +25,8 @@ fun NewTask(
     val taskViewModel: TaskViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val snackbarHostState = remember { SnackbarHostState() }
     
-    var form by remember { mutableStateOf(TaskFormState()) }
+    val baseline = remember { TaskFormState() }
+    var form by remember { mutableStateOf(baseline) }
     var notes by remember { mutableStateOf("") }
 
     TaskFormContent(
@@ -35,6 +36,7 @@ fun NewTask(
         onFormChange = { form = it },
         onNotesChange = { notes = it },
         snackbarHostState = snackbarHostState,
+        isDirty = form != baseline || notes.isNotBlank(),
         onCancel = { navController.popBackStack() },
         onCommit = {
             taskViewModel.insertTask(form.toEntity(cosplayId = cosplayId, notes = notes.ifBlank { null }))

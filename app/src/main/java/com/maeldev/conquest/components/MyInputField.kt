@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
  * - default single-line text fields (e.g., Name)
  * - numeric/decimal fields with optional filtering (e.g., Cost)
  * - multi-line "notes" fields with a fixed height and max lines
+ * - required fields that mark themselves once a save has been attempted ([isError])
  */
 @Composable
 fun MyInputField(
@@ -34,6 +35,9 @@ fun MyInputField(
     shape: RoundedCornerShape = RoundedCornerShape(20.dp),
     keyboardType: KeyboardType? = null,
     filterDecimal: Boolean = false,
+    isError: Boolean = false,
+    errorMessage: String? = null,
+    onClear: (() -> Unit)? = null,
 ) {
     val resolvedKeyboardType = keyboardType ?: if (filterDecimal) KeyboardType.Decimal else KeyboardType.Text
 
@@ -56,6 +60,9 @@ fun MyInputField(
         shape = shape,
         singleLine = singleLine,
         maxLines = maxLines,
+        isError = isError,
+        supportingText = errorSupportingText(isError, errorMessage),
+        trailingIcon = clearTrailingIcon(value.isNotEmpty(), label, onClear),
         keyboardOptions = KeyboardOptions(keyboardType = resolvedKeyboardType),
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.background,

@@ -1,9 +1,14 @@
 package com.maeldev.conquest.components
 
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.maeldev.conquest.data.classes.CosplayFormState
 import com.maeldev.conquest.theme.UIConsts
@@ -21,9 +26,12 @@ fun CosplayFormContent(
     onCancel: () -> Unit,
     onCommit: () -> Unit,
     postCommit: () -> Unit,
+    isDirty: Boolean = false,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    var showErrors by remember { mutableStateOf(false) }
+    val cancel = rememberDiscardChangesGuard(isDirty = isDirty, onDiscard = onCancel)
 
     DiscardUnsavedImageEffect(
         context = context,
@@ -58,16 +66,23 @@ fun CosplayFormContent(
             MyImageBox(
                 photoPath = form.cosplayPhotoPath,
                 contentDescription = "Selected cosplay photo",
-                size = UIConsts.imageSizeM,
+                size = UIConsts.imageSizeL,
+                shape = RoundedCornerShape(UIConsts.cornerRadiusM),
                 clickable = true,
                 onClick = { imageLauncher.launch() },
                 emptyContentDescription = "Pick cosplay photo",
+                showEditBadge = true,
+                onClear = {
+                    discardUnsavedImage(context, form.cosplayPhotoPath, originalPhotoPath)
+                    onFormChange(form.copy(cosplayPhotoPath = ""))
+                },
             )
 
-            MySwitchCard(
-                label = if (form.inProgress) "In Progress" else "Planned",
-                checked = form.inProgress,
-                onCheckedChange = { onFormChange(form.copy(inProgress = it)) }
+            MySectionLabel(text = "Status")
+
+            MyStatusSegmentedRow(
+                selected = form.status,
+                onStatusChange = { onFormChange(form.copy(status = it)) },
             )
 
             MyInputField(
@@ -75,6 +90,8 @@ fun CosplayFormContent(
                 onValueChange = { onFormChange(form.copy(characterName = it)) },
                 label = "Character Name*",
                 singleLine = true,
+                isError = showErrors && form.characterName.isBlank(),
+                errorMessage = "Character name is required",
             )
 
             MyInputField(
@@ -82,24 +99,29 @@ fun CosplayFormContent(
                 onValueChange = { onFormChange(form.copy(series = it)) },
                 label = "Series*",
                 singleLine = true,
+                isError = showErrors && form.series.isBlank(),
+                errorMessage = "Series is required",
             )
 
             DatePickerFieldToModal(
                 label = "Initial date*",
                 selectedDate = form.initialDate,
-                onDateSelected = { onFormChange(form.copy(initialDate = it)) }
+                onDateSelected = { onFormChange(form.copy(initialDate = it)) },
+                isError = showErrors && form.initialDate == null,
+                errorMessage = "Initial date is required",
             )
 
             DatePickerFieldToModal(
                 label = "Due date",
                 selectedDate = form.dueDate,
-                onDateSelected = { onFormChange(form.copy(dueDate = it)) }
+                onDateSelected = { onFormChange(form.copy(dueDate = it)) },
+                onClear = { onFormChange(form.copy(dueDate = null)) },
             )
 
             MyInputField(
                 value = form.budget,
                 onValueChange = { onFormChange(form.copy(budget = it)) },
-                label = "Budget (Optional)",
+                label = "Budget",
                 singleLine = true,
                 filterDecimal = true,
             )
@@ -108,7 +130,8 @@ fun CosplayFormContent(
         MySaveCancelRow(
             snackbarHostState = snackbarHostState,
             isValid = form.isValid,
-            onCancel = onCancel,
+            onInvalidAttempt = { showErrors = true },
+            onCancel = cancel,
             onCommit = onCommit,
             postCommit = postCommit,
         )

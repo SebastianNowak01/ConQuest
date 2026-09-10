@@ -24,13 +24,15 @@ fun NewEvent(
     val eventViewModel: EventViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val snackbarHostState = remember { SnackbarHostState() }
     
-    var form by remember { mutableStateOf(EventFormState()) }
+    val baseline = remember { EventFormState() }
+    var form by remember { mutableStateOf(baseline) }
 
     EventFormContent(
         title = "New Event",
         form = form,
         onFormChange = { form = it },
         snackbarHostState = snackbarHostState,
+        isDirty = form != baseline,
         onCancel = { navController.popBackStack() },
         onCommit = {
             eventViewModel.insertEvent(form.toEntity(id = 0))

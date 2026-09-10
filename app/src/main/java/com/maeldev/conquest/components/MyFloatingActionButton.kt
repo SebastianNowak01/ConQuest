@@ -1,7 +1,7 @@
 package com.maeldev.conquest.components
 
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -18,16 +18,20 @@ fun MyFab(
     containerColor: Color,
     contentColor: Color,
     icon: ImageVector,
-    contentDescription: String
+    contentDescription: String,
 ) {
     FloatingActionButton(
         onClick = onClick,
         containerColor = containerColor,
         contentColor = contentColor,
         shape = RoundedCornerShape(UIConsts.fabCornerRadius),
-        modifier = modifier
-            .padding(bottom = UIConsts.paddingM)
-            .statusBarsPadding()
+        // These FABs are all anchored to the bottom of the screen, so the inset that matters is
+        // the navigation bar's. This used to apply statusBarsPadding instead, which reserved the
+        // wrong inset at the wrong end and made the FAB row taller than it looked.
+        modifier =
+            modifier
+                .navigationBarsPadding()
+                .padding(bottom = UIConsts.paddingM),
     ) {
         Icon(icon, contentDescription = contentDescription)
     }

@@ -26,6 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import com.maeldev.conquest.data.pickerMillisToDate
+import com.maeldev.conquest.data.toPickerMillis
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -38,14 +40,18 @@ internal fun getCurrentDate(): Date {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerModal(
-    onDateSelected: (Date?) -> Unit, onDismiss: () -> Unit
+    onDateSelected: (Date?) -> Unit,
+    onDismiss: () -> Unit,
+    initialDate: Date? = null,
 ) {
-    val datePickerState = rememberDatePickerState()
+    // Open on the date the field already holds, instead of always landing on today.
+    val initialMillis = initialDate?.toPickerMillis()
+    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = initialMillis)
 
     DatePickerDialog(onDismissRequest = onDismiss, confirmButton = {
         TextButton(onClick = {
             val selectedMillis = datePickerState.selectedDateMillis
-            onDateSelected(selectedMillis?.let { Date(it) })
+            onDateSelected(selectedMillis?.let { pickerMillisToDate(it) })
             onDismiss()
         }) {
             Text("OK")
@@ -59,28 +65,47 @@ fun DatePickerModal(
     }
 }
 
+/**
+ * Date field that opens a picker when tapped.
+ *
+ * An optional field takes [onClear], which puts a clear button in place of the calendar icon
+ * while a date is set — without it a date, once chosen, can never be taken back off.
+ */
 @Composable
 fun DatePickerFieldToModal(
-    label: String, selectedDate: Date?, onDateSelected: (Date?) -> Unit
+    label: String,
+    selectedDate: Date?,
+    onDateSelected: (Date?) -> Unit,
+    onClear: (() -> Unit)? = null,
+    isError: Boolean = false,
+    errorMessage: String? = null,
 ) {
     var showModal by remember { mutableStateOf(false) }
+    val canClear = onClear != null && selectedDate != null
+    val calendarIcon: @Composable () -> Unit = {
+        Icon(Icons.Default.DateRange, contentDescription = "Select date")
+    }
+    val trailing = clearTrailingIcon(canClear, label, onClear) ?: calendarIcon
 
     OutlinedTextField(
         value = selectedDate?.let { convertDateToString(it) } ?: "",
         onValueChange = { },
         label = { Text(label) },
         placeholder = { Text("DD/MM/YYYY") },
-        trailingIcon = {
-            Icon(Icons.Default.DateRange, contentDescription = "Select date")
-        },
+        isError = isError,
+        supportingText = errorSupportingText(isError, errorMessage),
+        trailingIcon = trailing,
         shape = RoundedCornerShape(32.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .pointerInput(Unit) {
+            .pointerInput(canClear) {
                 awaitEachGesture {
                     awaitFirstDown(pass = PointerEventPass.Initial)
-                    val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
-                    if (upEvent != null) {
+                    // Wait for the Final pass so the trailing clear button, which consumes the
+                    // release it handles, is not also treated as a tap on the field itself —
+                    // otherwise clearing a date would reopen the picker in the same gesture.
+                    val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Final)
+                    if (upEvent != null && !upEvent.isConsumed) {
                         showModal = true
                     }
                 }
@@ -94,10 +119,14 @@ fun DatePickerFieldToModal(
     )
 
     if (showModal) {
-        DatePickerModal(onDateSelected = {
-            onDateSelected(it)
-            showModal = false
-        }, onDismiss = { showModal = false })
+        DatePickerModal(
+            onDateSelected = {
+                onDateSelected(it)
+                showModal = false
+            },
+            onDismiss = { showModal = false },
+            initialDate = selectedDate,
+        )
     }
 }
 

@@ -34,7 +34,14 @@ fun <T> MyLazyColumn(
     modifier: Modifier = Modifier,
     items: List<T>,
     key: ((T) -> Any)? = null,
-    contentPadding: PaddingValues = PaddingValues(UIConsts.paddingM),
+    // The floating buttons sit over the end of the list, so leave room to scroll clear of them.
+    contentPadding: PaddingValues =
+        PaddingValues(
+            start = UIConsts.paddingM,
+            end = UIConsts.paddingM,
+            top = UIConsts.paddingM,
+            bottom = UIConsts.listBottomInset,
+        ),
     spacedBy: Dp = UIConsts.spacingM,
     cardCornerRadius: Dp = UIConsts.cornerRadiusL,
     cardElevation: Dp = UIConsts.elevationS,
@@ -54,6 +61,7 @@ fun <T> MyLazyColumn(
             key = if (key != null) ({ item: T -> key(item) }) else null,
         ) { item ->
             MySelectableCardItem(
+                modifier = Modifier.animateItem(),
                 selected = isSelected(item),
                 cornerRadius = cardCornerRadius,
                 elevation = cardElevation,
@@ -69,6 +77,7 @@ fun <T> MyLazyColumn(
 
 @Composable
 private fun MySelectableCardItem(
+    modifier: Modifier = Modifier,
     selected: Boolean,
     cornerRadius: Dp,
     elevation: Dp,
@@ -80,7 +89,7 @@ private fun MySelectableCardItem(
     val shape = RoundedCornerShape(cornerRadius)
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(shape)
             .border(UIConsts.strokeThin, MaterialTheme.colorScheme.outline, shape)

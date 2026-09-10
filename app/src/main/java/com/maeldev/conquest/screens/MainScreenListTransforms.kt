@@ -2,6 +2,7 @@ package com.maeldev.conquest.screens
 
 import com.maeldev.conquest.data.classes.CosplaySortOrder
 import com.maeldev.conquest.data.classes.CosplaySortOption
+import com.maeldev.conquest.data.classes.CosplayStatus
 import com.maeldev.conquest.data.classes.CosplayStatusFilter
 import com.maeldev.conquest.data.entity.Cosplay
 import java.util.Date
@@ -20,12 +21,8 @@ private fun compareDates(first: Date?, second: Date?): Int {
 }
 
 fun matchesMainScreenFilter(cosplay: Cosplay, filter: CosplayStatusFilter): Boolean {
-    return when (filter) {
-        CosplayStatusFilter.All -> true
-        CosplayStatusFilter.Planned -> !cosplay.inProgress && !cosplay.finished
-        CosplayStatusFilter.InProcess -> cosplay.inProgress && !cosplay.finished
-        CosplayStatusFilter.Completed -> cosplay.finished
-    }
+    val wanted = filter.status ?: return true
+    return CosplayStatus.fromEntity(cosplay) == wanted
 }
 
 fun filterMainScreenCosplays(

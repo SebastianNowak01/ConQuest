@@ -160,8 +160,14 @@ fun MainScreenTopAppBar(
     onSearchQueryChange: (String) -> Unit,
     onMenuClick: () -> Unit,
 ) {
-    navBackStackEntry ?: return
-    val cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    // Scope the ViewModel to the destination the bar belongs to, not to whatever owner happens
+    // to be in scope here. This bar is composed in the Scaffold's topBar slot, outside the
+    // NavHost, so a bare viewModel() call resolves to the Activity's store while MainScreen's
+    // resolves to its NavBackStackEntry — two CosplayViewModels, and every filter or sort set
+    // here was written to the one the list never reads.
+    val entry = navBackStackEntry ?: return
+    val cosplayViewModel: CosplayViewModel =
+        viewModel(viewModelStoreOwner = entry, factory = AppViewModelProvider.Factory)
     val selectedFilter by cosplayViewModel.mainScreenFilter.collectAsState()
     val selectedSort by cosplayViewModel.mainScreenSort.collectAsState()
     val selectedOrder by cosplayViewModel.mainScreenSortOrder.collectAsState()
