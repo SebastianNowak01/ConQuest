@@ -23,6 +23,10 @@ object UIConsts {
     val imageSizeM = 80.dp
     val imageSizeL = 120.dp
     val imageBadgeSize = 28.dp
+    val chipIconSize = 16.dp
+    val chipVerticalPadding = 6.dp
+    val emptyStateIconSize = 56.dp
+    val progressBarHeight = 6.dp
     val previewBlurRadius = 24.dp
     val previewImagePadding = 24.dp
     const val previewScrimAlpha = 0.35f

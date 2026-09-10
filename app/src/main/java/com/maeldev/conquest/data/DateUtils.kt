@@ -51,6 +51,18 @@ fun pickerMillisToDate(millis: Long): Date {
     }.time
 }
 
+/**
+ * True when this date falls on a day before today.
+ *
+ * Dates in this app are calendar days, not instants: they are stored at midnight. Comparing them
+ * with Date.before(now) therefore calls anything happening *today* "past" from one minute after
+ * midnight onwards, which is not what a user means by an event having happened. Both sides are
+ * reduced to their calendar day before comparing.
+ */
+fun Date.isBeforeToday(): Boolean {
+    return toPickerMillis() < Date().toPickerMillis()
+}
+
 class DateConverter {
     @TypeConverter
     fun fromTimestamp(value: Long?): Date? {

@@ -1,6 +1,8 @@
 package com.maeldev.conquest.screens
 
 import com.maeldev.conquest.AppViewModelProvider
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.TheaterComedy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -8,8 +10,12 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.maeldev.conquest.viewmodel.CosplayViewModel
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import com.maeldev.conquest.components.MyAddFab
 import com.maeldev.conquest.components.MyCosplayRow
+import com.maeldev.conquest.components.MyEmptyState
+import com.maeldev.conquest.components.MySelectionCountLabel
 import com.maeldev.conquest.components.MyLazyColumn
 import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MySelectionModeFabs
@@ -79,12 +85,28 @@ fun MainScreen(
             },
             onLongClick = { cosplay -> selection.select(cosplay.uid) },
         ) { cosplay ->
-            MyCosplayRow(
-                name = cosplay.name,
-                series = cosplay.series,
-                photoPath = cosplay.cosplayPhotoPath ?: "",
+            MyCosplayRow(cosplay = cosplay)
+        }
+
+        if (sortedCosplays.isEmpty()) {
+            val nothingSaved = cosplays.isEmpty()
+            val emptyHint =
+                if (nothingSaved) {
+                    "Start a project and track its elements, tasks and progress."
+                } else {
+                    "No cosplay matches the current search and filter."
+                }
+
+            MyEmptyState(
+                icon = Icons.Default.TheaterComedy,
+                title = if (nothingSaved) "No cosplays yet" else "Nothing matches",
+                hint = emptyHint,
+                modifier = Modifier.align(Alignment.Center),
             )
         }
+
+        MySelectionCountLabel(selection = selection, itemLabelSingular = "cosplay")
+
         MyAddFab(
             navController,
             route = NewCosplay

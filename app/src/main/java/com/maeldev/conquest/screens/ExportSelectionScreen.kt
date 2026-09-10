@@ -2,9 +2,13 @@ package com.maeldev.conquest.screens
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.TheaterComedy
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -18,11 +22,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.maeldev.conquest.AppViewModelProvider
 import com.maeldev.conquest.components.MyCosplayRow
+import com.maeldev.conquest.components.MyEmptyState
 import com.maeldev.conquest.components.MyExportSelectionModeFabs
 import com.maeldev.conquest.components.MyLazyColumn
 import com.maeldev.conquest.components.MyOuterBox
@@ -121,10 +127,25 @@ fun ExportSelectionScreen(navController: NavController) {
                 onClick = { cosplay -> selection.toggle(cosplay.uid) },
                 onLongClick = { cosplay -> selection.select(cosplay.uid) },
             ) { cosplay ->
-                MyCosplayRow(
-                    name = cosplay.name,
-                    series = cosplay.series,
-                    photoPath = cosplay.cosplayPhotoPath ?: "",
+                // Unlike every other list in the app a plain tap selects here, so each row shows
+                // a checkbox — otherwise nothing on screen says what tapping will do.
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = selection.isSelected(cosplay.uid),
+                        onCheckedChange = { selection.toggle(cosplay.uid) },
+                    )
+                    Box(modifier = Modifier.weight(1f)) {
+                        MyCosplayRow(cosplay = cosplay)
+                    }
+                }
+            }
+
+            if (cosplays.isEmpty()) {
+                MyEmptyState(
+                    icon = Icons.Default.TheaterComedy,
+                    title = "Nothing to export",
+                    hint = "Cosplays you create will show here, ready to pick.",
+                    modifier = Modifier.align(Alignment.Center),
                 )
             }
 

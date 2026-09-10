@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -43,15 +44,17 @@ data class TabIcon(
     val imageVector: ImageVector, val contentDescription: String
 )
 
+private val tabs = listOf(
+    TabIcon(Icons.Filled.TheaterComedy, "Elements"),
+    TabIcon(Icons.AutoMirrored.Filled.List, "Tasks"),
+    TabIcon(Icons.Filled.Image, "Photos"),
+)
+
 @Composable
 fun CosplayTabs(
     navBackStackEntry: NavBackStackEntry, navController: NavController, initialTab: Int
 ) {
-    val tabIcons = listOf(
-        TabIcon(Icons.Filled.TheaterComedy, "Cosplay Elements"),
-        TabIcon(Icons.AutoMirrored.Filled.List, "Tasks"),
-        TabIcon(Icons.Filled.Image, "Reference Photos"),
-    )
+    val tabIcons = tabs
 
     val handle = navBackStackEntry.savedStateHandle
     val savedPage = handle.get<Int>("tab") ?: initialTab
@@ -69,7 +72,10 @@ fun CosplayTabs(
         TabRow(selectedTabIndex = pagerState.currentPage) {
             tabIcons.forEachIndexed { index, icon ->
                 Tab(
-                    icon = { Icon(icon.imageVector, icon.contentDescription) },
+                    icon = { Icon(icon.imageVector, contentDescription = null) },
+                    // The theatre-masks glyph for "Elements" is not self-explanatory, so the
+                    // tabs carry their names rather than relying on the icons alone.
+                    text = { Text(text = icon.contentDescription) },
                     selected = pagerState.currentPage == index,
                     onClick = { scope.launch { pagerState.animateScrollToPage(index) } })
             }

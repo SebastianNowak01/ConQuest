@@ -7,22 +7,30 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.TheaterComedy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.toRoute
 import com.maeldev.conquest.viewmodel.ElementViewModel
 import com.maeldev.conquest.components.MyAddFab
+import com.maeldev.conquest.components.MyEmptyState
 import com.maeldev.conquest.components.MyImageBox
 import com.maeldev.conquest.components.MyLazyColumn
 import com.maeldev.conquest.components.MyOuterBox
+import com.maeldev.conquest.components.MySelectionCountLabel
 import com.maeldev.conquest.components.MySelectionModeFabs
+import com.maeldev.conquest.components.MyStatusChip
 import com.maeldev.conquest.components.rememberSelectionState
 import com.maeldev.conquest.theme.UIConsts
 
@@ -85,7 +93,9 @@ fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEnt
                     Text(
                         text = element.name,
                         style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                     if (element.cost != null) {
                         Text(
@@ -96,27 +106,35 @@ fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEnt
                     }
                 }
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(UIConsts.paddingXS),
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(UIConsts.paddingXS),
                 ) {
-                    if (element.ready) {
-                        Text(
-                            "Ready",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                    }
-                    if (element.bought) {
-                        Text(
-                            "Bought",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                    }
+                    MyStatusChip(
+                        label = "Ready",
+                        icon = Icons.Default.CheckCircle,
+                        active = element.ready,
+                    )
+                    MyStatusChip(
+                        label = "Bought",
+                        icon = Icons.Default.ShoppingCart,
+                        active = element.bought,
+                    )
                 }
             }
         }
+
+        if (elements.isEmpty()) {
+            MyEmptyState(
+                icon = Icons.Default.TheaterComedy,
+                title = "No elements yet",
+                hint = "Wigs, props, each piece of the outfit — track them and what they cost.",
+                modifier = Modifier.align(Alignment.Center),
+            )
+        }
+
+        MySelectionCountLabel(selection = selection, itemLabelSingular = "element")
+
         MyAddFab(navController, route = NewElement(cosplayId))
     }
 }

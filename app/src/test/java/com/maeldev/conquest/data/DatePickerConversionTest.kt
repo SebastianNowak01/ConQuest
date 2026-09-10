@@ -2,6 +2,8 @@ package com.maeldev.conquest.data
 
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.Calendar
 import java.util.Date
@@ -125,6 +127,46 @@ class DatePickerConversionTest {
             assertEquals(zoneId, 6, utc.get(Calendar.DAY_OF_MONTH))
             assertEquals(zoneId, 0, utc.get(Calendar.HOUR_OF_DAY))
             assertEquals(zoneId, 0, utc.get(Calendar.MINUTE))
+        }
+    }
+
+    /**
+     * An event happening today has not happened yet. Comparing the stored midnight against the
+     * current instant would call it past from 00:01 onwards.
+     */
+    @Test
+    fun todayIsNotBeforeToday() {
+        zones.forEach { zoneId ->
+            TimeZone.setDefault(TimeZone.getTimeZone(zoneId))
+
+            val todayAtMidnight =
+                Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }.time
+
+            assertFalse(zoneId, todayAtMidnight.isBeforeToday())
+        }
+    }
+
+    @Test
+    fun yesterdayIsBeforeTodayAndTomorrowIsNot() {
+        zones.forEach { zoneId ->
+            TimeZone.setDefault(TimeZone.getTimeZone(zoneId))
+
+            val yesterday =
+                Calendar.getInstance().apply {
+                    add(Calendar.DAY_OF_YEAR, -1)
+                }.time
+            val tomorrow =
+                Calendar.getInstance().apply {
+                    add(Calendar.DAY_OF_YEAR, 1)
+                }.time
+
+            assertTrue(zoneId, yesterday.isBeforeToday())
+            assertFalse(zoneId, tomorrow.isBeforeToday())
         }
     }
 

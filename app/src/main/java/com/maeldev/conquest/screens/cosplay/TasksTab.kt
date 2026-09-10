@@ -3,25 +3,34 @@ package com.maeldev.conquest.screens.cosplay
 import com.maeldev.conquest.AppViewModelProvider
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.toRoute
 import com.maeldev.conquest.viewmodel.TaskViewModel
 import com.maeldev.conquest.components.MyAddFab
+import com.maeldev.conquest.components.MyEmptyState
 import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MyLazyColumn
+import com.maeldev.conquest.components.MySelectionCountLabel
 import com.maeldev.conquest.components.MySelectionModeFabs
+import com.maeldev.conquest.components.MyStatusChip
+import com.maeldev.conquest.components.convertDateToString
 import com.maeldev.conquest.components.rememberSelectionState
-import com.maeldev.conquest.components.MySwitchCard
 import com.maeldev.conquest.theme.UIConsts
 
 @Composable
@@ -65,26 +74,47 @@ fun TasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry)
             Text(
                 text = task.taskName,
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingS),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                MySwitchCard(
-                    label = "Done",
-                    checked = task.done,
-                    onCheckedChange = null,
-                    modifier = Modifier.weight(1f),
+
+            task.date?.let { date ->
+                Text(
+                    text = convertDateToString(date),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                MySwitchCard(
-                    label = "Alarm",
-                    checked = task.alarm,
-                    onCheckedChange = null,
-                    modifier = Modifier.weight(1f),
+            }
+
+            Row(
+                modifier = Modifier.padding(top = UIConsts.paddingXS),
+                horizontalArrangement = Arrangement.spacedBy(UIConsts.paddingS),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                MyStatusChip(
+                    label = "Done",
+                    icon = Icons.Default.CheckCircle,
+                    active = task.done,
+                )
+                MyStatusChip(
+                    label = "Reminder",
+                    icon = Icons.Default.Notifications,
+                    active = task.alarm,
                 )
             }
         }
+
+        if (tasks.isEmpty()) {
+            MyEmptyState(
+                icon = Icons.AutoMirrored.Filled.List,
+                title = "No tasks yet",
+                hint = "Add the steps this cosplay needs, and tick them off as you go.",
+                modifier = Modifier.align(Alignment.Center),
+            )
+        }
+
+        MySelectionCountLabel(selection = selection, itemLabelSingular = "task")
 
         MyAddFab(navController, route = NewTask(cosplayId))
     }

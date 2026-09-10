@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,8 +30,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.maeldev.conquest.viewmodel.ProgressPhotoViewModel
+import com.maeldev.conquest.components.MyEmptyState
 import com.maeldev.conquest.components.MyFab
 import com.maeldev.conquest.components.MyOuterBox
+import com.maeldev.conquest.components.MySelectionCountLabel
 import com.maeldev.conquest.components.MyPhotoGrid
 import com.maeldev.conquest.components.MyPhotoGridItem
 import com.maeldev.conquest.components.MySelectionModeFabs
@@ -55,7 +58,8 @@ fun ProgressScreen(
         photos.map { photo ->
             MyPhotoGridItem(
                 id = photo.id,
-                path = photo.path
+                path = photo.path,
+                hasNote = !photo.notes.isNullOrBlank(),
             )
         }
     }
@@ -135,6 +139,17 @@ fun ProgressScreen(
                 onItemLongClick = { photo -> selection.select(photo.id) },
             )
         }
+
+        if (gridPhotos.isEmpty()) {
+            MyEmptyState(
+                icon = Icons.Default.PhotoLibrary,
+                title = "No progress photos",
+                hint = "Photograph the build as it goes, and keep notes against each shot.",
+                modifier = Modifier.align(Alignment.Center),
+            )
+        }
+
+        MySelectionCountLabel(selection = selection, itemLabelSingular = "progress photo")
 
         if (!selection.isActive) {
             Row(
