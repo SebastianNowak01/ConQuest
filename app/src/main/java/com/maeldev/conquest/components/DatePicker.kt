@@ -26,6 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import com.maeldev.conquest.data.pickerMillisToDate
+import com.maeldev.conquest.data.toPickerMillis
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -43,12 +45,13 @@ fun DatePickerModal(
     initialDate: Date? = null,
 ) {
     // Open on the date the field already holds, instead of always landing on today.
-    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = initialDate?.time)
+    val initialMillis = initialDate?.toPickerMillis()
+    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = initialMillis)
 
     DatePickerDialog(onDismissRequest = onDismiss, confirmButton = {
         TextButton(onClick = {
             val selectedMillis = datePickerState.selectedDateMillis
-            onDateSelected(selectedMillis?.let { Date(it) })
+            onDateSelected(selectedMillis?.let { pickerMillisToDate(it) })
             onDismiss()
         }) {
             Text("OK")
