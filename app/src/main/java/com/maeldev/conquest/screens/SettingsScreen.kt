@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,6 +46,7 @@ import androidx.navigation.NavController
 import com.maeldev.conquest.AppViewModelProvider
 import com.maeldev.conquest.components.MyButton
 import com.maeldev.conquest.components.MyOuterBox
+import com.maeldev.conquest.components.MySnackbarHost
 import com.maeldev.conquest.theme.UIConsts
 import com.maeldev.conquest.viewmodel.ExportImportState
 import com.maeldev.conquest.viewmodel.ExportImportViewModel
@@ -62,9 +64,28 @@ fun SettingsScreen(navController: NavController) {
     val context = LocalContext.current
     val selectedOption by rememberThemePreference(context)
     val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val exportImportViewModel: ExportImportViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    val importState by exportImportViewModel.exportImportState.collectAsState()
 
     val options = listOf("dark", "light", "automatic")
     var expanded by remember { mutableStateOf(false) }
+
+    // Only imports are started from this screen; exports report their own outcome on the
+    // export selection screen, which owns a separate ExportImportViewModel instance.
+    LaunchedEffect(importState) {
+        val message = when (val state = importState) {
+            is ExportImportState.Success -> "Cosplays imported"
+            is ExportImportState.Error -> "Import failed: ${state.message}"
+            else -> null
+        } ?: return@LaunchedEffect
+
+        // Reset first so a repeated failure is shown again, then show the message from a scope
+        // that is not cancelled when importState changes back to Idle.
+        exportImportViewModel.resetState()
+        coroutineScope.launch { snackbarHostState.showSnackbar(message) }
+    }
 
     MyOuterBox {
         Column(
@@ -123,9 +144,6 @@ fun SettingsScreen(navController: NavController) {
             
             Spacer(modifier = Modifier.padding(UIConsts.paddingM))
             
-            val exportImportViewModel: ExportImportViewModel = viewModel(factory = AppViewModelProvider.Factory)
-            val exportState by exportImportViewModel.exportImportState.collectAsState()
-            
             val openDocumentLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.OpenDocument()
             ) { uri ->
@@ -146,26 +164,15 @@ fun SettingsScreen(navController: NavController) {
                 onClick = { openDocumentLauncher.launch(arrayOf("application/zip")) }
             )
             
-            when (exportState) {
-                is ExportImportState.Loading -> {
-                    Spacer(modifier = Modifier.padding(UIConsts.paddingS))
-                    CircularProgressIndicator()
-                }
-                is ExportImportState.Success -> {
-                    // Success state could be handled by a snackbar if we pass SnackbarHostState
-                    LaunchedEffect(Unit) {
-                        exportImportViewModel.resetState()
-                    }
-                }
-                is ExportImportState.Error -> {
-                    // Error state could be handled by a snackbar
-                }
-                else -> {}
+            if (importState is ExportImportState.Loading) {
+                Spacer(modifier = Modifier.padding(UIConsts.paddingS))
+                CircularProgressIndicator()
             }
         }
+
+        MySnackbarHost(hostState = snackbarHostState)
     }
 }
-
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 

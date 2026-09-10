@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.ktlint)
 }
 
 android {
@@ -39,6 +41,27 @@ android {
     buildFeatures {
         compose = true
     }
+    sourceSets.getByName("androidTest").assets.srcDir("$projectDir/schemas")
+}
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
+detekt {
+    config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
+    baseline = file("$rootDir/config/detekt/baseline.xml")
+    buildUponDefaultConfig = true
+    parallel = true
+}
+
+ktlint {
+    android = true
+    ignoreFailures = false
+    baseline = file("$rootDir/config/ktlint/baseline.xml")
+    filter {
+        exclude { it.file.path.contains("/build/") }
+    }
 }
 
 dependencies {
@@ -61,6 +84,7 @@ dependencies {
     implementation(libs.core.ktx)
     ksp(libs.androidx.room.compiler.v250)
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.robolectric)
     testImplementation(platform(libs.androidx.compose.bom))

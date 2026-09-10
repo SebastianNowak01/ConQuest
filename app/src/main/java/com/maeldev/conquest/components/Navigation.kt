@@ -33,7 +33,6 @@ fun MainNavigation(
     navController: NavHostController,
     searchQuery: String,
 ) {
-    val navController = navController
     NavHost(
         navController = navController,
         startDestination = MainScreen,

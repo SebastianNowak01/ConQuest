@@ -3,27 +3,18 @@ package com.maeldev.conquest.util
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import com.maeldev.conquest.data.classes.CosplayDto
-import com.maeldev.conquest.data.classes.CosplayElementDto
+import com.maeldev.conquest.components.IMAGE_STORAGE_DIR
 import com.maeldev.conquest.data.classes.CosplayExportDto
-import com.maeldev.conquest.data.classes.CosplayPhotoDto
-import com.maeldev.conquest.data.classes.CosplayTaskDto
-import com.maeldev.conquest.data.classes.EventDto
 import com.maeldev.conquest.data.classes.ExportDataDto
-import com.maeldev.conquest.data.classes.ProgressPhotoDto
+import com.maeldev.conquest.data.classes.toDto
+import com.maeldev.conquest.data.classes.toEntity
 import com.maeldev.conquest.data.dao.CosplayDao
 import com.maeldev.conquest.data.dao.CosplayElementDao
 import com.maeldev.conquest.data.dao.CosplayPhotoDao
 import com.maeldev.conquest.data.dao.CosplayTaskDao
 import com.maeldev.conquest.data.dao.EventDao
 import com.maeldev.conquest.data.dao.ProgressPhotoDao
-import com.maeldev.conquest.data.entity.Cosplay
-import com.maeldev.conquest.data.entity.CosplayElement
-import com.maeldev.conquest.data.entity.CosplayPhoto
-import com.maeldev.conquest.data.entity.CosplayTask
-import com.maeldev.conquest.data.entity.Event
 import com.maeldev.conquest.data.entity.EventCosplayCrossRef
-import com.maeldev.conquest.data.entity.ProgressPhoto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
@@ -33,10 +24,50 @@ import java.io.FileInputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
+import kotlin.coroutines.cancellation.CancellationException
 
 object ExportImportUtil {
+    private const val JSON_ENTRY_NAME = "data.json"
+    private const val IMAGES_ENTRY_PREFIX = "$IMAGE_STORAGE_DIR/"
 
-    private val json = Json { prettyPrint = true; ignoreUnknownKeys = true }
+    private val json = Json {
+        prettyPrint = true
+        ignoreUnknownKeys = true
+    }
+
+    /**
+     * Like [runCatching], but lets [CancellationException] propagate instead of reporting a
+     * cancelled scope as an export/import failure.
+     */
+    @Suppress("TooGenericExceptionCaught") // Mirrors runCatching: any failure becomes Result.failure.
+    private inline fun <T> runCatchingCancellable(block: () -> T): Result<T> {
+        return try {
+            Result.success(block())
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (throwable: Throwable) {
+            Result.failure(throwable)
+        }
+    }
+
+    /**
+     * Resolves a ZIP entry name to a file inside the managed images directory.
+     *
+     * Entry names come from an untrusted archive, so a name containing traversal segments
+     * (`images/../../databases/cosplays_database`) would otherwise write anywhere in the app
+     * sandbox. Any entry that resolves outside the images directory is rejected.
+     */
+    private fun resolveImageEntryFile(
+        context: Context,
+        entryName: String,
+    ): File {
+        val imagesRoot = File(context.filesDir, IMAGE_STORAGE_DIR).canonicalFile
+        val destination = File(context.filesDir, entryName).canonicalFile
+        if (!destination.path.startsWith(imagesRoot.path + File.separator)) {
+            error("Refusing to extract entry outside the images directory: $entryName")
+        }
+        return destination
+    }
 
     suspend fun exportCosplays(
         context: Context,
@@ -47,9 +78,9 @@ object ExportImportUtil {
         taskDao: CosplayTaskDao,
         photoDao: CosplayPhotoDao,
         progressPhotoDao: ProgressPhotoDao,
-        eventDao: EventDao
+        eventDao: EventDao,
     ): Result<Unit> = withContext(Dispatchers.IO) {
-        runCatching {
+        runCatchingCancellable {
             val cosplays = cosplayDao.getCosplaysByIdsOnce(cosplayIds)
             val elements = elementDao.getElementsForCosplaysOnce(cosplayIds)
             val tasks = taskDao.getTasksForCosplaysOnce(cosplayIds)
@@ -61,73 +92,20 @@ object ExportImportUtil {
             val events = if (eventIds.isNotEmpty()) eventDao.getEventsByIdsOnce(eventIds) else emptyList()
 
             val exportCosplays = cosplays.map { cosplay ->
-                val cosplayElements = elements.filter { it.cosplayId == cosplay.uid }
-                val cosplayTasks = tasks.filter { it.cosplayId == cosplay.uid }
-                val cosplayPhotos = photos.filter { it.cosplayId == cosplay.uid }
-                val cosplayProgressPhotos = progressPhotos.filter { it.cosplayId == cosplay.uid }
-                
-                val cosplayEventIds = eventCrossRefs.filter { it.cosplayId == cosplay.uid }.map { it.eventId }.toSet()
-                val cosplayEvents = events.filter { cosplayEventIds.contains(it.id) }
+                val cosplayEventIds = eventCrossRefs
+                    .filter { it.cosplayId == cosplay.uid }
+                    .map { it.eventId }
+                    .toSet()
 
                 CosplayExportDto(
-                    cosplay = CosplayDto(
-                        inProgress = cosplay.inProgress,
-                        finished = cosplay.finished,
-                        name = cosplay.name,
-                        series = cosplay.series,
-                        initialDate = cosplay.initialDate,
-                        dueDate = cosplay.dueDate,
-                        budget = cosplay.budget,
-                        overallPercentage = cosplay.overallPercentage,
-                        tasksCount = cosplay.tasksCount,
-                        eventsCount = cosplay.eventsCount,
-                        totalSpend = cosplay.totalSpend,
-                        totalTimeDays = cosplay.totalTimeDays,
-                        cosplayPhotoPath = cosplay.cosplayPhotoPath
-                    ),
-                    elements = cosplayElements.map {
-                        CosplayElementDto(
-                            name = it.name,
-                            cost = it.cost,
-                            ready = it.ready,
-                            photoPath = it.photoPath,
-                            highlight = it.highlight,
-                            bought = it.bought,
-                            notes = it.notes
-                        )
-                    },
-                    tasks = cosplayTasks.map {
-                        CosplayTaskDto(
-                            taskName = it.taskName,
-                            done = it.done,
-                            alarm = it.alarm,
-                            notes = it.notes,
-                            date = it.date
-                        )
-                    },
-                    photos = cosplayPhotos.map {
-                        CosplayPhotoDto(
-                            path = it.path,
-                            notes = it.notes
-                        )
-                    },
-                    progressPhotos = cosplayProgressPhotos.map {
-                        ProgressPhotoDto(
-                            path = it.path,
-                            notes = it.notes,
-                            createdAt = it.createdAt
-                        )
-                    },
-                    events = cosplayEvents.map {
-                        EventDto(
-                            eventName = it.eventName,
-                            eventLocation = it.eventLocation,
-                            eventType = it.eventType,
-                            eventDate = it.eventDate,
-                            description = it.description,
-                            alarm = it.alarm
-                        )
-                    }
+                    cosplay = cosplay.toDto(),
+                    elements = elements.filter { it.cosplayId == cosplay.uid }.map { it.toDto() },
+                    tasks = tasks.filter { it.cosplayId == cosplay.uid }.map { it.toDto() },
+                    photos = photos.filter { it.cosplayId == cosplay.uid }.map { it.toDto() },
+                    progressPhotos = progressPhotos
+                        .filter { it.cosplayId == cosplay.uid }
+                        .map { it.toDto() },
+                    events = events.filter { it.id in cosplayEventIds }.map { it.toDto() },
                 )
             }
 
@@ -145,7 +123,7 @@ object ExportImportUtil {
             context.contentResolver.openOutputStream(targetUri)?.use { outputStream ->
                 ZipOutputStream(outputStream).use { zos ->
                     // 1. Write JSON
-                    val jsonEntry = ZipEntry("data.json")
+                    val jsonEntry = ZipEntry(JSON_ENTRY_NAME)
                     zos.putNextEntry(jsonEntry)
                     zos.write(jsonString.toByteArray())
                     zos.closeEntry()
@@ -179,7 +157,7 @@ object ExportImportUtil {
         progressPhotoDao: ProgressPhotoDao,
         eventDao: EventDao
     ): Result<Unit> = withContext(Dispatchers.IO) {
-        runCatching {
+        runCatchingCancellable {
             var jsonString: String? = null
             
             // Unzip to temp dir to read images, or stream them
@@ -187,10 +165,10 @@ object ExportImportUtil {
                 ZipInputStream(inputStream).use { zis ->
                     var entry = zis.nextEntry
                     while (entry != null) {
-                        if (entry.name == "data.json") {
+                        if (entry.name == JSON_ENTRY_NAME) {
                             jsonString = zis.readBytes().toString(Charsets.UTF_8)
-                        } else if (entry.name.startsWith("images/")) {
-                            val destFile = File(context.filesDir, entry.name)
+                        } else if (entry.name.startsWith(IMAGES_ENTRY_PREFIX)) {
+                            val destFile = resolveImageEntryFile(context, entry.name)
                             destFile.parentFile?.mkdirs()
                             destFile.outputStream().use { fos ->
                                 zis.copyTo(fos)
@@ -202,104 +180,25 @@ object ExportImportUtil {
                 }
             } ?: error("Could not open input stream")
 
-            if (jsonString == null) {
-                error("data.json not found in the ZIP archive")
-            }
+            val payload = jsonString ?: error("$JSON_ENTRY_NAME not found in the ZIP archive")
 
-            val exportData = json.decodeFromString<ExportDataDto>(jsonString!!)
+            val exportData = json.decodeFromString<ExportDataDto>(payload)
 
             // Insert into DB
             exportData.cosplays.forEach { cosplayExport ->
-                val newCosplay = Cosplay(
-                    uid = 0, // auto generate
-                    inProgress = cosplayExport.cosplay.inProgress,
-                    finished = cosplayExport.cosplay.finished,
-                    name = cosplayExport.cosplay.name,
-                    series = cosplayExport.cosplay.series,
-                    initialDate = cosplayExport.cosplay.initialDate,
-                    dueDate = cosplayExport.cosplay.dueDate,
-                    budget = cosplayExport.cosplay.budget,
-                    overallPercentage = cosplayExport.cosplay.overallPercentage,
-                    tasksCount = cosplayExport.cosplay.tasksCount,
-                    eventsCount = cosplayExport.cosplay.eventsCount,
-                    totalSpend = cosplayExport.cosplay.totalSpend,
-                    totalTimeDays = cosplayExport.cosplay.totalTimeDays,
-                    cosplayPhotoPath = cosplayExport.cosplay.cosplayPhotoPath
-                )
-                val newCosplayId = cosplayDao.insertCosplay(newCosplay).toInt()
+                val newCosplayId = cosplayDao.insertCosplay(cosplayExport.cosplay.toEntity()).toInt()
 
-                cosplayExport.elements.forEach { elem ->
-                    elementDao.insertElement(
-                        CosplayElement(
-                            id = 0,
-                            cosplayId = newCosplayId,
-                            name = elem.name,
-                            cost = elem.cost,
-                            ready = elem.ready,
-                            photoPath = elem.photoPath,
-                            highlight = elem.highlight,
-                            bought = elem.bought,
-                            notes = elem.notes
-                        )
-                    )
+                cosplayExport.elements.forEach { elementDao.insertElement(it.toEntity(newCosplayId)) }
+                cosplayExport.tasks.forEach { taskDao.insertTask(it.toEntity(newCosplayId)) }
+                cosplayExport.photos.forEach { photoDao.insertPhoto(it.toEntity(newCosplayId)) }
+                cosplayExport.progressPhotos.forEach {
+                    progressPhotoDao.insertPhoto(it.toEntity(newCosplayId))
                 }
 
-                cosplayExport.tasks.forEach { task ->
-                    taskDao.insertTask(
-                        CosplayTask(
-                            id = 0,
-                            cosplayId = newCosplayId,
-                            taskName = task.taskName,
-                            done = task.done,
-                            alarm = task.alarm,
-                            notes = task.notes,
-                            date = task.date
-                        )
-                    )
-                }
-
-                cosplayExport.photos.forEach { photo ->
-                    photoDao.insertPhoto(
-                        CosplayPhoto(
-                            id = 0,
-                            cosplayId = newCosplayId,
-                            path = photo.path,
-                            notes = photo.notes
-                        )
-                    )
-                }
-
-                cosplayExport.progressPhotos.forEach { pp ->
-                    progressPhotoDao.insertPhoto(
-                        ProgressPhoto(
-                            id = 0,
-                            cosplayId = newCosplayId,
-                            path = pp.path,
-                            notes = pp.notes,
-                            createdAt = pp.createdAt
-                        )
-                    )
-                }
-                
                 cosplayExport.events.forEach { eventDto ->
-                    val newEvent = Event(
-                        id = 0,
-                        eventName = eventDto.eventName,
-                        eventLocation = eventDto.eventLocation,
-                        eventType = eventDto.eventType,
-                        eventDate = eventDto.eventDate,
-                        description = eventDto.description,
-                        alarm = eventDto.alarm
-                    )
-                    val newEventId = eventDao.insertEvent(newEvent).toInt()
-                    
+                    val newEventId = eventDao.insertEvent(eventDto.toEntity()).toInt()
                     eventDao.insertEventCosplayCrossRefs(
-                        listOf(
-                            EventCosplayCrossRef(
-                                eventId = newEventId,
-                                cosplayId = newCosplayId
-                            )
-                        )
+                        listOf(EventCosplayCrossRef(eventId = newEventId, cosplayId = newCosplayId)),
                     )
                 }
             }

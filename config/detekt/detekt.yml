@@ -1,0 +1,27 @@
+# Overrides layered on top of detekt's defaults (buildUponDefaultConfig = true in
+# app/build.gradle.kts). Only rules that need project-specific tuning are listed here.
+#
+# Jetpack Compose breaks several assumptions baked into detekt's defaults: @Composable
+# functions are PascalCase by convention, take long parameter lists to stay stateless, and
+# a screen-level composable is legitimately a long declarative block rather than complex
+# logic. Those rules are relaxed for @Composable only, and stay enforced everywhere else.
+
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable']
+
+complexity:
+  LongMethod:
+    ignoreAnnotated: ['Composable']
+  LongParameterList:
+    ignoreAnnotated: ['Composable']
+  CyclomaticComplexMethod:
+    ignoreAnnotated: ['Composable']
+  TooManyFunctions:
+    ignoreAnnotated: ['Composable']
+
+style:
+  # ktlint runs in android mode, which permits 140 columns. Keep detekt in agreement so a
+  # line cannot pass one tool and fail the other.
+  MaxLineLength:
+    maxLineLength: 140

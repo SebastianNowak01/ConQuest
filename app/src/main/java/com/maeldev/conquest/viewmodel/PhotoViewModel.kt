@@ -3,7 +3,6 @@ package com.maeldev.conquest.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.maeldev.conquest.components.deleteStoredImageByPath
 import com.maeldev.conquest.data.dao.CosplayPhotoDao
 import com.maeldev.conquest.data.entity.CosplayPhoto
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -60,10 +59,4 @@ class PhotoViewModel(
         }
     }
 
-    private fun deleteManagedImageFile(path: String?) {
-        deleteStoredImageByPath(
-            getApplication(),
-            path.orEmpty()
-        )
-    }
 }

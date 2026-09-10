@@ -52,9 +52,8 @@ private fun MySelectAllFabButton(onClick: () -> Unit, modifier: Modifier = Modif
 
 @Composable
 fun BoxScope.MyExportSelectionModeFabs(
-    onExitSelection: () -> Unit,
+    selection: SelectionState,
     onExportSelection: () -> Unit,
-    onSelectAll: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -63,8 +62,8 @@ fun BoxScope.MyExportSelectionModeFabs(
         horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingM),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        MyExitSelectionFabButton(onClick = onExitSelection)
+        MyExitSelectionFabButton(onClick = { selection.clear() })
         MyExportSelectionFabButton(onClick = onExportSelection)
-        MySelectAllFabButton(onClick = onSelectAll)
+        MySelectAllFabButton(onClick = { selection.selectAll() })
     }
 }

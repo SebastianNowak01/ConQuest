@@ -3,8 +3,8 @@ package com.maeldev.conquest.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.maeldev.conquest.components.deleteStoredImageByPath
 import com.maeldev.conquest.data.dao.CosplayDao
+import com.maeldev.conquest.data.dao.refreshStatsFor
 import com.maeldev.conquest.data.dao.CosplayElementDao
 import com.maeldev.conquest.data.entity.CosplayElement
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,20 +37,10 @@ class ElementViewModel(
         _elementCosplayId.value = id
     }
 
-    private suspend fun refreshCosplayStats(cosplayId: Int) {
-        cosplayDao.recomputeStatsForCosplay(cosplayId)
-    }
-
-    private suspend fun refreshCosplayStats(cosplayIds: Set<Int>) {
-        if (cosplayIds.isNotEmpty()) {
-            cosplayDao.recomputeStatsForCosplays(cosplayIds)
-        }
-    }
-
     fun insertElement(element: CosplayElement) {
         viewModelScope.launch {
             elementDao.insertElement(element)
-            refreshCosplayStats(element.cosplayId)
+            cosplayDao.refreshStatsFor(element.cosplayId)
         }
     }
 
@@ -60,7 +50,7 @@ class ElementViewModel(
             val photoPaths = elementDao.getPhotoPathsForElementIdsOnce(ids)
             elementDao.deleteElementsByIds(ids)
             photoPaths.forEach { deleteManagedImageFile(it) }
-            refreshCosplayStats(cosplayIds)
+            cosplayDao.refreshStatsFor(cosplayIds)
         }
     }
 
@@ -71,15 +61,9 @@ class ElementViewModel(
     fun updateElement(cosplayElement: CosplayElement, oldPathToDelete: String? = null) {
         viewModelScope.launch {
             elementDao.updateElement(cosplayElement)
-            refreshCosplayStats(cosplayElement.cosplayId)
+            cosplayDao.refreshStatsFor(cosplayElement.cosplayId)
             deleteManagedImageFile(oldPathToDelete)
         }
     }
 
-    private fun deleteManagedImageFile(path: String?) {
-        deleteStoredImageByPath(
-            getApplication(),
-            path.orEmpty()
-        )
-    }
 }

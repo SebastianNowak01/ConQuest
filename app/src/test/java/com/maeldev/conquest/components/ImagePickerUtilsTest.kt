@@ -7,21 +7,21 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.io.File
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.io.File
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
 class ImagePickerUtilsTest {
-
     @Test
     fun buildManagedImageRelativePath_usesImagesDirectory() {
-        val path = buildManagedImageRelativePath(
-            fileNamePrefix = "cosplay_cover",
-            extension = "jpg",
-            timestamp = 123L,
-        )
+        val path =
+            buildManagedImageRelativePath(
+                fileNamePrefix = "cosplay_cover",
+                extension = "jpg",
+                timestamp = 123L,
+            )
 
         assertEquals("images/cosplay_cover_123.jpg", path)
     }
@@ -49,4 +49,3 @@ class ImagePickerUtilsTest {
         assertFalse(targetFile.exists())
     }
 }
-

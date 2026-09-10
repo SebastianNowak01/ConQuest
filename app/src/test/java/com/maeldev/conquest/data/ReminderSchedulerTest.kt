@@ -1,11 +1,9 @@
 package com.maeldev.conquest.data
 
 import android.app.AlarmManager
-import android.app.NotificationManager
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -21,7 +19,6 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
 class ReminderSchedulerTest {
-
     private lateinit var context: Context
 
     @Before
@@ -35,8 +32,7 @@ class ReminderSchedulerTest {
 
         ReminderScheduler.scheduleReminder(
             context = context,
-            entityType = ReminderEntityType.TASK,
-            entityId = 1,
+            target = ReminderTarget(ReminderEntityType.TASK, 1),
             triggerAtMillis = futureTime,
             title = "Test Reminder",
             message = "Test Message",
@@ -63,8 +59,7 @@ class ReminderSchedulerTest {
 
         ReminderScheduler.scheduleReminder(
             context = context,
-            entityType = ReminderEntityType.TASK,
-            entityId = 99,
+            target = ReminderTarget(ReminderEntityType.TASK, 99),
             triggerAtMillis = pastTime,
             title = "Past Reminder",
             message = "Should be skipped",
@@ -82,8 +77,7 @@ class ReminderSchedulerTest {
         // Should not throw even if no alarm was previously set
         ReminderScheduler.cancelReminder(
             context = context,
-            entityType = ReminderEntityType.EVENT,
-            entityId = 999,
+            target = ReminderTarget(ReminderEntityType.EVENT, 999),
         )
     }
 
@@ -94,8 +88,7 @@ class ReminderSchedulerTest {
 
         ReminderScheduler.scheduleReminder(
             context = context,
-            entityType = ReminderEntityType.TASK,
-            entityId = 5,
+            target = ReminderTarget(ReminderEntityType.TASK, 5),
             triggerAtMillis = time1,
             title = "First",
             message = "First message",
@@ -103,8 +96,7 @@ class ReminderSchedulerTest {
 
         ReminderScheduler.scheduleReminder(
             context = context,
-            entityType = ReminderEntityType.TASK,
-            entityId = 5,
+            target = ReminderTarget(ReminderEntityType.TASK, 5),
             triggerAtMillis = time2,
             title = "Second",
             message = "Second message",

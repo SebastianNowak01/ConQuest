@@ -1,24 +1,29 @@
 package com.maeldev.conquest.viewmodel
 
+import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.maeldev.conquest.ConQuestApplication
+import com.maeldev.conquest.MainDispatcherRule
 import com.maeldev.conquest.data.classes.CosplaySortOption
+import com.maeldev.conquest.data.database.CosplayDatabase
 import com.maeldev.conquest.data.entity.Cosplay
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.util.Date
-import androidx.room.Room
-import com.maeldev.conquest.data.database.CosplayDatabase
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = ConQuestApplication::class)
 class CosplayViewModelTest {
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var viewModel: CosplayViewModel
     private lateinit var application: ConQuestApplication
@@ -27,15 +32,25 @@ class CosplayViewModelTest {
     @Before
     fun setup() {
         application = ApplicationProvider.getApplicationContext<ConQuestApplication>()
-        db = Room.inMemoryDatabaseBuilder(application, CosplayDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
-        viewModel = CosplayViewModel(
-            application,
-            db.cosplayDao(),
-            db.cosplayPhotoDao(),
-            db.progressPhotoDao()
-        )
+        db =
+            Room.inMemoryDatabaseBuilder(application, CosplayDatabase::class.java)
+                .allowMainThreadQueries()
+                // Run Room's work inline so a DAO call has finished when it returns.
+                .setQueryExecutor { it.run() }
+                .setTransactionExecutor { it.run() }
+                .build()
+        viewModel =
+            CosplayViewModel(
+                application,
+                db.cosplayDao(),
+                db.cosplayPhotoDao(),
+                db.progressPhotoDao(),
+            )
+    }
+
+    @After
+    fun tearDown() {
+        db.close()
     }
 
     @Test
@@ -46,23 +61,24 @@ class CosplayViewModelTest {
     }
 
     @Test
-    fun insertCosplay_addsToDatabase() = runBlocking {
-        val cosplay = Cosplay(
-            uid = 0,
-            inProgress = true,
-            finished = false,
-            name = "Naruto",
-            series = "Naruto",
-            initialDate = Date(),
-            dueDate = null,
-            budget = null
-        )
-        
-        viewModel.insertCosplay(cosplay)
-        Thread.sleep(100)
-        
-        val cosplays = db.cosplayDao().getAllCosplays().first()
-        assertEquals(1, cosplays.size)
-        assertEquals("Naruto", cosplays[0].name)
-    }
+    fun insertCosplay_addsToDatabase() =
+        runTest {
+            val cosplay =
+                Cosplay(
+                    uid = 0,
+                    inProgress = true,
+                    finished = false,
+                    name = "Naruto",
+                    series = "Naruto",
+                    initialDate = Date(),
+                    dueDate = null,
+                    budget = null,
+                )
+
+            viewModel.insertCosplay(cosplay)
+
+            val cosplays = db.cosplayDao().getAllCosplays().first()
+            assertEquals(1, cosplays.size)
+            assertEquals("Naruto", cosplays[0].name)
+        }
 }

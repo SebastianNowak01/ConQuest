@@ -41,17 +41,6 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
-private val HighContrastScheme = darkColorScheme(
-    primary = OffWhite,
-    secondary = HighContrastDarkGreen,
-    tertiary = HighContrastLightGray,
-    background = HighContrastDarkGray,
-    surface = HighContrastLightGreen,
-    onBackground = OffWhite,
-    onSurface = OffWhite,
-    onPrimary = OffWhite
-)
-
 @Composable
 fun ConQuestTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

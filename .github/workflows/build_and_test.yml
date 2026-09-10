@@ -50,5 +50,6 @@ jobs:
           GRADLE_OPTS: -Dorg.gradle.daemon=false
 
       - name: Run code quality checks
-        run: ./gradlew detekt ktlintCheck --build-cache --parallel
-        continue-on-error: true
+        # Both are applied to :app (the module with Kotlin sources) and run against a
+        # baseline, so pre-existing findings are grandfathered and new ones fail the build.
+        run: ./gradlew :app:detekt :app:ktlintCheck --build-cache --parallel

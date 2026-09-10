@@ -56,15 +56,17 @@ private fun MySelectAllFabButton(onClick: () -> Unit, modifier: Modifier = Modif
 
 @Composable
 fun BoxScope.MySelectionModeFabs(
-    onExitSelection: () -> Unit,
-    onDeleteSelection: () -> Unit,
-    onSelectAll: () -> Unit,
-    deleteDialogTitle: String = "Delete selected items?",
-    deleteDialogMessage: String = "This action is permanent.",
+    selection: SelectionState,
+    itemLabelSingular: String,
+    itemLabelPlural: String,
+    onDeleteSelection: (Set<Int>) -> Unit,
     deleteDialogConfirmText: String = "Delete",
     deleteDialogDismissText: String = "Cancel",
 ) {
     var showDeleteConfirmation by remember { mutableStateOf(false) }
+
+    val selectedCount = selection.count
+    val itemLabel = if (selectedCount == 1) itemLabelSingular else itemLabelPlural
 
     fun dismissDeleteDialog() {
         showDeleteConfirmation = false
@@ -77,20 +79,21 @@ fun BoxScope.MySelectionModeFabs(
         horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingM),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        MyExitSelectionFabButton(onClick = onExitSelection)
+        MyExitSelectionFabButton(onClick = { selection.clear() })
         MyDeleteSelectionFabButton(onClick = { showDeleteConfirmation = true })
-        MySelectAllFabButton(onClick = onSelectAll)
+        MySelectAllFabButton(onClick = { selection.selectAll() })
     }
 
     if (showDeleteConfirmation) {
         MyConfirmationDialog(
-            title = deleteDialogTitle,
-            message = deleteDialogMessage,
+            title = "Delete selected $itemLabel?",
+            message = "This will permanently delete $selectedCount selected $itemLabel.",
             confirmText = deleteDialogConfirmText,
             dismissText = deleteDialogDismissText,
             onConfirm = {
                 dismissDeleteDialog()
-                onDeleteSelection()
+                onDeleteSelection(selection.selectedIds)
+                selection.clear()
             },
             onDismiss = {
                 dismissDeleteDialog()

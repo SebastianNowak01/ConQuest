@@ -21,7 +21,7 @@ import com.maeldev.conquest.data.entity.ProgressPhoto
 @Database(
     entities = [Cosplay::class, CosplayPhoto::class, CosplayElement::class, CosplayTask::class, Event::class, EventCosplayCrossRef::class, ProgressPhoto::class],
     version = 14,
-    exportSchema = false
+    exportSchema = true
 )
 @TypeConverters(DateConverter::class)
 abstract class CosplayDatabase : RoomDatabase() {
