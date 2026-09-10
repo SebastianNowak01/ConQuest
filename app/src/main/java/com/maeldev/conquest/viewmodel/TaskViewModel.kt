@@ -5,7 +5,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.maeldev.conquest.data.ReminderEntityType
 import com.maeldev.conquest.data.ReminderScheduler
+import com.maeldev.conquest.data.ReminderTarget
 import com.maeldev.conquest.data.dao.CosplayDao
+import com.maeldev.conquest.data.dao.refreshStatsFor
 import com.maeldev.conquest.data.dao.CosplayTaskDao
 import com.maeldev.conquest.data.entity.CosplayTask
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -38,31 +40,27 @@ class TaskViewModel(
         _taskCosplayId.value = id
     }
 
-    private suspend fun refreshCosplayStats(cosplayId: Int) {
-        cosplayDao.recomputeStatsForCosplay(cosplayId)
-    }
-
-    private suspend fun refreshCosplayStats(cosplayIds: Set<Int>) {
-        if (cosplayIds.isNotEmpty()) {
-            cosplayDao.recomputeStatsForCosplays(cosplayIds)
-        }
-    }
-
     fun insertTask(task: CosplayTask) {
         viewModelScope.launch {
             val taskId = taskDao.insertTask(task).toInt()
-            handleReminderScheduling(ReminderEntityType.TASK, taskId, task.alarm, task.date, "Task Reminder", task.taskName)
-            refreshCosplayStats(task.cosplayId)
+            ReminderScheduler.syncReminder(
+                context = getApplication(),
+                target = ReminderTarget(ReminderEntityType.TASK, taskId),
+                alarm = task.alarm,
+                date = task.date,
+                message = task.taskName,
+            )
+            cosplayDao.refreshStatsFor(task.cosplayId)
         }
     }
 
     fun deleteTasksByIds(ids: Set<Int>) {
         viewModelScope.launch {
             val context = getApplication<Application>()
-            ids.forEach { id -> ReminderScheduler.cancelReminder(context, ReminderEntityType.TASK, id) }
+            ids.forEach { id -> ReminderScheduler.cancelReminder(context, ReminderTarget(ReminderEntityType.TASK, id)) }
             val cosplayIds = taskDao.getCosplayIdsForTaskIdsOnce(ids).toSet()
             taskDao.deleteTasksByIds(ids)
-            refreshCosplayStats(cosplayIds)
+            cosplayDao.refreshStatsFor(cosplayIds)
         }
     }
 
@@ -73,38 +71,15 @@ class TaskViewModel(
     fun updateTask(task: CosplayTask) {
         viewModelScope.launch {
             taskDao.updateTask(task)
-            handleReminderScheduling(ReminderEntityType.TASK, task.id, task.alarm, task.date, "Task Reminder", task.taskName)
-            refreshCosplayStats(task.cosplayId)
+            ReminderScheduler.syncReminder(
+                context = getApplication(),
+                target = ReminderTarget(ReminderEntityType.TASK, task.id),
+                alarm = task.alarm,
+                date = task.date,
+                message = task.taskName,
+            )
+            cosplayDao.refreshStatsFor(task.cosplayId)
         }
     }
 
-    private fun handleReminderScheduling(
-        entityType: ReminderEntityType,
-        entityId: Int,
-        alarm: Boolean,
-        date: java.util.Date?,
-        title: String,
-        message: String,
-    ) {
-        val context = getApplication<Application>()
-        if (alarm && date != null) {
-            val cal = java.util.Calendar.getInstance().apply {
-                time = date
-                set(java.util.Calendar.HOUR_OF_DAY, 9)
-                set(java.util.Calendar.MINUTE, 0)
-                set(java.util.Calendar.SECOND, 0)
-                set(java.util.Calendar.MILLISECOND, 0)
-            }
-            ReminderScheduler.scheduleReminder(
-                context = context,
-                entityType = entityType,
-                entityId = entityId,
-                triggerAtMillis = cal.timeInMillis,
-                title = title,
-                message = message,
-            )
-        } else {
-            ReminderScheduler.cancelReminder(context, entityType, entityId)
-        }
-    }
 }

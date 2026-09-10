@@ -32,8 +32,7 @@ class ReminderSchedulerTest {
 
         ReminderScheduler.scheduleReminder(
             context = context,
-            entityType = ReminderEntityType.TASK,
-            entityId = 1,
+            target = ReminderTarget(ReminderEntityType.TASK, 1),
             triggerAtMillis = futureTime,
             title = "Test Reminder",
             message = "Test Message",
@@ -60,8 +59,7 @@ class ReminderSchedulerTest {
 
         ReminderScheduler.scheduleReminder(
             context = context,
-            entityType = ReminderEntityType.TASK,
-            entityId = 99,
+            target = ReminderTarget(ReminderEntityType.TASK, 99),
             triggerAtMillis = pastTime,
             title = "Past Reminder",
             message = "Should be skipped",
@@ -79,8 +77,7 @@ class ReminderSchedulerTest {
         // Should not throw even if no alarm was previously set
         ReminderScheduler.cancelReminder(
             context = context,
-            entityType = ReminderEntityType.EVENT,
-            entityId = 999,
+            target = ReminderTarget(ReminderEntityType.EVENT, 999),
         )
     }
 
@@ -91,8 +88,7 @@ class ReminderSchedulerTest {
 
         ReminderScheduler.scheduleReminder(
             context = context,
-            entityType = ReminderEntityType.TASK,
-            entityId = 5,
+            target = ReminderTarget(ReminderEntityType.TASK, 5),
             triggerAtMillis = time1,
             title = "First",
             message = "First message",
@@ -100,8 +96,7 @@ class ReminderSchedulerTest {
 
         ReminderScheduler.scheduleReminder(
             context = context,
-            entityType = ReminderEntityType.TASK,
-            entityId = 5,
+            target = ReminderTarget(ReminderEntityType.TASK, 5),
             triggerAtMillis = time2,
             title = "Second",
             message = "Second message",

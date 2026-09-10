@@ -18,7 +18,6 @@ interface CosplayDao {
     @Query("SELECT * FROM cosplays")
     fun getAllCosplays(): Flow<List<Cosplay>>
 
-
     @Query("SELECT * FROM cosplays WHERE uid = :cosplayId LIMIT 1")
     fun getCosplayById(cosplayId: Int): Flow<Cosplay?>
 
@@ -94,82 +93,29 @@ interface CosplayDao {
                     ) / 86400000
                 END
             )
-        WHERE uid = :cosplayId
-        """
-    )
-    suspend fun recomputeStatsForCosplay(cosplayId: Int)
-
-    @Query(
-        """
-        UPDATE cosplays
-        SET
-            tasks_count = (
-                SELECT COUNT(*)
-                FROM cosplay_tasks
-                WHERE cosplay_id = uid
-            ),
-            overall_percentage = (
-                CASE
-                    WHEN (
-                        SELECT COUNT(*)
-                        FROM cosplay_tasks
-                        WHERE cosplay_id = uid
-                    ) = 0 THEN 0
-                    ELSE CAST(ROUND((
-                        (
-                            SELECT COUNT(*)
-                            FROM cosplay_tasks
-                            WHERE cosplay_id = uid
-                              AND done = 1
-                        ) * 100.0
-                    ) / (
-                        SELECT COUNT(*)
-                        FROM cosplay_tasks
-                        WHERE cosplay_id = uid
-                    )) AS INTEGER)
-                END
-            ),
-            total_spend = (
-                SELECT COALESCE(SUM(cost), 0.0)
-                FROM cosplay_elements
-                WHERE cosplay_id = uid
-            ),
-            events_count = (
-                SELECT COUNT(DISTINCT event_id)
-                FROM event_cosplay_cross_ref
-                WHERE cosplay_id = uid
-            ),
-            total_time_days = (
-                CASE
-                    WHEN COALESCE(
-                        (
-                            SELECT MAX(date)
-                            FROM cosplay_tasks
-                            WHERE cosplay_id = uid
-                              AND date IS NOT NULL
-                        ),
-                        due_date,
-                        initial_date
-                    ) < initial_date THEN 0
-                    ELSE (
-                        COALESCE(
-                            (
-                                SELECT MAX(date)
-                                FROM cosplay_tasks
-                                WHERE cosplay_id = uid
-                                  AND date IS NOT NULL
-                            ),
-                            due_date,
-                            initial_date
-                        ) - initial_date
-                    ) / 86400000
-                END
-            )
         WHERE uid IN (:cosplayIds)
-        """
+        """,
     )
     suspend fun recomputeStatsForCosplays(cosplayIds: Set<Int>)
 
     @Update
     suspend fun updateCosplay(cosplay: Cosplay)
+}
+
+/**
+ * Recomputes the cached stat columns for [cosplayIds], skipping the update entirely when there
+ * is nothing to refresh.
+ *
+ * Every view model that mutates tasks, elements or event links needs this, so it lives here
+ * rather than being re-declared privately in each of them.
+ */
+suspend fun CosplayDao.refreshStatsFor(cosplayIds: Set<Int>) {
+    if (cosplayIds.isNotEmpty()) {
+        recomputeStatsForCosplays(cosplayIds)
+    }
+}
+
+/** Convenience overload for the common single-cosplay case. */
+suspend fun CosplayDao.refreshStatsFor(cosplayId: Int) {
+    refreshStatsFor(setOf(cosplayId))
 }

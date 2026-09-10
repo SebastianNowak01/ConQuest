@@ -3,11 +3,11 @@ package com.maeldev.conquest.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.maeldev.conquest.components.deleteStoredImageByPath
 import com.maeldev.conquest.data.classes.CosplaySortOrder
 import com.maeldev.conquest.data.classes.CosplaySortOption
 import com.maeldev.conquest.data.classes.CosplayStatusFilter
 import com.maeldev.conquest.data.dao.CosplayDao
+import com.maeldev.conquest.data.dao.refreshStatsFor
 import com.maeldev.conquest.data.dao.CosplayPhotoDao
 import com.maeldev.conquest.data.dao.ProgressPhotoDao
 import com.maeldev.conquest.data.entity.Cosplay
@@ -49,20 +49,10 @@ class CosplayViewModel(
         _mainScreenSortOrder.value = order
     }
 
-    private suspend fun refreshCosplayStats(cosplayId: Int) {
-        dao.recomputeStatsForCosplay(cosplayId)
-    }
-
-    private suspend fun refreshCosplayStats(cosplayIds: Set<Int>) {
-        if (cosplayIds.isNotEmpty()) {
-            dao.recomputeStatsForCosplays(cosplayIds)
-        }
-    }
-
     fun insertCosplay(cosplay: Cosplay) {
         viewModelScope.launch {
             val cosplayId = dao.insertCosplay(cosplay).toInt()
-            refreshCosplayStats(cosplayId)
+            dao.refreshStatsFor(cosplayId)
         }
     }
 
@@ -73,7 +63,7 @@ class CosplayViewModel(
     fun updateCosplay(cosplay: Cosplay, oldPathToDelete: String? = null) {
         viewModelScope.launch {
             dao.updateCosplay(cosplay)
-            refreshCosplayStats(cosplay.uid)
+            dao.refreshStatsFor(cosplay.uid)
             deleteManagedImageFile(oldPathToDelete)
         }
     }
@@ -92,10 +82,4 @@ class CosplayViewModel(
         }
     }
 
-    private fun deleteManagedImageFile(path: String?) {
-        deleteStoredImageByPath(
-            getApplication(),
-            path.orEmpty()
-        )
-    }
 }

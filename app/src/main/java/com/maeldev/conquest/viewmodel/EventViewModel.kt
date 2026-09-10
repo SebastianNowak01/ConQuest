@@ -7,7 +7,9 @@ import com.maeldev.conquest.data.classes.CosplaySortOrder
 import com.maeldev.conquest.data.classes.EventSortOption
 import com.maeldev.conquest.data.ReminderEntityType
 import com.maeldev.conquest.data.ReminderScheduler
+import com.maeldev.conquest.data.ReminderTarget
 import com.maeldev.conquest.data.dao.CosplayDao
+import com.maeldev.conquest.data.dao.refreshStatsFor
 import com.maeldev.conquest.data.dao.EventDao
 import com.maeldev.conquest.data.entity.Event
 import com.maeldev.conquest.data.entity.EventCosplayCrossRef
@@ -49,12 +51,6 @@ class EventViewModel(
     val events: StateFlow<List<Event>> =
         eventDao.getAllEvents().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    private suspend fun refreshCosplayStats(cosplayIds: Set<Int>) {
-        if (cosplayIds.isNotEmpty()) {
-            cosplayDao.recomputeStatsForCosplays(cosplayIds)
-        }
-    }
-
     private suspend fun replaceEventCosplayLinks(eventId: Int, cosplayIds: Set<Int>) {
         eventDao.deleteEventCosplayCrossRefsForEvent(eventId)
         if (cosplayIds.isNotEmpty()) {
@@ -72,9 +68,15 @@ class EventViewModel(
     fun insertEvent(event: Event, cosplayIds: Set<Int> = emptySet()) {
         viewModelScope.launch {
             val eventId = eventDao.insertEvent(event).toInt()
-            handleReminderScheduling(ReminderEntityType.EVENT, eventId, event.alarm, event.eventDate, "Event Reminder", event.eventName)
+            ReminderScheduler.syncReminder(
+                context = getApplication(),
+                target = ReminderTarget(ReminderEntityType.EVENT, eventId),
+                alarm = event.alarm,
+                date = event.eventDate,
+                message = event.eventName,
+            )
             replaceEventCosplayLinks(eventId = eventId, cosplayIds = cosplayIds)
-            refreshCosplayStats(cosplayIds)
+            cosplayDao.refreshStatsFor(cosplayIds)
         }
     }
 
@@ -82,12 +84,18 @@ class EventViewModel(
         viewModelScope.launch {
             val existingCosplayIds = eventDao.getCosplayIdsForEventOnce(event.id).toSet()
             eventDao.updateEvent(event)
-            handleReminderScheduling(ReminderEntityType.EVENT, event.id, event.alarm, event.eventDate, "Event Reminder", event.eventName)
+            ReminderScheduler.syncReminder(
+                context = getApplication(),
+                target = ReminderTarget(ReminderEntityType.EVENT, event.id),
+                alarm = event.alarm,
+                date = event.eventDate,
+                message = event.eventName,
+            )
             if (cosplayIds != null) {
                 replaceEventCosplayLinks(eventId = event.id, cosplayIds = cosplayIds)
-                refreshCosplayStats(existingCosplayIds + cosplayIds)
+                cosplayDao.refreshStatsFor(existingCosplayIds + cosplayIds)
             } else {
-                refreshCosplayStats(existingCosplayIds)
+                cosplayDao.refreshStatsFor(existingCosplayIds)
             }
         }
     }
@@ -95,10 +103,10 @@ class EventViewModel(
     fun deleteEventsByIds(ids: Set<Int>) {
         viewModelScope.launch {
             val context = getApplication<Application>()
-            ids.forEach { id -> ReminderScheduler.cancelReminder(context, ReminderEntityType.EVENT, id) }
+            ids.forEach { id -> ReminderScheduler.cancelReminder(context, ReminderTarget(ReminderEntityType.EVENT, id)) }
             val cosplayIds = eventDao.getCosplayIdsForEventIdsOnce(ids).toSet()
             eventDao.deleteEventsByIds(ids)
-            refreshCosplayStats(cosplayIds)
+            cosplayDao.refreshStatsFor(cosplayIds)
         }
     }
 
@@ -106,33 +114,4 @@ class EventViewModel(
         return eventDao.getEventById(id)
     }
 
-    private fun handleReminderScheduling(
-        entityType: ReminderEntityType,
-        entityId: Int,
-        alarm: Boolean,
-        date: java.util.Date?,
-        title: String,
-        message: String,
-    ) {
-        val context = getApplication<Application>()
-        if (alarm && date != null) {
-            val cal = java.util.Calendar.getInstance().apply {
-                time = date
-                set(java.util.Calendar.HOUR_OF_DAY, 9)
-                set(java.util.Calendar.MINUTE, 0)
-                set(java.util.Calendar.SECOND, 0)
-                set(java.util.Calendar.MILLISECOND, 0)
-            }
-            ReminderScheduler.scheduleReminder(
-                context = context,
-                entityType = entityType,
-                entityId = entityId,
-                triggerAtMillis = cal.timeInMillis,
-                title = title,
-                message = message,
-            )
-        } else {
-            ReminderScheduler.cancelReminder(context, entityType, entityId)
-        }
-    }
 }
