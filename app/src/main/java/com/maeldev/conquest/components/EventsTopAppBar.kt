@@ -169,8 +169,10 @@ fun EventsTopAppBar(
     onSearchQueryChange: (String) -> Unit,
     onMenuClick: () -> Unit,
 ) {
-    navBackStackEntry ?: return
-    val eventViewModel: EventViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    // Same store as EventsScreen — see the note in MainScreenTopAppBar.
+    val entry = navBackStackEntry ?: return
+    val eventViewModel: EventViewModel =
+        viewModel(viewModelStoreOwner = entry, factory = AppViewModelProvider.Factory)
     val selectedType by eventViewModel.eventsFilterType.collectAsState()
     val selectedOrder by eventViewModel.eventsSortOrder.collectAsState()
     val selectedSortOption by eventViewModel.eventsSortOption.collectAsState()

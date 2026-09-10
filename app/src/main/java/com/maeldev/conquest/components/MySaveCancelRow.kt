@@ -3,7 +3,6 @@ package com.maeldev.conquest.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -27,10 +26,11 @@ fun BoxScope.MySaveCancelRow(
     saveContentDescription: String = "Save",
 ) {
     Row(
-        modifier = modifier
-            .align(androidx.compose.ui.Alignment.BottomCenter)
-            .padding(bottom = bottomPadding)
-            .navigationBarsPadding(),
+        // MyFab applies the navigation bar inset itself, so the row does not repeat it.
+        modifier =
+            modifier
+                .align(androidx.compose.ui.Alignment.BottomCenter)
+                .padding(bottom = bottomPadding),
         horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingL)
     ) {
         // Cancel is deliberately not the error colour: the delete action in selection mode is a
