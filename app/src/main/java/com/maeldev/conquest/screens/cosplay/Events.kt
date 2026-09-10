@@ -2,12 +2,9 @@ package com.maeldev.conquest.screens.cosplay
 
 import com.maeldev.conquest.AppViewModelProvider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.maeldev.conquest.viewmodel.EventViewModel
@@ -16,6 +13,7 @@ import com.maeldev.conquest.components.MyAddFab
 import com.maeldev.conquest.components.MyLazyColumn
 import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MySelectionModeFabs
+import com.maeldev.conquest.components.rememberSelectionState
 import com.maeldev.conquest.data.classes.CosplaySortOrder
 import com.maeldev.conquest.data.classes.EventSortOption
 import kotlinx.serialization.Serializable
@@ -33,8 +31,6 @@ fun EventsScreen(
     val selectedType by eventViewModel.eventsFilterType.collectAsState()
     val selectedOrder by eventViewModel.eventsSortOrder.collectAsState()
     val selectedSortOption by eventViewModel.eventsSortOption.collectAsState()
-    var selectionMode by remember { mutableStateOf(false) }
-    var selectedIds by remember { mutableStateOf(setOf<Int>()) }
 
     val filteredEvents = remember(events, selectedType, selectedOrder, selectedSortOption, searchQuery) {
         val normalizedSearchQuery = searchQuery.trim()
@@ -65,54 +61,30 @@ fun EventsScreen(
         }
     }
 
-    LaunchedEffect(filteredEvents) {
-        val visibleIds = filteredEvents.map { it.id }.toSet()
-        selectedIds = selectedIds.intersect(visibleIds)
-        if (selectedIds.isEmpty()) {
-            selectionMode = false
-        }
-    }
+    val selection = rememberSelectionState(items = filteredEvents, id = { it.id })
 
     MyOuterBox {
-        if (selectionMode) {
+        if (selection.isActive) {
             MySelectionModeFabs(
-                onExitSelection = {
-                    selectionMode = false
-                    selectedIds = emptySet()
-                },
-                onDeleteSelection = {
-                    eventViewModel.deleteEventsByIds(selectedIds)
-                    selectionMode = false
-                    selectedIds = emptySet()
-                },
-                onSelectAll = {
-                    selectedIds = filteredEvents.map { it.id }.toSet()
-                    selectionMode = selectedIds.isNotEmpty()
-                },
-                deleteDialogTitle = "Delete selected ${if (selectedIds.size == 1) "event" else "events"}?",
-                deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "event" else "events"}.",
+                selection = selection,
+                itemLabelSingular = "event",
+                itemLabelPlural = "events",
+                onDeleteSelection = { ids -> eventViewModel.deleteEventsByIds(ids) },
             )
         }
 
         MyLazyColumn(
             items = filteredEvents,
             key = { it.id },
-            isSelected = { selectedIds.contains(it.id) },
+            isSelected = { selection.isSelected(it.id) },
             onClick = { event ->
-                if (!selectionMode) {
+                if (!selection.isActive) {
                     navController.navigate(EditEvent(event.id))
                     return@MyLazyColumn
                 }
-                val id = event.id
-                selectedIds = if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
-                if (selectedIds.isEmpty()) {
-                    selectionMode = false
-                }
+                selection.toggle(event.id)
             },
-            onLongClick = { event ->
-                selectionMode = true
-                selectedIds = selectedIds + event.id
-            },
+            onLongClick = { event -> selection.select(event.id) },
         ) { event ->
             EventListItem(event = event)
         }

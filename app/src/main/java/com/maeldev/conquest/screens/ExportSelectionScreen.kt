@@ -16,10 +16,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -28,6 +26,7 @@ import com.maeldev.conquest.components.MyCosplayRow
 import com.maeldev.conquest.components.MyExportSelectionModeFabs
 import com.maeldev.conquest.components.MyLazyColumn
 import com.maeldev.conquest.components.MyOuterBox
+import com.maeldev.conquest.components.rememberSelectionState
 import com.maeldev.conquest.components.MySnackbarHost
 import com.maeldev.conquest.viewmodel.CosplayViewModel
 import com.maeldev.conquest.viewmodel.ExportImportState
@@ -50,19 +49,10 @@ fun ExportSelectionScreen(navController: NavController) {
     val cosplays by cosplayViewModel.allCosplays.collectAsState()
     val exportState by exportImportViewModel.exportImportState.collectAsState()
 
-    var selectionMode by remember { mutableStateOf(false) }
-    var selectedIds by remember { mutableStateOf(setOf<Int>()) }
+    val selection = rememberSelectionState(items = cosplays, id = { it.uid })
 
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
-
-    LaunchedEffect(cosplays) {
-        val visibleIds = cosplays.map { it.uid }.toSet()
-        selectedIds = selectedIds.intersect(visibleIds)
-        if (selectedIds.isEmpty()) {
-            selectionMode = false
-        }
-    }
 
     LaunchedEffect(exportState) {
         when (val state = exportState) {
@@ -84,8 +74,8 @@ fun ExportSelectionScreen(navController: NavController) {
     val createDocumentLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/zip")
     ) { uri ->
-        if (uri != null && selectedIds.isNotEmpty()) {
-            exportImportViewModel.exportCosplays(selectedIds, uri)
+        if (uri != null && selection.isActive) {
+            exportImportViewModel.exportCosplays(selection.selectedIds, uri)
         }
     }
 
@@ -105,14 +95,12 @@ fun ExportSelectionScreen(navController: NavController) {
         }
     ) { paddingValues ->
         MyOuterBox(modifier = Modifier.padding(paddingValues)) {
-            if (selectionMode) {
+            if (selection.isActive) {
                 MyExportSelectionModeFabs(
-                    onExitSelection = {
-                        selectionMode = false
-                        selectedIds = emptySet()
-                    },
+                    selection = selection,
                     onExportSelection = {
                         val dateString = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
+                        val selectedIds = selection.selectedIds
                         val fileName = if (selectedIds.size == 1) {
                             val name = cosplays.first { it.uid == selectedIds.first() }.name.replace(" ", "_")
                             "${name}_$dateString.zip"
@@ -121,31 +109,17 @@ fun ExportSelectionScreen(navController: NavController) {
                         }
                         createDocumentLauncher.launch(fileName)
                     },
-                    onSelectAll = {
-                        selectedIds = cosplays.map { it.uid }.toSet()
-                        selectionMode = selectedIds.isNotEmpty()
-                    }
                 )
             }
 
             MyLazyColumn(
                 items = cosplays,
                 key = { it.uid },
-                isSelected = { selectedIds.contains(it.uid) },
-                onClick = { cosplay ->
-                    if (!selectionMode) {
-                        selectionMode = true
-                        selectedIds = setOf(cosplay.uid)
-                        return@MyLazyColumn
-                    }
-                    val id = cosplay.uid
-                    selectedIds = if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
-                    if (selectedIds.isEmpty()) selectionMode = false
-                },
-                onLongClick = { cosplay ->
-                    selectionMode = true
-                    selectedIds = selectedIds + cosplay.uid
-                },
+                isSelected = { selection.isSelected(it.uid) },
+                // Unlike the other lists a plain tap selects here, since this screen exists
+                // only to pick cosplays for export.
+                onClick = { cosplay -> selection.toggle(cosplay.uid) },
+                onLongClick = { cosplay -> selection.select(cosplay.uid) },
             ) { cosplay ->
                 MyCosplayRow(
                     name = cosplay.name,

@@ -31,6 +31,7 @@ import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MyPhotoGrid
 import com.maeldev.conquest.components.MyPhotoGridItem
 import com.maeldev.conquest.components.MySelectionModeFabs
+import com.maeldev.conquest.components.rememberSelectionState
 import com.maeldev.conquest.components.pickAndSaveImageLauncher
 import com.maeldev.conquest.theme.UIConsts
 
@@ -54,39 +55,19 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
         }
     }
 
-    var selectionMode by remember { mutableStateOf(false) }
-    var selectedIds by remember { mutableStateOf(setOf<Int>()) }
-
-    LaunchedEffect(gridPhotos) {
-        val visibleIds = gridPhotos.map { it.id }.toSet()
-        selectedIds = selectedIds.intersect(visibleIds)
-        if (selectedIds.isEmpty()) {
-            selectionMode = false
-        }
-    }
+    val selection = rememberSelectionState(items = gridPhotos, id = { it.id })
 
     MyOuterBox {
-        if (selectionMode) {
+        if (selection.isActive) {
             MySelectionModeFabs(
-                onExitSelection = {
-                    selectionMode = false
-                    selectedIds = emptySet()
-                },
-                onDeleteSelection = {
-                    photoViewModel.deletePhotosByIds(selectedIds)
-                    selectionMode = false
-                    selectedIds = emptySet()
-                },
-                onSelectAll = {
-                    selectedIds = gridPhotos.map { it.id }.toSet()
-                    selectionMode = selectedIds.isNotEmpty()
-                },
-                deleteDialogTitle = "Delete selected ${if (selectedIds.size == 1) "photo" else "photos"}?",
-                deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "photo" else "photos"}.",
+                selection = selection,
+                itemLabelSingular = "photo",
+                itemLabelPlural = "photos",
+                onDeleteSelection = { ids -> photoViewModel.deletePhotosByIds(ids) },
             )
         }
 
-        if (!selectionMode) {
+        if (!selection.isActive) {
             PickAndSaveImage(
                 context = context,
                 modifier = Modifier.align(Alignment.BottomCenter),
@@ -105,24 +86,17 @@ fun PhotosTab(navBackStackEntry: NavBackStackEntry, navController: NavController
                     .fillMaxWidth()
                     .fillMaxSize(),
                 photos = gridPhotos,
-                selectedIds = selectedIds,
+                selectedIds = selection.selectedIds,
                 columns = GridCells.Adaptive(minSize = UIConsts.photoThumbSize),
                 contentDescription = "Cosplay photo",
                 onItemClick = { photo ->
-                    if (!selectionMode) {
+                    if (!selection.isActive) {
                         navController.navigate(EditPhoto(photo.id))
                         return@MyPhotoGrid
                     }
-                    val id = photo.id
-                    val newSet =
-                        if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
-                    selectedIds = newSet
-                    if (newSet.isEmpty()) selectionMode = false
+                    selection.toggle(photo.id)
                 },
-                onItemLongClick = { photo ->
-                    selectionMode = true
-                    selectedIds = selectedIds + photo.id
-                },
+                onItemLongClick = { photo -> selection.select(photo.id) },
             )
         }
     }

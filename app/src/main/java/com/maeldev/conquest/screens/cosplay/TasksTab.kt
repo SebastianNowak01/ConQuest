@@ -9,9 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -23,6 +20,7 @@ import com.maeldev.conquest.components.MyAddFab
 import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MyLazyColumn
 import com.maeldev.conquest.components.MySelectionModeFabs
+import com.maeldev.conquest.components.rememberSelectionState
 import com.maeldev.conquest.components.MySwitchCard
 import com.maeldev.conquest.theme.UIConsts
 
@@ -39,56 +37,30 @@ fun TasksTab(navController: NavController, navBackStackEntry: NavBackStackEntry)
 
     val tasks by taskViewModel.tasks.collectAsState()
 
-    var selectionMode by remember { mutableStateOf(false) }
-    var selectedIds by remember { mutableStateOf(setOf<Int>()) }
-
-    LaunchedEffect(tasks) {
-        val visibleIds = tasks.map { it.id }.toSet()
-        selectedIds = selectedIds.intersect(visibleIds)
-        if (selectedIds.isEmpty()) {
-            selectionMode = false
-        }
-    }
+    val selection = rememberSelectionState(items = tasks, id = { it.id })
 
     MyOuterBox {
-        if (selectionMode) {
+        if (selection.isActive) {
             MySelectionModeFabs(
-                onExitSelection = {
-                    selectionMode = false
-                    selectedIds = emptySet()
-                },
-                onDeleteSelection = {
-                    taskViewModel.deleteTasksByIds(selectedIds)
-                    selectionMode = false
-                    selectedIds = emptySet()
-                },
-                onSelectAll = {
-                    selectedIds = tasks.map { it.id }.toSet()
-                    selectionMode = selectedIds.isNotEmpty()
-                },
-                deleteDialogTitle = "Delete selected ${if (selectedIds.size == 1) "task" else "tasks"}?",
-                deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "task" else "tasks"}.",
+                selection = selection,
+                itemLabelSingular = "task",
+                itemLabelPlural = "tasks",
+                onDeleteSelection = { ids -> taskViewModel.deleteTasksByIds(ids) },
             )
         }
 
         MyLazyColumn(
             items = tasks,
             key = { it.id },
-            isSelected = { selectedIds.contains(it.id) },
+            isSelected = { selection.isSelected(it.id) },
             onClick = { task ->
-                if (!selectionMode) {
+                if (!selection.isActive) {
                     navController.navigate(EditTask(task.id))
                     return@MyLazyColumn
                 }
-                val id = task.id
-                selectedIds = if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
-                if (selectedIds.isEmpty()) selectionMode = false
-
+                selection.toggle(task.id)
             },
-            onLongClick = { task ->
-                selectionMode = true
-                selectedIds = selectedIds + task.id
-            },
+            onLongClick = { task -> selection.select(task.id) },
         ) { task ->
             Text(
                 text = task.taskName,

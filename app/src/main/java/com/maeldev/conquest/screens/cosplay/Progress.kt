@@ -34,6 +34,7 @@ import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MyPhotoGrid
 import com.maeldev.conquest.components.MyPhotoGridItem
 import com.maeldev.conquest.components.MySelectionModeFabs
+import com.maeldev.conquest.components.rememberSelectionState
 import com.maeldev.conquest.components.pickAndSaveImageLauncher
 import com.maeldev.conquest.components.saveBitmapToInternalStorage
 import com.maeldev.conquest.theme.UIConsts
@@ -58,17 +59,8 @@ fun ProgressScreen(
             )
         }
     }
-    var selectionMode by remember { mutableStateOf(false) }
-    var selectedIds by remember { mutableStateOf(setOf<Int>()) }
+    val selection = rememberSelectionState(items = gridPhotos, id = { it.id })
     var error by remember { mutableStateOf("") }
-
-    LaunchedEffect(gridPhotos) {
-        val visibleIds = gridPhotos.map { it.id }.toSet()
-        selectedIds = selectedIds.intersect(visibleIds)
-        if (selectedIds.isEmpty()) {
-            selectionMode = false
-        }
-    }
 
     LaunchedEffect(cosplayId) {
         progressPhotoViewModel.setProgressCosplayId(cosplayId)
@@ -102,23 +94,12 @@ fun ProgressScreen(
     }
 
     MyOuterBox {
-        if (selectionMode) {
+        if (selection.isActive) {
             MySelectionModeFabs(
-                onExitSelection = {
-                    selectionMode = false
-                    selectedIds = emptySet()
-                },
-                onDeleteSelection = {
-                    progressPhotoViewModel.deleteProgressPhotosByIds(selectedIds)
-                    selectionMode = false
-                    selectedIds = emptySet()
-                },
-                onSelectAll = {
-                    selectedIds = gridPhotos.map { it.id }.toSet()
-                    selectionMode = selectedIds.isNotEmpty()
-                },
-                deleteDialogTitle = "Delete selected ${if (selectedIds.size == 1) "progress photo" else "progress photos"}?",
-                deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "progress photo" else "progress photos"}.",
+                selection = selection,
+                itemLabelSingular = "progress photo",
+                itemLabelPlural = "progress photos",
+                onDeleteSelection = { ids -> progressPhotoViewModel.deleteProgressPhotosByIds(ids) },
             )
         }
 
@@ -140,33 +121,22 @@ fun ProgressScreen(
                     .fillMaxWidth()
                     .fillMaxSize(),
                 photos = gridPhotos,
-                selectedIds = selectedIds,
+                selectedIds = selection.selectedIds,
                 columns = GridCells.Adaptive(minSize = UIConsts.photoThumbSize),
                 contentPadding = PaddingValues(),
                 contentDescription = "Progress photo",
                 onItemClick = { photo ->
-                    if (!selectionMode) {
+                    if (!selection.isActive) {
                         navController.navigate(EditProgressPhoto(photo.id, cosplayId))
                         return@MyPhotoGrid
                     }
-                    val id = photo.id
-                    selectedIds = if (selectedIds.contains(id)) {
-                        selectedIds - id
-                    } else {
-                        selectedIds + id
-                    }
-                    if (selectedIds.isEmpty()) {
-                        selectionMode = false
-                    }
+                    selection.toggle(photo.id)
                 },
-                onItemLongClick = { photo ->
-                    selectionMode = true
-                    selectedIds = selectedIds + photo.id
-                },
+                onItemLongClick = { photo -> selection.select(photo.id) },
             )
         }
 
-        if (!selectionMode) {
+        if (!selection.isActive) {
             Row(
                 modifier = Modifier.align(Alignment.BottomCenter),
                 horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingL),

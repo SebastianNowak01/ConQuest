@@ -1,0 +1,6 @@
+root = true
+
+[*.{kt,kts}]
+# @Composable functions are PascalCase by convention. This mirrors the FunctionNaming
+# exemption in config/detekt/detekt.yml so both linters agree.
+ktlint_function_naming_ignore_when_annotated_with = Composable

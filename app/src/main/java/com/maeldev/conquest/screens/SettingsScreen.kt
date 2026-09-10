@@ -174,7 +174,6 @@ fun SettingsScreen(navController: NavController) {
     }
 }
 
-
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 val DARK_MODE_KEY = stringPreferencesKey("dark_mode_option")

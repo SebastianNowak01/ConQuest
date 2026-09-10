@@ -44,12 +44,6 @@
     <ID>MatchingDeclarationName:ProgressPhotos.kt$ProgressPhoto</ID>
     <ID>MatchingDeclarationName:SettingsScreen.kt$SettingsScreenParams</ID>
     <ID>MaxLineLength:CosplayDatabase.kt$CosplayDatabase$entities = [Cosplay::class, CosplayPhoto::class, CosplayElement::class, CosplayTask::class, Event::class, EventCosplayCrossRef::class, ProgressPhoto::class]</ID>
-    <ID>MaxLineLength:ElementsTab.kt$deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "element" else "elements"}."</ID>
-    <ID>MaxLineLength:Events.kt$deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "event" else "events"}."</ID>
-    <ID>MaxLineLength:MainScreen.kt$deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "cosplay" else "cosplays"}."</ID>
-    <ID>MaxLineLength:PhotosTab.kt$deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "photo" else "photos"}."</ID>
-    <ID>MaxLineLength:Progress.kt$deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "progress photo" else "progress photos"}."</ID>
-    <ID>MaxLineLength:TasksTab.kt$deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "task" else "tasks"}."</ID>
     <ID>TooManyFunctions:EventDao.kt$EventDao</ID>
   </CurrentIssues>
 </SmellBaseline>

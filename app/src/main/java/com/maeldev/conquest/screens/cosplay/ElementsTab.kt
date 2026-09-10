@@ -11,9 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -26,6 +23,7 @@ import com.maeldev.conquest.components.MyImageBox
 import com.maeldev.conquest.components.MyLazyColumn
 import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MySelectionModeFabs
+import com.maeldev.conquest.components.rememberSelectionState
 import com.maeldev.conquest.theme.UIConsts
 
 @Composable
@@ -41,55 +39,30 @@ fun ElementsTab(navController: NavController, navBackStackEntry: NavBackStackEnt
 
     val elements by elementViewModel.elements.collectAsState()
 
-    var selectionMode by remember { mutableStateOf(false) }
-    var selectedIds by remember { mutableStateOf(setOf<Int>()) }
-
-    LaunchedEffect(elements) {
-        val visibleIds = elements.map { it.id }.toSet()
-        selectedIds = selectedIds.intersect(visibleIds)
-        if (selectedIds.isEmpty()) {
-            selectionMode = false
-        }
-    }
+    val selection = rememberSelectionState(items = elements, id = { it.id })
 
     MyOuterBox {
-        if (selectionMode) {
+        if (selection.isActive) {
             MySelectionModeFabs(
-                onExitSelection = {
-                    selectionMode = false
-                    selectedIds = emptySet()
-                },
-                onDeleteSelection = {
-                    elementViewModel.deleteElementsByIds(selectedIds)
-                    selectionMode = false
-                    selectedIds = emptySet()
-                },
-                onSelectAll = {
-                    selectedIds = elements.map { it.id }.toSet()
-                    selectionMode = selectedIds.isNotEmpty()
-                },
-                deleteDialogTitle = "Delete selected ${if (selectedIds.size == 1) "element" else "elements"}?",
-                deleteDialogMessage = "This will permanently delete ${selectedIds.size} selected ${if (selectedIds.size == 1) "element" else "elements"}.",
+                selection = selection,
+                itemLabelSingular = "element",
+                itemLabelPlural = "elements",
+                onDeleteSelection = { ids -> elementViewModel.deleteElementsByIds(ids) },
             )
         }
 
         MyLazyColumn(
             items = elements,
             key = { it.id },
-            isSelected = { selectedIds.contains(it.id) },
+            isSelected = { selection.isSelected(it.id) },
             onClick = { element ->
-                if (!selectionMode) {
+                if (!selection.isActive) {
                     navController.navigate(EditElement(element.id))
                     return@MyLazyColumn
                 }
-                val id = element.id
-                selectedIds = if (selectedIds.contains(id)) selectedIds - id else selectedIds + id
-                if (selectedIds.isEmpty()) selectionMode = false
+                selection.toggle(element.id)
             },
-            onLongClick = { element ->
-                selectionMode = true
-                selectedIds = selectedIds + element.id
-            },
+            onLongClick = { element -> selection.select(element.id) },
             cardContentPadding = UIConsts.spacingS,
         ) { element ->
             Row(
