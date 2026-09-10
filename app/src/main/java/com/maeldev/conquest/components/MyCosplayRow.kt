@@ -3,7 +3,6 @@ package com.maeldev.conquest.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -88,16 +87,24 @@ fun MyCosplayRow(cosplay: Cosplay) {
             )
         }
 
-        if (cosplay.overallPercentage > 0) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(UIConsts.paddingS),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             LinearProgressIndicator(
                 progress = { cosplay.overallPercentage / 100f },
                 modifier =
                     Modifier
-                        .fillMaxWidth()
+                        .weight(1f)
                         .height(UIConsts.progressBarHeight)
                         .clip(RoundedCornerShape(UIConsts.progressBarHeight)),
                 color = MaterialTheme.colorScheme.secondary,
                 trackColor = MaterialTheme.colorScheme.surfaceVariant,
+            )
+            Text(
+                text = "${cosplay.overallPercentage}% done",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
@@ -111,12 +118,10 @@ fun MyCosplayRow(cosplay: Cosplay) {
                     text = convertDateToString(due),
                 )
             }
-            if (cosplay.tasksCount > 0) {
-                MyCosplayMeta(
-                    icon = Icons.AutoMirrored.Filled.List,
-                    text = "${cosplay.tasksCount} tasks",
-                )
-            }
+            MyCosplayMeta(
+                icon = Icons.AutoMirrored.Filled.List,
+                text = if (cosplay.tasksCount == 1) "1 task" else "${cosplay.tasksCount} tasks",
+            )
         }
     }
 }

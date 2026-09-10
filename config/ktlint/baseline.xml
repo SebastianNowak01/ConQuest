@@ -165,7 +165,7 @@
         <error line="34" column="1" source="standard:no-consecutive-blank-lines" />
     </file>
     <file name="src/main/java/com/maeldev/conquest/components/MyCosplayRow.kt">
-        <error line="32" column="13" source="standard:multiline-expression-wrapping" />
+        <error line="31" column="13" source="standard:multiline-expression-wrapping" />
     </file>
     <file name="src/main/java/com/maeldev/conquest/components/MyExportSelectionModeFabs.kt">
         <error line="18" column="38" source="standard:function-signature" />
