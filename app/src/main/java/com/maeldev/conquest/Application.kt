@@ -2,6 +2,7 @@ package com.maeldev.conquest
 
 import android.app.Application
 import androidx.room.Room
+import com.maeldev.conquest.data.database.ALL_MIGRATIONS
 import com.maeldev.conquest.data.database.CosplayDatabase
 
 class ConQuestApplication : Application() {
@@ -9,6 +10,7 @@ class ConQuestApplication : Application() {
         Room.databaseBuilder(
             applicationContext, CosplayDatabase::class.java, "cosplays_database"
         )
+            .addMigrations(*ALL_MIGRATIONS)
             .fallbackToDestructiveMigrationOnDowngrade(true)
             .build()
     }
