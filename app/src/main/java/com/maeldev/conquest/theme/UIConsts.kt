@@ -21,7 +21,7 @@ object UIConsts {
     val heightM = 120.dp
     val photoThumbSize = 120.dp
     val imageSizeS = 48.dp
-    val imageSizeM = 80.dp
+    val imageSizeM = 60.dp
     val imageSizeL = 120.dp
     val imageBadgeSize = 28.dp
     val chipIconSize = 16.dp

@@ -3,8 +3,9 @@ package com.maeldev.conquest.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -13,6 +14,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,100 +39,98 @@ private val CosplayStatus.icon: ImageVector
             CosplayStatus.Done -> Icons.Default.CheckCircle
         }
 
-/**
- * A cosplay as it appears in the main list.
- *
- * This used to be a photo, a name and a series and nothing else, while eight of the ten sort
- * options order the list by fields it never showed — so sorting by budget, tasks or due date
- * looked like it did nothing at all. Status, progress, due date and task count are now on the
- * row, which is also what makes the status vocabulary visible outside the edit screen.
- */
 @Composable
 fun MyCosplayRow(cosplay: Cosplay) {
     val status = CosplayStatus.fromEntity(cosplay)
 
-    Column(verticalArrangement = Arrangement.spacedBy(UIConsts.paddingS)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            MyImageBox(
-                photoPath = cosplay.cosplayPhotoPath.orEmpty(),
-                clickable = false,
-                onClick = {},
-                config =
-                    MyImageBoxConfig(
-                        size = UIConsts.imageSizeS,
-                        contentDescription = cosplay.name,
-                        emptyContentDescription = "Cosplay photo",
-                    ),
-            )
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(UIConsts.paddingS),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        MyImageBox(
+            photoPath = cosplay.cosplayPhotoPath.orEmpty(),
+            clickable = false,
+            onClick = {},
+            config =
+                MyImageBoxConfig(
+                    size = UIConsts.imageSizeM,
+                    contentDescription = cosplay.name,
+                    emptyContentDescription = "Cosplay photo",
+                ),
+        )
 
-            Column(
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .padding(start = UIConsts.paddingS),
-            ) {
-                Text(
-                    text = cosplay.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Text(
-                    text = cosplay.series,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-
-            MyStatusChip(
-                label = status.label,
-                icon = status.icon,
-                active = true,
-            )
-        }
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(UIConsts.paddingS),
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(UIConsts.paddingXS),
         ) {
-            LinearProgressIndicator(
-                progress = { cosplay.overallPercentage / 100f },
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .height(UIConsts.progressBarHeight)
-                        .clip(RoundedCornerShape(UIConsts.progressBarHeight)),
-                color = LightGreen,
-                trackColor = DarkGreen,
-                // Material 3 draws a dot in the indicator colour at the end of the track by
-                // default, which reads as stray light green on a bar that is barely filled.
-                drawStopIndicator = {},
+            Text(
+                text = cosplay.name,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
             Text(
-                text = "${cosplay.overallPercentage}% done",
-                style = MaterialTheme.typography.bodySmall,
+                text = cosplay.series,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
-        }
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingS),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            cosplay.dueDate?.let { due ->
-                MyCosplayMeta(
-                    icon = Icons.Default.Event,
-                    text = convertDateToString(due),
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(UIConsts.paddingS),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                LinearProgressIndicator(
+                    progress = { cosplay.overallPercentage / 100f },
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .height(UIConsts.progressBarHeight)
+                            .clip(RoundedCornerShape(UIConsts.progressBarHeight)),
+                    color = LightGreen,
+                    trackColor = DarkGreen,
+                    // Material 3 draws a dot in the indicator colour at the end of the track by
+                    // default, which reads as stray light green on a bar that is barely filled.
+                    drawStopIndicator = {},
+                )
+                Text(
+                    text = "${cosplay.overallPercentage}%",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            MyCosplayMeta(
-                icon = Icons.AutoMirrored.Filled.List,
-                text = if (cosplay.tasksCount == 1) "1 task" else "${cosplay.tasksCount} tasks",
-            )
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingS),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                cosplay.dueDate?.let { due ->
+                    MyCosplayMeta(
+                        icon = Icons.Default.Event,
+                        text = convertDateToString(due),
+                    )
+                }
+                MyCosplayMeta(
+                    icon = Icons.AutoMirrored.Filled.List,
+                    text = if (cosplay.tasksCount == 1) "1 task" else "${cosplay.tasksCount} tasks",
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                // Bottom corner, icon only, the way a task states Done and an element Ready. As a
+                // labelled chip beside the name it took the width the character name needed, and
+                // the three statuses are different enough shapes that the label earns nothing.
+                MyStatusChip(
+                    label = status.label,
+                    icon = status.icon,
+                    active = true,
+                    showLabel = false,
+                )
+            }
         }
     }
 }
@@ -144,7 +144,7 @@ private fun MyCosplayMeta(
         horizontalArrangement = Arrangement.spacedBy(UIConsts.paddingXS),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        androidx.compose.material3.Icon(
+        Icon(
             imageVector = icon,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
