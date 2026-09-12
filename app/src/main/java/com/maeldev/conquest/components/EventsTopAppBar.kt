@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -30,6 +29,7 @@ import com.maeldev.conquest.AppViewModelProvider
 import com.maeldev.conquest.data.classes.CosplaySortOrder
 import com.maeldev.conquest.data.classes.EventSortOption
 import com.maeldev.conquest.data.entity.EventType
+import com.maeldev.conquest.theme.UIConsts
 import com.maeldev.conquest.viewmodel.EventViewModel
 
 @Composable
@@ -153,13 +153,12 @@ private fun EventsOrderButton(
 
     val rotation = if (selectedOrder == CosplaySortOrder.MostToLeast) 180f else 0f
 
-    IconButton(onClick = { onOrderChange(nextOrder) }) {
-        Icon(
-            imageVector = Icons.Default.KeyboardArrowDown,
-            contentDescription = "Order: $currentOrderLabel. Tap to switch to $nextOrderLabel",
-            modifier = Modifier.graphicsLayer(rotationZ = rotation),
-        )
-    }
+    MyIcon(
+        onClick = { onOrderChange(nextOrder) },
+        imageVector = Icons.Default.KeyboardArrowDown,
+        contentDescription = "Order: $currentOrderLabel. Tap to switch to $nextOrderLabel",
+        modifier = Modifier.graphicsLayer(rotationZ = rotation),
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -180,6 +179,7 @@ fun EventsTopAppBar(
 
     TopAppBar(
         colors = topAppBarColorsObject(),
+        expandedHeight = UIConsts.topAppBarHeight,
         title = {
             Row(
                 modifier = Modifier.fillMaxSize(),
@@ -192,12 +192,11 @@ fun EventsTopAppBar(
             }
         },
         navigationIcon = {
-            IconButton(onClick = onMenuClick) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Menu",
-                )
-            }
+            MyIcon(
+                onClick = onMenuClick,
+                imageVector = Icons.Default.Menu,
+                contentDescription = "Menu",
+            )
         },
         actions = {
             EventsFilterButton(

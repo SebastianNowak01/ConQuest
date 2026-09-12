@@ -10,8 +10,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.TheaterComedy
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -30,12 +28,14 @@ import com.maeldev.conquest.AppViewModelProvider
 import com.maeldev.conquest.components.MyCosplayRow
 import com.maeldev.conquest.components.MyEmptyState
 import com.maeldev.conquest.components.MyExportSelectionModeFabs
+import com.maeldev.conquest.components.MyIcon
 import com.maeldev.conquest.components.MyLazyColumn
 import com.maeldev.conquest.components.MyListItemActions
 import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MySnackbarHost
 import com.maeldev.conquest.components.rememberSelectionState
 import com.maeldev.conquest.data.entity.Cosplay
+import com.maeldev.conquest.theme.UIConsts
 import com.maeldev.conquest.viewmodel.CosplayViewModel
 import com.maeldev.conquest.viewmodel.ExportImportState
 import com.maeldev.conquest.viewmodel.ExportImportViewModel
@@ -89,14 +89,14 @@ fun ExportSelectionScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
+                expandedHeight = UIConsts.topAppBarHeight,
                 title = { Text("Select Cosplays to Export") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                        )
-                    }
+                    MyIcon(
+                        onClick = { navController.popBackStack() },
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                    )
                 },
             )
         },

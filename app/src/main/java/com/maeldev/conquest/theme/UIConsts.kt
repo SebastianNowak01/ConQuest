@@ -53,4 +53,7 @@ object UIConsts {
     val screenHorizontalPadding = 10.dp
     val searchBarVerticalPadding = 6.dp
     val columnVerticalSpacing = 20.dp
+    val tabHeight = 56.dp
+    val topAppBarHeight = 80.dp
+    val topAppBarIconSize = 24.dp
 }

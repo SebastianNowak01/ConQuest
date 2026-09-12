@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -30,6 +29,7 @@ import com.maeldev.conquest.AppViewModelProvider
 import com.maeldev.conquest.data.classes.CosplaySortOption
 import com.maeldev.conquest.data.classes.CosplaySortOrder
 import com.maeldev.conquest.data.classes.CosplayStatusFilter
+import com.maeldev.conquest.theme.UIConsts
 import com.maeldev.conquest.viewmodel.CosplayViewModel
 
 @Composable
@@ -100,13 +100,12 @@ private fun OrderButton(
             0f
         }
 
-    IconButton(onClick = { onOrderChange(nextOrder) }) {
-        Icon(
-            imageVector = Icons.Default.KeyboardArrowDown,
-            contentDescription = "Order: $currentOrderLabel. Tap to switch to $nextOrderLabel",
-            modifier = Modifier.graphicsLayer(rotationZ = rotation),
-        )
-    }
+    MyIcon(
+        onClick = { onOrderChange(nextOrder) },
+        imageVector = Icons.Default.KeyboardArrowDown,
+        contentDescription = "Order: $currentOrderLabel. Tap to switch to $nextOrderLabel",
+        modifier = Modifier.graphicsLayer(rotationZ = rotation),
+    )
 }
 
 @Composable
@@ -178,6 +177,7 @@ fun MainScreenTopAppBar(
 
     TopAppBar(
         colors = topAppBarColorsObject(),
+        expandedHeight = UIConsts.topAppBarHeight,
         title = {
             Row(
                 modifier = Modifier.fillMaxSize(),
@@ -190,12 +190,11 @@ fun MainScreenTopAppBar(
             }
         },
         navigationIcon = {
-            IconButton(onClick = onMenuClick) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Menu",
-                )
-            }
+            MyIcon(
+                onClick = onMenuClick,
+                imageVector = Icons.Default.Menu,
+                contentDescription = "Menu",
+            )
         },
         actions = {
             FilterButton(

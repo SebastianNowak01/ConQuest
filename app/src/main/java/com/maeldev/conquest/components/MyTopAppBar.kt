@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -69,14 +67,14 @@ fun getTopAppBarConfig(
 private fun SettingsTopAppBar(onMenuClick: () -> Unit) {
     TopAppBar(
         colors = topAppBarColorsObject(),
+        expandedHeight = UIConsts.topAppBarHeight,
         title = { Text("Settings screen") },
         navigationIcon = {
-            IconButton(onClick = onMenuClick) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Menu",
-                )
-            }
+            MyIcon(
+                onClick = onMenuClick,
+                imageVector = Icons.Default.Menu,
+                contentDescription = "Menu",
+            )
         },
     )
 }
@@ -86,14 +84,14 @@ private fun SettingsTopAppBar(onMenuClick: () -> Unit) {
 private fun ProgressTopAppBar(onMenuClick: () -> Unit) {
     TopAppBar(
         colors = topAppBarColorsObject(),
+        expandedHeight = UIConsts.topAppBarHeight,
         title = { Text("Progress") },
         navigationIcon = {
-            IconButton(onClick = onMenuClick) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Menu",
-                )
-            }
+            MyIcon(
+                onClick = onMenuClick,
+                imageVector = Icons.Default.Menu,
+                contentDescription = "Menu",
+            )
         },
     )
 }
@@ -103,14 +101,14 @@ private fun ProgressTopAppBar(onMenuClick: () -> Unit) {
 private fun StatsTopAppBar(onMenuClick: () -> Unit) {
     TopAppBar(
         colors = topAppBarColorsObject(),
+        expandedHeight = UIConsts.topAppBarHeight,
         title = { Text("Stats") },
         navigationIcon = {
-            IconButton(onClick = onMenuClick) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Menu",
-                )
-            }
+            MyIcon(
+                onClick = onMenuClick,
+                imageVector = Icons.Default.Menu,
+                contentDescription = "Menu",
+            )
         },
     )
 }
@@ -136,6 +134,7 @@ private fun CosplayTopAppBar(
 
     TopAppBar(
         colors = topAppBarColorsObject(),
+        expandedHeight = UIConsts.topAppBarHeight,
         title = {
             val loadedCosplay = cosplay
             if (loadedCosplay != null) {
@@ -158,7 +157,7 @@ private fun CosplayTopAppBar(
                         onClick = {},
                         config =
                             MyImageBoxConfig(
-                                size = UIConsts.imageSizeS,
+                                size = UIConsts.imageSizeM,
                                 contentDescription = loadedCosplay.name,
                                 emptyContentDescription = "Cosplay photo",
                             ),
@@ -178,7 +177,7 @@ private fun CosplayTopAppBar(
                         )
                         Text(
                             text = loadedCosplay.series,
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodyMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -187,12 +186,11 @@ private fun CosplayTopAppBar(
             }
         },
         navigationIcon = {
-            IconButton(onClick = onMenuClick) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Menu",
-                )
-            }
+            MyIcon(
+                onClick = onMenuClick,
+                imageVector = Icons.Default.Menu,
+                contentDescription = "Menu",
+            )
         },
     )
 }
