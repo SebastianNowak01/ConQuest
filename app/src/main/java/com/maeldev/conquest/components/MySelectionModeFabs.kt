@@ -4,8 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -16,38 +16,49 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
+import com.maeldev.conquest.theme.BrickRed
+import com.maeldev.conquest.theme.OffWhite
 import com.maeldev.conquest.theme.UIConsts
 
 @Composable
-private fun MyExitSelectionFabButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun MyExitSelectionFabButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     MyFab(
         onClick = onClick,
         modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        containerColor = MaterialTheme.colorScheme.tertiary,
         contentColor = MaterialTheme.colorScheme.primary,
-        icon = Icons.AutoMirrored.Filled.ArrowBack,
+        icon = Icons.Default.Close,
         contentDescription = "Exit selection",
     )
 }
 
 @Composable
-private fun MyDeleteSelectionFabButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun MyDeleteSelectionFabButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     MyFab(
         onClick = onClick,
         modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.errorContainer,
-        contentColor = MaterialTheme.colorScheme.primary,
-        icon = Icons.Default.Close,
+        containerColor = BrickRed,
+        contentColor = OffWhite,
+        icon = Icons.Default.Delete,
         contentDescription = "Delete",
     )
 }
 
 @Composable
-private fun MySelectAllFabButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun MySelectAllFabButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     MyFab(
         onClick = onClick,
         modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+        containerColor = MaterialTheme.colorScheme.secondary,
         contentColor = MaterialTheme.colorScheme.primary,
         icon = Icons.Default.DoneAll,
         contentDescription = "Select all",
@@ -73,9 +84,10 @@ fun BoxScope.MySelectionModeFabs(
     }
 
     Row(
-        modifier = Modifier
-            .align(Alignment.BottomCenter)
-            .zIndex(2f),
+        modifier =
+            Modifier
+                .align(Alignment.BottomCenter)
+                .zIndex(2f),
         horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingM),
         verticalAlignment = Alignment.CenterVertically,
     ) {

@@ -52,8 +52,8 @@ fun BoxScope.MySaveCancelRow(
                 .padding(bottom = bottomPadding),
         horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingL),
     ) {
-        // Cancel is deliberately not the error colour: the delete action in selection mode is a
-        // red FAB with this same Close icon, and leaving a form without saving is not destruction.
+        // Cancel is deliberately not the error colour: red is reserved for the delete FAB in
+        // selection mode, and leaving a form without saving is not destruction.
         MyFab(
             onClick = onCancel,
             containerColor = MaterialTheme.colorScheme.tertiary,

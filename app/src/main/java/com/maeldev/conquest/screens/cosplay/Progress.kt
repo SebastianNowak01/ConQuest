@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.MaterialTheme
@@ -168,7 +167,7 @@ fun ProgressScreen(
                     onClick = { galleryLauncher.launch() },
                     containerColor = MaterialTheme.colorScheme.tertiary,
                     contentColor = MaterialTheme.colorScheme.primary,
-                    icon = Icons.Default.Add,
+                    icon = Icons.Default.PhotoLibrary,
                     contentDescription = "Add from gallery",
                 )
                 MyFab(

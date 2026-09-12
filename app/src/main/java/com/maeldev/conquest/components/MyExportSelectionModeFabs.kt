@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DoneAll
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,9 +22,9 @@ private fun MyExitSelectionFabButton(
     MyFab(
         onClick = onClick,
         modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        containerColor = MaterialTheme.colorScheme.tertiary,
         contentColor = MaterialTheme.colorScheme.primary,
-        icon = Icons.AutoMirrored.Filled.ArrowBack,
+        icon = Icons.Default.Close,
         contentDescription = "Exit selection",
     )
 }
@@ -37,9 +37,9 @@ private fun MyExportSelectionFabButton(
     MyFab(
         onClick = onClick,
         modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.primaryContainer,
-        contentColor = MaterialTheme.colorScheme.primary,
-        icon = Icons.Default.Share,
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        icon = Icons.Default.FileDownload,
         contentDescription = "Export",
     )
 }
@@ -52,7 +52,7 @@ private fun MySelectAllFabButton(
     MyFab(
         onClick = onClick,
         modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+        containerColor = MaterialTheme.colorScheme.secondary,
         contentColor = MaterialTheme.colorScheme.primary,
         icon = Icons.Default.DoneAll,
         contentDescription = "Select all",

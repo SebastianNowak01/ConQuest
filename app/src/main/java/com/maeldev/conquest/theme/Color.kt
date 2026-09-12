@@ -7,7 +7,7 @@ val LightGray = Color(0xFF5C5C5C)
 val DarkGray = Color(0xFF2E2E2E)
 val DarkGreen = Color(0xFF2F4F3B)
 val LightGreen = Color(0xFF249D57)
-
 val LighterGray = Color(0xFFD6D6D6)
 val LighterGreen = Color(0xFF4CAF6A)
 val LighterDarkGreen = Color(0xFF589D6A)
+val BrickRed = Color(0xFFA03A31)
