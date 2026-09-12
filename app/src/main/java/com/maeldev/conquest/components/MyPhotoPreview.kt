@@ -50,7 +50,7 @@ fun MyPhotoPreview(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
-                        MaterialTheme.colorScheme.scrim.copy(alpha = UIConsts.previewScrimAlpha),
+                        MaterialTheme.colorScheme.scrim.copy(alpha = UIConsts.PREVIEW_SCRIM_ALPHA),
                     ),
             )
 

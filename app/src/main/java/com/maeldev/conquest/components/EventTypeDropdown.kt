@@ -43,15 +43,17 @@ fun EventTypeDropdown(
             label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             shape = RoundedCornerShape(UIConsts.inputCornerRadius),
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.background,
-                unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                disabledContainerColor = MaterialTheme.colorScheme.background,
-                errorContainerColor = MaterialTheme.colorScheme.background,
-            ),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true),
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.background,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                    disabledContainerColor = MaterialTheme.colorScheme.background,
+                    errorContainerColor = MaterialTheme.colorScheme.background,
+                ),
         )
 
         ExposedDropdownMenu(
@@ -84,14 +86,12 @@ fun EventTypeDropdown(
 }
 
 val EventType.displayName: String
-    get() = when (this) {
-        EventType.EXPO -> "Expo"
-        EventType.CONVENTION -> "Convention"
-        EventType.CONTEST -> "Contest"
-        EventType.MEETING -> "Meeting"
-        EventType.PARTY -> "Party"
-        EventType.OTHER -> "Other"
-    }
-
-
-
+    get() =
+        when (this) {
+            EventType.EXPO -> "Expo"
+            EventType.CONVENTION -> "Convention"
+            EventType.CONTEST -> "Contest"
+            EventType.MEETING -> "Meeting"
+            EventType.PARTY -> "Party"
+            EventType.OTHER -> "Other"
+        }

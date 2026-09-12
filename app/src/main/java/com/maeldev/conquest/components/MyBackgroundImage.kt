@@ -22,9 +22,9 @@ fun MyBackgroundImage(
     contentDescription: String? = null,
 ) {
     val backgroundAlpha = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) {
-        UIConsts.decorativeBackgroundAlphaDark
+        UIConsts.DECORATIVE_BACKGROUND_ALPHA_DARK
     } else {
-        UIConsts.decorativeBackgroundAlphaLight
+        UIConsts.DECORATIVE_BACKGROUND_ALPHA_LIGHT
     }
     val density = LocalDensity.current
     val windowContainerSize = LocalWindowInfo.current.containerSize

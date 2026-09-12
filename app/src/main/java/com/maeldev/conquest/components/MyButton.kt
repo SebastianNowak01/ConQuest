@@ -18,7 +18,7 @@ fun MyButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth(UIConsts.columnWidthFraction),
+        modifier = modifier.fillMaxWidth(UIConsts.COLUMN_WIDTH_FRACTION),
         shape = RoundedCornerShape(UIConsts.cornerRadiusL),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.secondary,

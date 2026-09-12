@@ -27,7 +27,7 @@ fun BoxScope.MyColumn(content: @Composable () -> Unit) {
     Column(
         modifier = Modifier
             .align(Alignment.TopCenter)
-            .fillMaxWidth(UIConsts.columnWidthFraction)
+            .fillMaxWidth(UIConsts.COLUMN_WIDTH_FRACTION)
             .verticalScroll(scrollState)
             .imePadding()
             .padding(

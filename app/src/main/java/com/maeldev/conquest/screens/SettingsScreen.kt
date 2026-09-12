@@ -183,7 +183,7 @@ private fun MySettingsSectionLabel(text: String) {
         color = MaterialTheme.colorScheme.primary,
         modifier =
             Modifier
-                .fillMaxWidth(UIConsts.columnWidthFraction)
+                .fillMaxWidth(UIConsts.COLUMN_WIDTH_FRACTION)
                 .padding(bottom = UIConsts.paddingS),
     )
 }

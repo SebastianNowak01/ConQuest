@@ -24,7 +24,7 @@ fun MyFab(
         onClick = onClick,
         containerColor = containerColor,
         contentColor = contentColor,
-        shape = RoundedCornerShape(UIConsts.fabCornerRadius),
+        shape = RoundedCornerShape(UIConsts.FAB_CORNER_RADIUS),
         // These FABs are all anchored to the bottom of the screen, so the inset that matters is
         // the navigation bar's. This used to apply statusBarsPadding instead, which reserved the
         // wrong inset at the wrong end and made the FAB row taller than it looked.

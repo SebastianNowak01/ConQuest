@@ -29,7 +29,7 @@ fun BoxScope.MyLoadingOverlay(label: String) {
                 .matchParentSize()
                 .zIndex(OVERLAY_Z_INDEX)
                 .background(
-                    MaterialTheme.colorScheme.background.copy(alpha = UIConsts.previewScrimAlpha),
+                    MaterialTheme.colorScheme.background.copy(alpha = UIConsts.PREVIEW_SCRIM_ALPHA),
                 )
                 .clickable(interactionSource = interactionSource, indication = null) {},
         contentAlignment = Alignment.Center,

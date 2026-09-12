@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber") // Palette file: raw ARGB literals are the definition, not a magic value.
+
 package com.maeldev.conquest.theme
 
 import androidx.compose.ui.graphics.Color
