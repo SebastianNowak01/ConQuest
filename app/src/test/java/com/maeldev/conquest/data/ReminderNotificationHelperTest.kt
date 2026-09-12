@@ -71,7 +71,6 @@ class ReminderNotificationHelperTest {
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val shadowManager = Shadows.shadowOf(notificationManager)
 
-        // Enable notifications for the test context
         shadowManager.setNotificationsEnabled(true)
 
         ReminderNotificationHelper.showNotification(

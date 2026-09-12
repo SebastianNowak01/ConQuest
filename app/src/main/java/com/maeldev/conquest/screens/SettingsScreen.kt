@@ -3,7 +3,6 @@ package com.maeldev.conquest.screens
 import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -35,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.window.PopupProperties
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -47,6 +44,9 @@ import com.maeldev.conquest.AppViewModelProvider
 import com.maeldev.conquest.components.MyButton
 import com.maeldev.conquest.components.MyOuterBox
 import com.maeldev.conquest.components.MySnackbarHost
+import com.maeldev.conquest.components.menuBorder
+import com.maeldev.conquest.components.menuContainerColor
+import com.maeldev.conquest.components.menuShape
 import com.maeldev.conquest.theme.UIConsts
 import com.maeldev.conquest.viewmodel.ExportImportState
 import com.maeldev.conquest.viewmodel.ExportImportViewModel
@@ -72,8 +72,6 @@ fun SettingsScreen(navController: NavController) {
     val options = listOf("dark", "light", "automatic")
     var expanded by remember { mutableStateOf(false) }
 
-    // Only imports are started from this screen; exports report their own outcome on the
-    // export selection screen, which owns a separate ExportImportViewModel instance.
     LaunchedEffect(importState) {
         val message = when (val state = importState) {
             is ExportImportState.Success -> "Cosplays imported"
@@ -81,8 +79,6 @@ fun SettingsScreen(navController: NavController) {
             else -> null
         } ?: return@LaunchedEffect
 
-        // Reset first so a repeated failure is shown again, then show the message from a scope
-        // that is not cancelled when importState changes back to Idle.
         exportImportViewModel.resetState()
         coroutineScope.launch { snackbarHostState.showSnackbar(message) }
     }
@@ -119,13 +115,12 @@ fun SettingsScreen(navController: NavController) {
                         errorContainerColor = MaterialTheme.colorScheme.background,
                     ),
                 )
-                DropdownMenu(
+                ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
-                    modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .background(color = MaterialTheme.colorScheme.tertiary),
-                    properties = PopupProperties(clippingEnabled = true),
+                    shape = menuShape,
+                    containerColor = menuContainerColor,
+                    border = menuBorder,
                 ) {
                     options.forEach { selectionOption ->
                         DropdownMenuItem(
@@ -136,9 +131,6 @@ fun SettingsScreen(navController: NavController) {
                                 }
                                 expanded = false
                             },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = UIConsts.paddingS),
                         )
                     }
                 }
@@ -178,7 +170,6 @@ fun SettingsScreen(navController: NavController) {
     }
 }
 
-/** Heading over a group of settings — the screen was previously a bare stack of controls. */
 @Composable
 private fun MySettingsSectionLabel(text: String) {
     Text(

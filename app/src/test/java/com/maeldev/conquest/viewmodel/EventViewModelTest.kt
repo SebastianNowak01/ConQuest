@@ -36,7 +36,6 @@ class EventViewModelTest {
         db =
             Room.inMemoryDatabaseBuilder(application, CosplayDatabase::class.java)
                 .allowMainThreadQueries()
-                // Run Room's work inline so a DAO call has finished when it returns.
                 .setQueryExecutor { it.run() }
                 .setTransactionExecutor { it.run() }
                 .build()
@@ -63,7 +62,6 @@ class EventViewModelTest {
     @Test
     fun insertEvent_addsToDatabase() =
         runTest {
-            // Insert a Cosplay first for relation testing
             val cosplayId = db.cosplayDao().insertCosplay(Cosplay(0, true, false, "C1", "S1", Date(), null, null)).toInt()
 
             val event =

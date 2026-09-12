@@ -105,7 +105,6 @@ class ReminderSchedulerTest {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val shadowAlarmManager = Shadows.shadowOf(alarmManager)
 
-        // The PendingIntent uses FLAG_UPDATE_CURRENT, so the last schedule should win
         val lastAlarm = shadowAlarmManager.scheduledAlarms.last()
         assertEquals(time2, lastAlarm.triggerAtTime)
     }

@@ -27,6 +27,10 @@ import com.maeldev.conquest.theme.UIConsts
  * that vanished when false, so "not ready yet" was indistinguishable from a row that had never
  * said anything. A chip is legible in both states: filled with its icon when set, outlined and
  * muted when not.
+ *
+ * Clear [showLabel] where the chip sits beside the row's text rather than below it: two labelled
+ * chips take about 200dp, which on a phone is width the name needs more. The label still reaches
+ * screen readers either way — it is the chip's whole content description.
  */
 @Composable
 fun MyStatusChip(
@@ -34,6 +38,7 @@ fun MyStatusChip(
     icon: ImageVector,
     active: Boolean,
     modifier: Modifier = Modifier,
+    showLabel: Boolean = true,
 ) {
     val container = if (active) MaterialTheme.colorScheme.secondary else Color.Transparent
     val content =
@@ -55,7 +60,7 @@ fun MyStatusChip(
         Row(
             modifier =
                 Modifier.padding(
-                    horizontal = UIConsts.paddingS,
+                    horizontal = if (showLabel) UIConsts.paddingS else UIConsts.chipVerticalPadding,
                     vertical = UIConsts.chipVerticalPadding,
                 ),
             horizontalArrangement =
@@ -67,7 +72,9 @@ fun MyStatusChip(
                 contentDescription = null,
                 modifier = Modifier.size(UIConsts.chipIconSize),
             )
-            Text(text = label, style = MaterialTheme.typography.labelMedium)
+            if (showLabel) {
+                Text(text = label, style = MaterialTheme.typography.labelMedium)
+            }
         }
     }
 }

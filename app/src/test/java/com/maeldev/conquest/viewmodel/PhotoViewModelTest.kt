@@ -35,7 +35,6 @@ class PhotoViewModelTest {
         db =
             Room.inMemoryDatabaseBuilder(application, CosplayDatabase::class.java)
                 .allowMainThreadQueries()
-                // Run Room's work inline so a DAO call has finished when it returns.
                 .setQueryExecutor { it.run() }
                 .setTransactionExecutor { it.run() }
                 .build()
@@ -59,7 +58,6 @@ class PhotoViewModelTest {
             viewModel.addPhoto(cosplayId, "/test/path/photo.jpg")
             org.robolectric.shadows.ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
 
-            // Need to set cosplay ID to collect photos flow, but can just query DAO directly
             val photos = db.cosplayPhotoDao().getPhotosForCosplay(cosplayId).first()
             assertEquals(1, photos.size)
             assertEquals("/test/path/photo.jpg", photos[0].path)

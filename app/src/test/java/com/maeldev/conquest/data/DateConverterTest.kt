@@ -45,11 +45,6 @@ class DateConverterTest {
         assertEquals(EventType.PARTY, converter.stringToEventType("Party"))
     }
 
-    /**
-     * A row holding a name this build does not know — written by hand, or by a later version —
-     * must not throw: the read happens inside Room's query mapping, so an exception here takes
-     * down every screen observing events rather than spoiling the one row.
-     */
     @Test
     fun testStringToEventTypeFallsBackToOtherForUnknownValue() {
         assertEquals(EventType.OTHER, converter.stringToEventType("con"))

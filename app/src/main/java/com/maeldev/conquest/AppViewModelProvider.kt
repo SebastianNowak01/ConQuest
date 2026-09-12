@@ -14,7 +14,6 @@ import com.maeldev.conquest.viewmodel.PhotoViewModel
 import com.maeldev.conquest.viewmodel.ProgressPhotoViewModel
 import com.maeldev.conquest.viewmodel.TaskViewModel
 
-/** Every DAO an export or import touches, gathered from [db]. */
 private fun cosplayDaos(db: CosplayDatabase) =
     CosplayDaos(
         cosplayDao = db.cosplayDao(),

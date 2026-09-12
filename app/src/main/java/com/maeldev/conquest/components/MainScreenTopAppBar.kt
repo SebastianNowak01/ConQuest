@@ -8,7 +8,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -46,7 +45,7 @@ private fun FilterButton(
         contentDescription = "Filter",
     )
 
-    DropdownMenu(
+    MyDropdownMenu(
         expanded = expanded,
         onDismissRequest = { expanded = false },
     ) {
@@ -123,7 +122,7 @@ private fun SortButton(
         contentDescription = "Sort",
     )
 
-    DropdownMenu(
+    MyDropdownMenu(
         expanded = expanded,
         onDismissRequest = { expanded = false },
     ) {

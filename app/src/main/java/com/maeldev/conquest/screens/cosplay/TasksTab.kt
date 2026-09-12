@@ -1,8 +1,9 @@
 package com.maeldev.conquest.screens.cosplay
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.CheckCircle
@@ -78,37 +79,48 @@ fun TasksTab(
                     onLongClick = { task -> selection.select(task.id) },
                 ),
         ) { task ->
-            Text(
-                text = task.taskName,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-
-            task.date?.let { date ->
-                Text(
-                    text = convertDateToString(date),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-
             Row(
-                modifier = Modifier.padding(top = UIConsts.paddingXS),
-                horizontalArrangement = Arrangement.spacedBy(UIConsts.paddingS),
-                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingS),
             ) {
-                MyStatusChip(
-                    label = "Done",
-                    icon = Icons.Default.CheckCircle,
-                    active = task.done,
-                )
-                MyStatusChip(
-                    label = "Reminder",
-                    icon = Icons.Default.Notifications,
-                    active = task.alarm,
-                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = task.taskName,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+
+                    task.date?.let { date ->
+                        Text(
+                            text = convertDateToString(date),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+
+                // Bottom corner, icon only, exactly as an element states Ready and Bought: the
+                // two tabs list the same kind of thing and should not each invent a layout.
+                Row(
+                    modifier = Modifier.align(Alignment.Bottom),
+                    horizontalArrangement = Arrangement.spacedBy(UIConsts.paddingS),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    MyStatusChip(
+                        label = "Done",
+                        icon = Icons.Default.CheckCircle,
+                        active = task.done,
+                        showLabel = false,
+                    )
+                    MyStatusChip(
+                        label = "Reminder",
+                        icon = Icons.Default.Notifications,
+                        active = task.alarm,
+                        showLabel = false,
+                    )
+                }
             }
         }
 

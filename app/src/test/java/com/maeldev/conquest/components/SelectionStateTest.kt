@@ -47,7 +47,6 @@ class SelectionStateTest {
 
     @Test
     fun selectAll_selectsOnlyVisibleItems() {
-        // Mirrors a filtered or searched list: ids 3 and 4 exist but are not on screen.
         val selection = selectionOf(1, 2)
 
         selection.selectAll()
@@ -69,7 +68,6 @@ class SelectionStateTest {
         val selection = selectionOf(1, 2, 3)
         selection.selectAll()
 
-        // Item 2 was deleted, or filtered out by a search.
         selection.onVisibleIdsChanged(setOf(1, 3))
 
         assertEquals(setOf(1, 3), selection.selectedIds)

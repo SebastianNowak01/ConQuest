@@ -35,7 +35,6 @@ class ElementViewModelTest {
         db =
             Room.inMemoryDatabaseBuilder(application, CosplayDatabase::class.java)
                 .allowMainThreadQueries()
-                // Run Room's work inline so a DAO call has finished when it returns.
                 .setQueryExecutor { it.run() }
                 .setTransactionExecutor { it.run() }
                 .build()

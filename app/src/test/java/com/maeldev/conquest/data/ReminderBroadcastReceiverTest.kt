@@ -23,7 +23,6 @@ class ReminderBroadcastReceiverTest {
     @Before
     fun setup() {
         context = ApplicationProvider.getApplicationContext()
-        // Enable notifications
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
         Shadows.shadowOf(nm).setNotificationsEnabled(true)
     }
@@ -52,11 +51,9 @@ class ReminderBroadcastReceiverTest {
         val receiver = ReminderBroadcastReceiver()
         val intent =
             Intent().apply {
-                // No "title" extra
                 putExtra("notification_id", 999)
             }
 
-        // Should not crash even without title
         receiver.onReceive(context, intent)
 
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager

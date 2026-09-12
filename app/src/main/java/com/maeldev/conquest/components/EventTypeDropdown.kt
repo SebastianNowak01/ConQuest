@@ -3,7 +3,6 @@ package com.maeldev.conquest.components
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -57,9 +56,14 @@ fun EventTypeDropdown(
             ),
         )
 
-        DropdownMenu(
+        // The box's own menu, so it takes the width of the anchored field instead of sizing
+        // itself to its longest label and sitting narrow under a full-width field.
+        ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
+            shape = menuShape,
+            containerColor = menuContainerColor,
+            border = menuBorder,
         ) {
             if (allowAllOption) {
                 DropdownMenuItem(

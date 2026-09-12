@@ -44,12 +44,6 @@ class DatePickerConversionTest {
         )
     }
 
-    /**
-     * What Material's picker does with the millis it is handed: it reads them as UTC, shows that
-     * UTC day, and hands back that day's UTC midnight. Routing the round trips through this is
-     * what makes them meaningful — comparing our two functions directly only proves they are
-     * inverses of each other, which a pair of no-ops also satisfies.
-     */
     private fun simulatePicker(millis: Long): Long {
         return Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
             timeInMillis = millis
@@ -60,8 +54,6 @@ class DatePickerConversionTest {
         }.timeInMillis
     }
 
-    // UTC itself, then either side of it, out to the extremes: Kiritimati is UTC+14 and Midway
-    // UTC-11. Warsaw is the zone the off-by-one day was first seen on.
     private val zones =
         listOf(
             "UTC",
@@ -71,7 +63,6 @@ class DatePickerConversionTest {
             "Pacific/Midway",
         )
 
-    /** The bug seen on device: 23:00 in Warsaw is the previous day in UTC. */
     @Test
     fun lateEveningEastOfUtcKeepsItsOwnDay() {
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/Warsaw"))
@@ -83,7 +74,6 @@ class DatePickerConversionTest {
         assertEquals(Triple(2026, Calendar.AUGUST, 6), dayFieldsOf(roundTripped))
     }
 
-    /** The mirror image: UTC midnight is still the previous day in New York. */
     @Test
     fun earlyMorningWestOfUtcKeepsItsOwnDay() {
         TimeZone.setDefault(TimeZone.getTimeZone("America/New_York"))
@@ -114,7 +104,6 @@ class DatePickerConversionTest {
         }
     }
 
-    /** What the picker is handed must be midnight UTC, or it highlights the neighbouring day. */
     @Test
     fun pickerMillisIsUtcMidnight() {
         zones.forEach { zoneId ->
@@ -130,10 +119,6 @@ class DatePickerConversionTest {
         }
     }
 
-    /**
-     * An event happening today has not happened yet. Comparing the stored midnight against the
-     * current instant would call it past from 00:01 onwards.
-     */
     @Test
     fun todayIsNotBeforeToday() {
         zones.forEach { zoneId ->
@@ -170,7 +155,6 @@ class DatePickerConversionTest {
         }
     }
 
-    /** A date the user never touched must survive being loaded and saved unchanged. */
     @Test
     fun conversionsAreInverses() {
         zones.forEach { zoneId ->

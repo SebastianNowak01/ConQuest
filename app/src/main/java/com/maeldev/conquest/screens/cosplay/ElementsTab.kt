@@ -2,10 +2,8 @@ package com.maeldev.conquest.screens.cosplay
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -120,24 +118,25 @@ fun ElementsTab(
                     }
                 }
 
-                // IntrinsicSize.Max sizes the column to the wider chip ("Bought"), and
-                // fillMaxWidth then stretches the narrower one to match it.
-                Column(
-                    modifier = Modifier.width(IntrinsicSize.Max),
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.spacedBy(UIConsts.paddingS),
+                // The pair a task shows under its name, moved into the row's bottom corner:
+                // beside the text rather than below it, the card is the same height whether or
+                // not the element carries a cost, instead of growing a third line for the chips.
+                Row(
+                    modifier = Modifier.align(Alignment.Bottom),
+                    horizontalArrangement = Arrangement.spacedBy(UIConsts.paddingS),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     MyStatusChip(
                         label = "Ready",
                         icon = Icons.Default.CheckCircle,
                         active = element.ready,
-                        modifier = Modifier.fillMaxWidth(),
+                        showLabel = false,
                     )
                     MyStatusChip(
                         label = "Bought",
                         icon = Icons.Default.ShoppingCart,
                         active = element.bought,
-                        modifier = Modifier.fillMaxWidth(),
+                        showLabel = false,
                     )
                 }
             }
