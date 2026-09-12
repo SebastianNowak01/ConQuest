@@ -12,9 +12,9 @@ import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.maeldev.conquest.data.pickerMillisToDate
+import com.maeldev.conquest.data.startOfDay
 import com.maeldev.conquest.data.toPickerMillis
 import com.maeldev.conquest.theme.UIConsts
 import java.text.SimpleDateFormat
@@ -34,7 +35,7 @@ import java.util.Date
 import java.util.Locale
 
 internal fun getCurrentDate(): Date {
-    return Calendar.getInstance().time
+    return Calendar.getInstance().time.startOfDay()
 }
 
 /**
@@ -154,12 +155,13 @@ fun DatePickerFieldToModal(
         shape = RoundedCornerShape(UIConsts.inputCornerRadius),
         interactionSource = interactionSource,
         modifier = Modifier.fillMaxWidth(),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.background,
-            unfocusedContainerColor = MaterialTheme.colorScheme.background,
-            disabledContainerColor = MaterialTheme.colorScheme.background,
-            errorContainerColor = MaterialTheme.colorScheme.background,
-        ),
+        colors =
+            OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                disabledContainerColor = MaterialTheme.colorScheme.background,
+                errorContainerColor = MaterialTheme.colorScheme.background,
+            ),
     )
 
     if (showModal) {

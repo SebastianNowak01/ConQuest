@@ -70,6 +70,7 @@ interface CosplayDao {
             total_time_days = (
                 CASE
                     WHEN COALESCE(
+                        finished_date,
                         (
                             SELECT MAX(date)
                             FROM cosplay_tasks
@@ -81,6 +82,7 @@ interface CosplayDao {
                     ) < initial_date THEN 0
                     ELSE (
                         COALESCE(
+                            finished_date,
                             (
                                 SELECT MAX(date)
                                 FROM cosplay_tasks

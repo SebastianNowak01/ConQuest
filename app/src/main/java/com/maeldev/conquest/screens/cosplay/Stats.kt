@@ -1,6 +1,5 @@
 package com.maeldev.conquest.screens.cosplay
 
-import com.maeldev.conquest.AppViewModelProvider
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,10 +27,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.maeldev.conquest.AppViewModelProvider
+import com.maeldev.conquest.components.MyOuterBox
+import com.maeldev.conquest.data.classes.daysWorked
+import com.maeldev.conquest.theme.UIConsts
 import com.maeldev.conquest.viewmodel.CosplayViewModel
 import com.maeldev.conquest.viewmodel.ProgressPhotoViewModel
-import com.maeldev.conquest.components.MyOuterBox
-import com.maeldev.conquest.theme.UIConsts
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -52,9 +53,10 @@ fun StatsScreen(
 
     MyOuterBox {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(UIConsts.paddingM),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(UIConsts.paddingM),
             verticalArrangement = Arrangement.spacedBy(UIConsts.paddingM),
         ) {
             val currentCosplay = cosplay
@@ -62,16 +64,17 @@ fun StatsScreen(
                 StatCard(
                     icon = Icons.Default.AttachMoney,
                     title = "Total Cost",
-                    value = String.format(
-                        java.util.Locale.getDefault(),
-                        "$%.2f",
-                        currentCosplay.totalSpend,
-                    ),
+                    value =
+                        String.format(
+                            java.util.Locale.getDefault(),
+                            "$%.2f",
+                            currentCosplay.totalSpend,
+                        ),
                 )
                 StatCard(
                     icon = Icons.Default.Schedule,
                     title = "Total Days Worked",
-                    value = currentCosplay.totalTimeDays.toString(),
+                    value = currentCosplay.daysWorked().toString(),
                 )
                 StatCard(
                     icon = Icons.Default.Event,
@@ -102,20 +105,23 @@ fun StatCard(
     val shape = RoundedCornerShape(UIConsts.cornerRadiusL)
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(UIConsts.strokeThin, MaterialTheme.colorScheme.outline, shape),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.background,
-        ),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .border(UIConsts.strokeThin, MaterialTheme.colorScheme.outline, shape),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.background,
+            ),
         elevation = CardDefaults.cardElevation(defaultElevation = UIConsts.elevationS),
         shape = shape,
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(UIConsts.paddingM),
-            verticalAlignment = Alignment.CenterVertically
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(UIConsts.paddingM),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 imageVector = icon,
@@ -123,7 +129,7 @@ fun StatCard(
                 // Not the secondary green: as a bare tint rather than a filled container it is
                 // too dark against this background to read.
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(end = UIConsts.paddingM)
+                modifier = Modifier.padding(end = UIConsts.paddingM),
             )
             Column {
                 Text(

@@ -23,5 +23,6 @@ data class Cosplay(
     @ColumnInfo(name = "events_count") val eventsCount: Int = 0,
     @ColumnInfo(name = "total_spend") val totalSpend: Double = 0.0,
     @ColumnInfo(name = "total_time_days") val totalTimeDays: Long = 0L,
+    @ColumnInfo(name = "finished_date") val finishedDate: Date? = null,
     @ColumnInfo(name = "cosplay_photo_path") val cosplayPhotoPath: String? = null,
 )

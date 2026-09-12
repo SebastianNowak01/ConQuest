@@ -51,6 +51,20 @@ fun pickerMillisToDate(millis: Long): Date {
     }.time
 }
 
+/** Midnight, local time, on the calendar day this date falls on. */
+fun Date.startOfDay(): Date = pickerMillisToDate(toPickerMillis())
+
+/**
+ * Whole calendar days from this date to [other]; negative when [other] is the earlier one.
+ *
+ * Counted over the UTC-normalised calendar days [toPickerMillis] produces rather than by
+ * subtracting the two instants: a plain millisecond difference divided by a day silently loses a
+ * day whenever one side carries a time of day, and drifts again across a DST boundary.
+ */
+fun Date.daysUntil(other: Date): Long = (other.toPickerMillis() - toPickerMillis()) / MILLIS_PER_DAY
+
+private const val MILLIS_PER_DAY = 86_400_000L
+
 /**
  * True when this date falls on a day before today.
  *

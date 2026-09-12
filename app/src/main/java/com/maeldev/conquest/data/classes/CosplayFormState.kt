@@ -43,6 +43,7 @@ data class CosplayFormState(
             initialDate = requireNotNull(initialDate) { "Initial date required" },
             dueDate = dueDate,
             budget = budgetAmount,
+            finishedDate = finishedDateFor(current = null),
             cosplayPhotoPath = cosplayPhotoPath.ifBlank { null },
         )
     }
@@ -59,7 +60,21 @@ data class CosplayFormState(
             initialDate = requireNotNull(initialDate) { "Initial date required" },
             dueDate = dueDate,
             budget = budgetAmount,
+            finishedDate = finishedDateFor(current),
             cosplayPhotoPath = cosplayPhotoPath.ifBlank { null },
         )
     }
+
+    /**
+     * The day this cosplay was finished, stamped the first time the form saves it as Done.
+     *
+     * An existing stamp is never re-dated: editing a finished cosplay's budget a year later must
+     * not move the day it was completed. Leaving Done clears it, so a reopened cosplay starts
+     * counting again instead of keeping a stale end date.
+     */
+    private fun finishedDateFor(current: Cosplay?): Date? =
+        when {
+            status != CosplayStatus.Done -> null
+            else -> current?.finishedDate ?: getCurrentDate()
+        }
 }
