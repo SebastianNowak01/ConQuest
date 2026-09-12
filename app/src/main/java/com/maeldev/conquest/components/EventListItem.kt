@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Event
@@ -14,7 +13,6 @@ import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,48 +21,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.maeldev.conquest.data.entity.Event
-import com.maeldev.conquest.data.entity.EventType
 import com.maeldev.conquest.data.isBeforeToday
 import com.maeldev.conquest.theme.UIConsts
-import java.util.Date
-
-@Composable
-fun EventsFilters(
-    selectedType: EventType?,
-    selectedDate: Date?,
-    onTypeSelected: (EventType?) -> Unit,
-    onDateSelected: (Date?) -> Unit,
-    onClearFilters: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .padding(horizontal = UIConsts.screenHorizontalPadding),
-    ) {
-        MyHeaderText(text = "Events")
-
-        EventTypeDropdown(
-            selectedType = selectedType,
-            onTypeSelected = onTypeSelected,
-            label = "Filter by Type",
-            allowAllOption = true,
-        )
-
-        DatePickerFieldToModal(
-            label = "Filter by Date",
-            selectedDate = selectedDate,
-            onDateSelected = onDateSelected,
-        )
-
-        if (selectedType != null || selectedDate != null) {
-            TextButton(onClick = onClearFilters) {
-                Text(text = "Clear Filters")
-            }
-        }
-    }
-}
 
 @Composable
 fun EventListItem(event: Event) {
@@ -118,9 +76,6 @@ fun EventListItem(event: Event) {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Bottom corner like a cosplay's status, but labelled where that one is not: every
-            // type draws the same LocalActivity icon, so the word is what separates Expo from
-            // Contest.
             MyStatusChip(
                 label = event.eventType.displayName,
                 icon = Icons.Default.LocalActivity,
