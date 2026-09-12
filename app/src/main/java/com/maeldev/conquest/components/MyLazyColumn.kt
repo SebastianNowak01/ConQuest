@@ -29,8 +29,8 @@ data class MyListStyle(
     // The floating buttons sit over the end of the list, so leave room to scroll clear of them.
     val contentPadding: PaddingValues =
         PaddingValues(
-            start = UIConsts.paddingM,
-            end = UIConsts.paddingM,
+            start = UIConsts.screenHorizontalPadding,
+            end = UIConsts.screenHorizontalPadding,
             top = UIConsts.paddingM,
             bottom = UIConsts.listBottomInset,
         ),

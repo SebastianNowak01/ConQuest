@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import com.maeldev.conquest.theme.UIConsts
 
 private const val SINGLE_LINE_MAX_LINES = 1
 private const val MULTI_LINE_MAX_LINES = 6
@@ -28,7 +28,7 @@ data class InputFieldOptions(
     /** Defaults to 1 for single-line fields and 6 otherwise. */
     val maxLines: Int? = null,
     val height: Dp? = null,
-    val shape: RoundedCornerShape = RoundedCornerShape(20.dp),
+    val shape: RoundedCornerShape = RoundedCornerShape(UIConsts.inputCornerRadius),
     val keyboardType: KeyboardType? = null,
     val filterDecimal: Boolean = false,
 ) {

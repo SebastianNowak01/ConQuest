@@ -39,7 +39,7 @@ fun EventsFilters(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = UIConsts.paddingM),
+            .padding(horizontal = UIConsts.screenHorizontalPadding),
     ) {
         MyHeaderText(text = "Events")
 

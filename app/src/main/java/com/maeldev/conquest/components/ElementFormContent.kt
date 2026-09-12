@@ -88,7 +88,6 @@ fun ElementFormContent(
                 options =
                     InputFieldOptions(
                         singleLine = true,
-                        shape = RoundedCornerShape(UIConsts.cornerRadiusL),
                     ),
                 error =
                     FieldError(
@@ -104,7 +103,6 @@ fun ElementFormContent(
                 options =
                     InputFieldOptions(
                         singleLine = true,
-                        shape = RoundedCornerShape(UIConsts.cornerRadiusL),
                         filterDecimal = true,
                     ),
             )

@@ -88,7 +88,7 @@ fun PhotosTab(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .padding(horizontal = UIConsts.paddingM)
+                    .padding(horizontal = UIConsts.screenHorizontalPadding)
                     .padding(top = UIConsts.paddingM)
                     .padding(bottom = UIConsts.paddingL * 4),
         ) {

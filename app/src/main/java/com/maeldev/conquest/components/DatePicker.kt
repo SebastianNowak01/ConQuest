@@ -25,9 +25,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.dp
 import com.maeldev.conquest.data.pickerMillisToDate
 import com.maeldev.conquest.data.toPickerMillis
+import com.maeldev.conquest.theme.UIConsts
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -95,7 +95,7 @@ fun DatePickerFieldToModal(
         isError = isError,
         supportingText = errorSupportingText(isError, errorMessage),
         trailingIcon = trailing,
-        shape = RoundedCornerShape(32.dp),
+        shape = RoundedCornerShape(UIConsts.inputCornerRadius),
         modifier = Modifier
             .fillMaxWidth()
             .pointerInput(canClear) {

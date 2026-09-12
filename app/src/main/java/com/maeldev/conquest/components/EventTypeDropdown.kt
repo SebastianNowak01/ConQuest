@@ -1,5 +1,7 @@
 package com.maeldev.conquest.components
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -17,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.maeldev.conquest.data.entity.EventType
+import com.maeldev.conquest.theme.UIConsts
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +35,9 @@ fun EventTypeDropdown(
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
-        modifier = modifier,
+        // Full width like every other field: sized to its content the dropdown sat visibly
+        // narrower than the inputs stacked above and below it.
+        modifier = modifier.fillMaxWidth(),
     ) {
         OutlinedTextField(
             value = selectedType?.displayName ?: "All",
@@ -40,7 +45,9 @@ fun EventTypeDropdown(
             readOnly = true,
             label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            shape = RoundedCornerShape(UIConsts.inputCornerRadius),
             modifier = Modifier
+                .fillMaxWidth()
                 .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.background,
@@ -83,6 +90,7 @@ val EventType.displayName: String
         EventType.CONTEST -> "Contest"
         EventType.MEETING -> "Meeting"
         EventType.PARTY -> "Party"
+        EventType.OTHER -> "Other"
     }
 
 

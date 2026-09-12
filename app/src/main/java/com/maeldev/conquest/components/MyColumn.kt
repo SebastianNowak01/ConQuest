@@ -31,8 +31,8 @@ fun BoxScope.MyColumn(content: @Composable () -> Unit) {
             .verticalScroll(scrollState)
             .imePadding()
             .padding(
-                start = UIConsts.paddingM,
-                end = UIConsts.paddingM,
+                start = UIConsts.screenHorizontalPadding,
+                end = UIConsts.screenHorizontalPadding,
                 bottom = UIConsts.formBottomInset,
             ),
         verticalArrangement = Arrangement.spacedBy(UIConsts.columnVerticalSpacing),

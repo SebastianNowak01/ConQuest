@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
@@ -22,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
@@ -88,6 +88,7 @@ fun MyImageBox(
                 icon = Icons.Default.Edit,
                 contentDescription = if (hasPhoto) "Change image" else config.emptyContentDescription,
                 onClick = onClick,
+                shape = config.badgeShape,
                 modifier = Modifier.align(Alignment.BottomEnd),
             )
         }
@@ -97,6 +98,7 @@ fun MyImageBox(
                 icon = Icons.Default.Close,
                 contentDescription = "Remove image",
                 onClick = onClear,
+                shape = config.badgeShape,
                 modifier = Modifier.align(Alignment.TopEnd),
             )
         }
@@ -111,20 +113,25 @@ fun MyImageBox(
     }
 }
 
+/**
+ * Badge on the corner of a [MyImageBox]. It takes [MyImageBoxConfig.badgeShape] so it reads as part
+ * of the image rather than a circle stuck onto a soft-square.
+ */
 @Composable
 private fun MyImageBoxBadge(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     contentDescription: String,
     onClick: () -> Unit,
+    shape: Shape,
     modifier: Modifier = Modifier,
 ) {
     Surface(
         modifier =
             modifier
                 .size(UIConsts.imageBadgeSize)
-                .clip(CircleShape)
+                .clip(shape)
                 .clickable(onClick = onClick),
-        shape = CircleShape,
+        shape = shape,
         color = MaterialTheme.colorScheme.secondary,
         contentColor = MaterialTheme.colorScheme.primary,
     ) {

@@ -79,8 +79,19 @@ class DateConverter {
         return eventType?.name
     }
 
+    /**
+     * Reads a stored event type, tolerating anything this build does not recognise.
+     *
+     * `valueOf` throws on an unknown name, and because the read happens inside Room's query
+     * mapping that exception takes down every screen observing events — one unreadable row and
+     * the Events list is unreachable. A row written by a future build, or edited by hand, is
+     * therefore read as [EventType.OTHER] rather than as a crash. The comparison is
+     * case-insensitive because only the casing of a name, not its meaning, varies.
+     */
     @TypeConverter
     fun stringToEventType(value: String?): EventType? {
-        return value?.let { EventType.valueOf(it) }
+        if (value == null) return null
+        return EventType.entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
+            ?: EventType.OTHER
     }
 }

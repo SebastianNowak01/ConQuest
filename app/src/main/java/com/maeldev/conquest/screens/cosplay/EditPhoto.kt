@@ -150,7 +150,6 @@ fun EditPhoto(
                         singleLine = false,
                         maxLines = 6,
                         height = UIConsts.heightM,
-                        shape = RoundedCornerShape(UIConsts.cornerRadiusM),
                     ),
             )
         }

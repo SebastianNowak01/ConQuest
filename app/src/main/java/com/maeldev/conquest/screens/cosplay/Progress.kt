@@ -114,7 +114,7 @@ fun ProgressScreen(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .padding(horizontal = UIConsts.paddingM)
+                    .padding(horizontal = UIConsts.screenHorizontalPadding)
                     .padding(bottom = UIConsts.paddingL * 4),
         ) {
             if (error.isNotEmpty()) {

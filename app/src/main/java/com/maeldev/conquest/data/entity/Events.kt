@@ -19,11 +19,18 @@ data class Event(
     @ColumnInfo(name = "alarm") val alarm: Boolean = false,
 )
 
+/**
+ * Kind of event, stored by name in `events.event_type`.
+ *
+ * [OTHER] is also the landing place for a stored value this build cannot read — see
+ * [com.maeldev.conquest.data.DateConverter.stringToEventType]. Keep it last so the picker offers
+ * the real kinds first.
+ */
 enum class EventType {
     EXPO,
     CONVENTION,
     CONTEST,
     MEETING,
     PARTY,
+    OTHER,
 }
-

@@ -10,10 +10,11 @@ object UIConsts {
     val paddingS = 8.dp
     val paddingM = 16.dp
     val paddingL = 24.dp
-
+    val cornerRadiusS = 8.dp
     val cornerRadiusM = 16.dp
     val cornerRadiusL = 32.dp
 
+    val inputCornerRadius = cornerRadiusL
     val strokeThin = 1.dp
     val elevationS = 4.dp
 
@@ -35,11 +36,6 @@ object UIConsts {
 
     val placeholderHeightL = 200.dp
 
-    /**
-     * Room reserved at the bottom of a form or list for the floating action buttons over it:
-     * the 56dp FAB plus the row's own padding and the navigation bar inset, with room to spare
-     * so the last field is not left sitting under the Save button.
-     */
     val formBottomInset = 144.dp
     val listBottomInset = 144.dp
 
@@ -49,12 +45,12 @@ object UIConsts {
 
     val letterSpacingS = 1.5.sp
 
-    const val columnWidthFraction = 0.9f
+    const val columnWidthFraction = 0.94f
 
-    /** Clears the Save/Cancel FAB row so a snackbar sits just above it, not over the form. */
     val snackbarHostVerticalOffset = 88.dp
     const val fabCornerRadius = 50
 
+    val screenHorizontalPadding = 10.dp
     val searchBarVerticalPadding = 6.dp
     val columnVerticalSpacing = 20.dp
 }

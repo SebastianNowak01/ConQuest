@@ -17,6 +17,10 @@ import com.maeldev.conquest.data.classes.CosplayStatus
  * All three states are on screen at once, so the control shows what the alternatives are and
  * which one is set. The switch this replaced could only say two of the three, and relabelled
  * itself as it was toggled — the label was the value rather than the question being asked.
+ *
+ * Selection is carried by the active container and content colours alone. The default checkmark is
+ * suppressed with an empty `icon` because Material reserves its slot in *every* segment, and on a
+ * phone that width is what pushed "In Progress" onto a second line.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,8 +46,13 @@ fun MyStatusSegmentedRow(
                         inactiveContainerColor = MaterialTheme.colorScheme.background,
                         inactiveContentColor = MaterialTheme.colorScheme.primary,
                     ),
+                icon = {},
             ) {
-                Text(text = status.label)
+                Text(
+                    text = status.label,
+                    style = MaterialTheme.typography.labelMedium,
+                    maxLines = 1,
+                )
             }
         }
     }

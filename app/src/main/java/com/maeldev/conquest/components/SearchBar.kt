@@ -18,12 +18,12 @@ fun SearchBar(
         onValueChange = onValueChange,
         placeholder = { Text("Search", fontSize = UIConsts.fontSizeMedium) },
         modifier = Modifier.padding(
-            start = UIConsts.paddingM,
-            end = UIConsts.paddingM,
+            start = UIConsts.screenHorizontalPadding,
+            end = UIConsts.screenHorizontalPadding,
             top = UIConsts.searchBarVerticalPadding,
             bottom = UIConsts.searchBarVerticalPadding,
         ),
-        shape = RoundedCornerShape(UIConsts.cornerRadiusL),
+        shape = RoundedCornerShape(UIConsts.inputCornerRadius),
         singleLine = true,
         colors = topAppBarTextFieldColorsObject(),
         textStyle = TextStyle(fontSize = UIConsts.fontSizeMedium)

@@ -8,8 +8,11 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  * went straight from 12 to 14, so one migration covers the whole gap. Builds handed out before
  * August 2026 sit at 12, and without this they crash on first database access rather than upgrading.
  */
+private const val SCHEMA_VERSION_12 = 12
+private const val SCHEMA_VERSION_14 = 14
+
 val MIGRATION_12_14 =
-    object : Migration(12, 14) {
+    object : Migration(SCHEMA_VERSION_12, SCHEMA_VERSION_14) {
         override fun migrate(db: SupportSQLiteDatabase) {
             db.execSQL("ALTER TABLE events ADD COLUMN alarm INTEGER NOT NULL DEFAULT 0")
         }
