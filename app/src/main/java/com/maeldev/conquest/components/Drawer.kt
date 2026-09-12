@@ -33,81 +33,98 @@ import com.maeldev.conquest.screens.cosplay.Stats
 import com.maeldev.conquest.theme.UIConsts
 import kotlinx.coroutines.launch
 
-val routes = listOf(
-    MainScreen,
-    SettingsScreenParams,
-    Events,
-)
+val routes =
+    listOf(
+        MainScreen,
+        SettingsScreenParams,
+        Events,
+    )
 
-val noDrawerRoutes = listOf(
-    "com.maeldev.conquest.screens.cosplay.NewCosplay",
-    "com.maeldev.conquest.screens.cosplay.NewEvent",
-    "com.maeldev.conquest.screens.cosplay.EditEvent/{eventId}",
-    "com.maeldev.conquest.screens.cosplay.EditProgressPhoto/{photoId}/{cosplayId}",
-    "com.maeldev.conquest.screens.cosplay.NewElement/{cosplayId}",
-    "com.maeldev.conquest.screens.cosplay.NewTask/{cosplayId}",
-    "com.maeldev.conquest.screens.cosplay.EditElement/{elementId}",
-    "com.maeldev.conquest.screens.cosplay.EditTask/{taskId}",
-    "com.maeldev.conquest.screens.cosplay.EditPhoto/{photoId}",
-    "com.maeldev.conquest.screens.cosplay.EditCosplay/{cosplayId}",
-)
+val noDrawerRoutes =
+    listOf(
+        "com.maeldev.conquest.screens.ExportSelectionScreen",
+        "com.maeldev.conquest.screens.cosplay.NewCosplay",
+        "com.maeldev.conquest.screens.cosplay.NewEvent",
+        "com.maeldev.conquest.screens.cosplay.EditEvent/{eventId}",
+        "com.maeldev.conquest.screens.cosplay.EditProgressPhoto/{photoId}/{cosplayId}",
+        "com.maeldev.conquest.screens.cosplay.NewElement/{cosplayId}",
+        "com.maeldev.conquest.screens.cosplay.NewTask/{cosplayId}",
+        "com.maeldev.conquest.screens.cosplay.EditElement/{elementId}",
+        "com.maeldev.conquest.screens.cosplay.EditTask/{taskId}",
+        "com.maeldev.conquest.screens.cosplay.EditPhoto/{photoId}",
+        "com.maeldev.conquest.screens.cosplay.EditCosplay/{cosplayId}",
+    )
 
 @Composable
 fun Drawer(
-    navController: NavHostController, drawerState: DrawerState, content: @Composable () -> Unit
+    navController: NavHostController,
+    drawerState: DrawerState,
+    content: @Composable () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val arguments = navBackStackEntry?.arguments
-    val currentCosplayId = if (arguments?.containsKey("uid") == true) {
-        arguments.getInt("uid")
-    } else if (arguments?.containsKey("cosplayId") == true) {
-        arguments.getInt("cosplayId")
-    } else {
-        null
-    }
-    val isInCosplayTabs = currentRoute?.startsWith("com.maeldev.conquest.screens.cosplay.MainCosplayScreen") == true ||
+    val currentCosplayId =
+        if (arguments?.containsKey("uid") == true) {
+            arguments.getInt("uid")
+        } else if (arguments?.containsKey("cosplayId") == true) {
+            arguments.getInt("cosplayId")
+        } else {
+            null
+        }
+    val isInCosplayTabs =
+        currentRoute?.startsWith("com.maeldev.conquest.screens.cosplay.MainCosplayScreen") == true ||
             currentRoute?.startsWith("com.maeldev.conquest.screens.cosplay.Progress") == true ||
             currentRoute?.startsWith("com.maeldev.conquest.screens.cosplay.Stats") == true
 
-    val drawerItems = if (isInCosplayTabs && currentCosplayId != null) {
-        navigationItems + progressNavigationItem + statsNavigationItem
-    } else {
-        navigationItems
-    }
-    val drawerRoutes = if (isInCosplayTabs && currentCosplayId != null) {
-        routes + Progress(currentCosplayId) + Stats(
-            currentCosplayId
-        )
-    } else {
-        routes
-    }
+    val drawerItems =
+        if (isInCosplayTabs && currentCosplayId != null) {
+            navigationItems + progressNavigationItem + statsNavigationItem
+        } else {
+            navigationItems
+        }
+    val drawerRoutes =
+        if (isInCosplayTabs && currentCosplayId != null) {
+            routes + Progress(currentCosplayId) +
+                Stats(
+                    currentCosplayId,
+                )
+        } else {
+            routes
+        }
 
-    val selectedItemIndex = drawerRoutes.indexOfFirst { route ->
-        currentRoute?.startsWith(route::class.qualifiedName ?: "") == true
-    }.takeIf { it >= 0 } ?: 0
+    val selectedItemIndex =
+        drawerRoutes.indexOfFirst { route ->
+            currentRoute?.startsWith(route::class.qualifiedName ?: "") == true
+        }.takeIf { it >= 0 } ?: 0
 
     ModalNavigationDrawer(
-        drawerState = drawerState, drawerContent = {
+        drawerState = drawerState,
+        drawerContent = {
             ModalDrawerSheet(
-                drawerContainerColor = MaterialTheme.colorScheme.background
+                drawerContainerColor = MaterialTheme.colorScheme.background,
             ) {
-                Spacer(modifier = Modifier.height(
-                    UIConsts.paddingM))
+                Spacer(
+                    modifier =
+                        Modifier.height(
+                            UIConsts.paddingM,
+                        ),
+                )
                 Text(
                     text = "ConQuest",
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(
-                        horizontal = UIConsts.paddingL,
-                        vertical = UIConsts.paddingS,
-                    )
+                    modifier =
+                        Modifier.padding(
+                            horizontal = UIConsts.paddingL,
+                            vertical = UIConsts.paddingS,
+                        ),
                 )
                 HorizontalDivider(
                     thickness = UIConsts.strokeThin,
                     color = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.padding(bottom = UIConsts.paddingS)
+                    modifier = Modifier.padding(bottom = UIConsts.paddingS),
                 )
                 drawerItems.forEachIndexed { index, item ->
                     NavigationDrawerItem(
@@ -120,15 +137,16 @@ fun Drawer(
                         icon = {
                             Icon(
                                 imageVector = if (index == selectedItemIndex) item.selectedIcon else item.unselectedIcon,
-                                contentDescription = item.title
+                                contentDescription = item.title,
                             )
                         },
                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-                        colors = navigationDrawerItemColorsObject()
+                        colors = navigationDrawerItemColorsObject(),
                     )
                 }
             }
-        }) {
+        },
+    ) {
         content()
     }
 }
@@ -139,7 +157,7 @@ fun topAppBarColorsObject(): TopAppBarColors {
     return TopAppBarDefaults.topAppBarColors(
         containerColor = MaterialTheme.colorScheme.background,
         titleContentColor = MaterialTheme.colorScheme.primary,
-        navigationIconContentColor = MaterialTheme.colorScheme.primary
+        navigationIconContentColor = MaterialTheme.colorScheme.primary,
     )
 }
 
@@ -154,7 +172,7 @@ fun topAppBarTextFieldColorsObject(): TextFieldColors {
         focusedIndicatorColor = Color.Transparent,
         unfocusedIndicatorColor = Color.Transparent,
         disabledIndicatorColor = Color.Transparent,
-        errorIndicatorColor = Color.Transparent
+        errorIndicatorColor = Color.Transparent,
     )
 }
 

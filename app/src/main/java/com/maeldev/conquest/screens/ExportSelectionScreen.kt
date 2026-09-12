@@ -3,17 +3,11 @@ package com.maeldev.conquest.screens
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.TheaterComedy
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -25,17 +19,19 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.maeldev.conquest.AppViewModelProvider
+import com.maeldev.conquest.components.MyBackFab
 import com.maeldev.conquest.components.MyCosplayRow
 import com.maeldev.conquest.components.MyEmptyState
 import com.maeldev.conquest.components.MyExportSelectionModeFabs
-import com.maeldev.conquest.components.MyIcon
+import com.maeldev.conquest.components.MyHeaderText
 import com.maeldev.conquest.components.MyLazyColumn
 import com.maeldev.conquest.components.MyListItemActions
+import com.maeldev.conquest.components.MyLoadingOverlay
 import com.maeldev.conquest.components.MyOuterBox
+import com.maeldev.conquest.components.MySelectionCountLabel
 import com.maeldev.conquest.components.MySnackbarHost
 import com.maeldev.conquest.components.rememberSelectionState
 import com.maeldev.conquest.data.entity.Cosplay
-import com.maeldev.conquest.theme.UIConsts
 import com.maeldev.conquest.viewmodel.CosplayViewModel
 import com.maeldev.conquest.viewmodel.ExportImportState
 import com.maeldev.conquest.viewmodel.ExportImportViewModel
@@ -48,7 +44,6 @@ import java.util.Locale
 @Serializable
 object ExportSelectionScreen
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExportSelectionScreen(navController: NavController) {
     val cosplayViewModel: CosplayViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -86,78 +81,56 @@ fun ExportSelectionScreen(navController: NavController) {
             }
         }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                expandedHeight = UIConsts.topAppBarHeight,
-                title = { Text("Select Cosplays to Export") },
-                navigationIcon = {
-                    MyIcon(
-                        onClick = { navController.popBackStack() },
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                    )
+    MyOuterBox {
+        Column(modifier = Modifier.fillMaxSize()) {
+            MyHeaderText(text = "Export Cosplays")
+
+            // The list gets its own Box so the count pill can anchor to the top of the list the
+            // way it does on the drawer screens, where the app bar occupies this header's band.
+            Box(modifier = Modifier.weight(1f)) {
+                MyLazyColumn(
+                    items = cosplays,
+                    key = { it.uid },
+                    actions =
+                        MyListItemActions(
+                            isSelected = { selection.isSelected(it.uid) },
+                            // Unlike the other lists a plain tap selects here, since this screen
+                            // exists only to pick cosplays for export.
+                            onClick = { cosplay -> selection.toggle(cosplay.uid) },
+                            onLongClick = { cosplay -> selection.select(cosplay.uid) },
+                        ),
+                ) { cosplay ->
+                    MyCosplayRow(cosplay = cosplay)
+                }
+
+                MySelectionCountLabel(selection = selection, itemLabelSingular = "cosplay")
+            }
+        }
+
+        if (cosplays.isEmpty()) {
+            MyEmptyState(
+                icon = Icons.Default.TheaterComedy,
+                title = "Nothing to export",
+                hint = "Cosplays you create will show here, ready to pick.",
+                modifier = Modifier.align(Alignment.Center),
+            )
+        }
+
+        if (selection.isActive) {
+            MyExportSelectionModeFabs(
+                selection = selection,
+                onExportSelection = {
+                    createDocumentLauncher.launch(exportFileName(cosplays, selection.selectedIds))
                 },
             )
-        },
-    ) { paddingValues ->
-        MyOuterBox(modifier = Modifier.padding(paddingValues)) {
-            if (selection.isActive) {
-                MyExportSelectionModeFabs(
-                    selection = selection,
-                    onExportSelection = {
-                        createDocumentLauncher.launch(exportFileName(cosplays, selection.selectedIds))
-                    },
-                )
-            }
-
-            MyLazyColumn(
-                items = cosplays,
-                key = { it.uid },
-                actions =
-                    MyListItemActions(
-                        isSelected = { selection.isSelected(it.uid) },
-                        // Unlike the other lists a plain tap selects here, since this screen exists
-                        // only to pick cosplays for export.
-                        onClick = { cosplay -> selection.toggle(cosplay.uid) },
-                        onLongClick = { cosplay -> selection.select(cosplay.uid) },
-                    ),
-            ) { cosplay ->
-                SelectableCosplayRow(
-                    cosplay = cosplay,
-                    checked = selection.isSelected(cosplay.uid),
-                    onToggle = { selection.toggle(cosplay.uid) },
-                )
-            }
-
-            if (cosplays.isEmpty()) {
-                MyEmptyState(
-                    icon = Icons.Default.TheaterComedy,
-                    title = "Nothing to export",
-                    hint = "Cosplays you create will show here, ready to pick.",
-                    modifier = Modifier.align(Alignment.Center),
-                )
-            }
-
-            MySnackbarHost(hostState = snackbarHostState)
+        } else {
+            MyBackFab(onClick = { navController.popBackStack() })
         }
-    }
-}
 
-/**
- * Unlike every other list in the app a plain tap selects here, so each row shows a checkbox —
- * otherwise nothing on screen says what tapping will do.
- */
-@Composable
-private fun SelectableCosplayRow(
-    cosplay: Cosplay,
-    checked: Boolean,
-    onToggle: () -> Unit,
-) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Checkbox(checked = checked, onCheckedChange = { onToggle() })
-        Box(modifier = Modifier.weight(1f)) {
-            MyCosplayRow(cosplay = cosplay)
+        MySnackbarHost(hostState = snackbarHostState)
+
+        if (exportState is ExportImportState.Loading) {
+            MyLoadingOverlay(label = "Exporting")
         }
     }
 }

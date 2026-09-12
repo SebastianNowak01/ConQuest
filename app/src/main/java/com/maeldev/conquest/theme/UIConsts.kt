@@ -56,4 +56,6 @@ object UIConsts {
     val tabHeight = 56.dp
     val topAppBarHeight = 80.dp
     val topAppBarIconSize = 24.dp
+
+    val loadingIndicatorSize = 48.dp
 }

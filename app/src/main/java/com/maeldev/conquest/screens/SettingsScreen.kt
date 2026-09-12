@@ -73,11 +73,12 @@ fun SettingsScreen(navController: NavController) {
     var expanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(importState) {
-        val message = when (val state = importState) {
-            is ExportImportState.Success -> "Cosplays imported"
-            is ExportImportState.Error -> "Import failed: ${state.message}"
-            else -> null
-        } ?: return@LaunchedEffect
+        val message =
+            when (val state = importState) {
+                is ExportImportState.Success -> "Cosplays imported"
+                is ExportImportState.Error -> "Import failed: ${state.message}"
+                else -> null
+            } ?: return@LaunchedEffect
 
         exportImportViewModel.resetState()
         coroutineScope.launch { snackbarHostState.showSnackbar(message) }
@@ -85,9 +86,10 @@ fun SettingsScreen(navController: NavController) {
 
     MyOuterBox {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = UIConsts.paddingL),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(top = UIConsts.paddingL),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -103,17 +105,19 @@ fun SettingsScreen(navController: NavController) {
                     readOnly = true,
                     label = { Text("Theme") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier
-                        .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true)
-                        .fillMaxWidth(0.9f),
+                    modifier =
+                        Modifier
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true)
+                            .fillMaxWidth(0.9f),
                     shape = RoundedCornerShape(UIConsts.cornerRadiusL),
                     textStyle = MaterialTheme.typography.bodyLarge,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = MaterialTheme.colorScheme.background,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                        disabledContainerColor = MaterialTheme.colorScheme.background,
-                        errorContainerColor = MaterialTheme.colorScheme.background,
-                    ),
+                    colors =
+                        OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.background,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                            disabledContainerColor = MaterialTheme.colorScheme.background,
+                            errorContainerColor = MaterialTheme.colorScheme.background,
+                        ),
                 )
                 ExposedDropdownMenu(
                     expanded = expanded,
@@ -135,31 +139,32 @@ fun SettingsScreen(navController: NavController) {
                     }
                 }
             }
-            
+
             Spacer(modifier = Modifier.padding(UIConsts.paddingM))
 
             MySettingsSectionLabel(text = "Your data")
 
-            val openDocumentLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.OpenDocument()
-            ) { uri ->
-                if (uri != null) {
-                    exportImportViewModel.importCosplays(uri)
+            val openDocumentLauncher =
+                rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.OpenDocument(),
+                ) { uri ->
+                    if (uri != null) {
+                        exportImportViewModel.importCosplays(uri)
+                    }
                 }
-            }
 
             MyButton(
                 text = "Export Cosplays",
-                onClick = { navController.navigate(ExportSelectionScreen) }
+                onClick = { navController.navigate(ExportSelectionScreen) },
             )
 
             Spacer(modifier = Modifier.padding(UIConsts.paddingS))
 
             MyButton(
                 text = "Import Cosplays",
-                onClick = { openDocumentLauncher.launch(arrayOf("application/zip")) }
+                onClick = { openDocumentLauncher.launch(arrayOf("application/zip")) },
             )
-            
+
             if (importState is ExportImportState.Loading) {
                 Spacer(modifier = Modifier.padding(UIConsts.paddingS))
                 CircularProgressIndicator()
@@ -187,15 +192,19 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "se
 
 val DARK_MODE_KEY = stringPreferencesKey("dark_mode_option")
 
-suspend fun setDarkModeOption(context: Context, option: String) {
+suspend fun setDarkModeOption(
+    context: Context,
+    option: String,
+) {
     context.dataStore.edit { prefs ->
         prefs[DARK_MODE_KEY] = option
     }
 }
 
-fun getDarkModeOption(context: Context): Flow<String> = context.dataStore.data.map { prefs ->
-    prefs[DARK_MODE_KEY] ?: "automatic"
-}
+fun getDarkModeOption(context: Context): Flow<String> =
+    context.dataStore.data.map { prefs ->
+        prefs[DARK_MODE_KEY] ?: "automatic"
+    }
 
 @Composable
 fun rememberThemePreference(context: Context): State<String> {

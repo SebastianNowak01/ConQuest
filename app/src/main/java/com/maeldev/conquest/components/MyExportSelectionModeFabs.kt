@@ -15,7 +15,10 @@ import androidx.compose.ui.zIndex
 import com.maeldev.conquest.theme.UIConsts
 
 @Composable
-private fun MyExitSelectionFabButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun MyExitSelectionFabButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     MyFab(
         onClick = onClick,
         modifier = modifier,
@@ -27,7 +30,10 @@ private fun MyExitSelectionFabButton(onClick: () -> Unit, modifier: Modifier = M
 }
 
 @Composable
-private fun MyExportSelectionFabButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun MyExportSelectionFabButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     MyFab(
         onClick = onClick,
         modifier = modifier,
@@ -39,7 +45,10 @@ private fun MyExportSelectionFabButton(onClick: () -> Unit, modifier: Modifier =
 }
 
 @Composable
-private fun MySelectAllFabButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun MySelectAllFabButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     MyFab(
         onClick = onClick,
         modifier = modifier,
@@ -50,15 +59,17 @@ private fun MySelectAllFabButton(onClick: () -> Unit, modifier: Modifier = Modif
     )
 }
 
+/** The [MySelectionModeFabs] row, with export in place of delete. */
 @Composable
 fun BoxScope.MyExportSelectionModeFabs(
     selection: SelectionState,
     onExportSelection: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .align(Alignment.BottomCenter)
-            .zIndex(2f),
+        modifier =
+            Modifier
+                .align(Alignment.BottomCenter)
+                .zIndex(2f),
         horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingM),
         verticalAlignment = Alignment.CenterVertically,
     ) {
