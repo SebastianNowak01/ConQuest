@@ -3,6 +3,7 @@ package com.maeldev.conquest.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -37,9 +38,10 @@ fun EventsFilters(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = UIConsts.screenHorizontalPadding),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = UIConsts.screenHorizontalPadding),
     ) {
         MyHeaderText(text = "Events")
 
@@ -64,14 +66,6 @@ fun EventsFilters(
     }
 }
 
-/**
- * An event as it appears in the list.
- *
- * This was four stacked lines all in the same colour, one of them the string "Expo - 14/03/2026",
- * with nothing separating the name from the details and no sign of whether an event had already
- * happened. The name now leads, the type is a chip, location and date carry icons, and an event
- * whose date has passed is dimmed.
- */
 @Composable
 fun EventListItem(event: Event) {
     val isPast = event.eventDate.isBeforeToday()
@@ -83,36 +77,14 @@ fun EventListItem(event: Event) {
         }
 
     Column(verticalArrangement = Arrangement.spacedBy(UIConsts.paddingXS)) {
-        Row(
+        Text(
+            text = event.eventName,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = bodyColor,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(UIConsts.paddingS),
-        ) {
-            Text(
-                text = event.eventName,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = bodyColor,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f, fill = false),
-            )
-            MyStatusChip(
-                label = event.eventType.displayName,
-                icon = Icons.Default.LocalActivity,
-                active = !isPast,
-            )
-        }
-
-        EventListItemMeta(
-            icon = Icons.Default.Place,
-            text = event.eventLocation,
-            color = bodyColor,
-        )
-        EventListItemMeta(
-            icon = Icons.Default.Event,
-            text = convertDateToString(event.eventDate),
-            color = bodyColor,
         )
 
         if (!event.description.isNullOrBlank()) {
@@ -124,6 +96,37 @@ fun EventListItem(event: Event) {
                 overflow = TextOverflow.Ellipsis,
             )
         }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(UIConsts.spacingS),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            // The venue is the only part that may run long, so it is the only part allowed to
+            // shrink: the date stays whole and the chip keeps the right edge.
+            EventListItemMeta(
+                icon = Icons.Default.Place,
+                text = event.eventLocation,
+                color = bodyColor,
+                modifier = Modifier.weight(1f, fill = false),
+            )
+            EventListItemMeta(
+                icon = Icons.Default.Event,
+                text = convertDateToString(event.eventDate),
+                color = bodyColor,
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Bottom corner like a cosplay's status, but labelled where that one is not: every
+            // type draws the same LocalActivity icon, so the word is what separates Expo from
+            // Contest.
+            MyStatusChip(
+                label = event.eventType.displayName,
+                icon = Icons.Default.LocalActivity,
+                active = !isPast,
+            )
+        }
     }
 }
 
@@ -132,8 +135,10 @@ private fun EventListItemMeta(
     icon: ImageVector,
     text: String,
     color: Color,
+    modifier: Modifier = Modifier,
 ) {
     Row(
+        modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(UIConsts.paddingXS),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -152,4 +157,3 @@ private fun EventListItemMeta(
         )
     }
 }
-

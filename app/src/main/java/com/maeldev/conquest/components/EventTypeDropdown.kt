@@ -34,8 +34,6 @@ fun EventTypeDropdown(
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
-        // Full width like every other field: sized to its content the dropdown sat visibly
-        // narrower than the inputs stacked above and below it.
         modifier = modifier.fillMaxWidth(),
     ) {
         OutlinedTextField(
@@ -56,8 +54,6 @@ fun EventTypeDropdown(
             ),
         )
 
-        // The box's own menu, so it takes the width of the anchored field instead of sizing
-        // itself to its longest label and sitting narrow under a full-width field.
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
